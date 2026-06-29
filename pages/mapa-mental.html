@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa Mental — AM PPGIA/PUC-PR</title>
+  <meta name="description" content="Mapa mental completo da disciplina Aprendizagem de Máquina — PPGIA/PUC-PR 2026.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<canvas id="neural-canvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.2;"></canvas>
+
+<header class="site-header">
+  <div class="logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-label="AM logo">
+      <circle cx="14" cy="14" r="13" stroke="#58a6ff" stroke-width="1.5"/>
+      <circle cx="5"  cy="8"  r="2" fill="#3fb950"/>
+      <circle cx="5"  cy="14" r="2" fill="#3fb950"/>
+      <circle cx="5"  cy="20" r="2" fill="#3fb950"/>
+      <circle cx="14" cy="11" r="2.2" fill="#58a6ff"/>
+      <circle cx="14" cy="17" r="2.2" fill="#58a6ff"/>
+      <circle cx="23" cy="14" r="2.5" fill="#bc8cff"/>
+      <line x1="7" y1="8"  x2="12" y2="11" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="8"  x2="12" y2="17" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="14" x2="12" y2="11" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="14" x2="12" y2="17" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="20" x2="12" y2="11" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="20" x2="12" y2="17" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="16.2" y1="11" x2="20.5" y2="14" stroke="#bc8cff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="16.2" y1="17" x2="20.5" y2="14" stroke="#bc8cff" stroke-width="0.8" stroke-opacity="0.5"/>
+    </svg>
+    <div>
+      <div>AM · PPGIA/PUC-PR</div>
+      <div class="tagline">Aprendizagem de Máquina · 2026</div>
+    </div>
+  </div>
+  <nav>
+    <a href="../index.html">Início</a>
+    <a href="atividade-1.html">Atividade 1</a>
+    <a href="mapa-mental.html" class="active">Mapa Mental</a>
+    <a href="https://github.com/fsd-dantas/ppgia-puc-pr-am" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+</header>
+
+<!-- Hero -->
+<section class="hero" style="min-height:32vh;padding-top:var(--space-16);padding-bottom:var(--space-10);">
+  <div style="max-width:var(--content-default);margin:0 auto;text-align:left;width:100%;padding:0 var(--space-6);">
+    <div class="hero-badge" style="margin-bottom:var(--space-4);">
+      <span class="dot"></span>
+      Visão Estrutural da Disciplina
+    </div>
+    <h1 class="fade-up" style="font-size:var(--text-2xl);margin-bottom:var(--space-4);">Mapa Mental</h1>
+    <p class="fade-up delay-1" style="font-size:var(--text-base);color:var(--text-muted);max-width:55ch;">
+      Estrutura visual completa de todos os tópicos da ementa, organizada em 5 módulos por nível de complexidade e tipo de abordagem.
+    </p>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- Mind map image -->
+<section class="section-pad" style="position:relative;z-index:1;">
+  <div class="container-wide">
+
+    <div class="card" data-reveal style="padding:var(--space-4);">
+      <img
+        src="../assets/img/mindmap.png"
+        alt="Mapa mental completo da disciplina Aprendizagem de Máquina — 5 módulos: Fundamentos, Protocolos Experimentais, Técnicas Rasas, Modelos Descritivos, Técnicas Profundas"
+        class="mindmap-img"
+        loading="lazy"
+      >
+    </div>
+
+    <!-- Legend -->
+    <div class="mindmap-legend mt-4" data-reveal>
+      <div class="legend-item"><div class="legend-dot" style="background:#3fb950;"></div>Fundamentos &amp; Terminologia</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#d29922;"></div>Protocolos Experimentais</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f0883e;"></div>Técnicas Rasas (Shallow)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#bc8cff;"></div>Modelos Descritivos</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f0883e;"></div>Técnicas Profundas (Deep)</div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- Breakdown per module -->
+<section class="section-pad" style="position:relative;z-index:1;">
+  <div class="container">
+    <div class="section-label">Detalhamento</div>
+    <h2 class="section-title">Módulos e Subtópicos</h2>
+
+    <div class="card-grid card-grid-2">
+
+      <div class="card" data-reveal>
+        <h3 style="color:#3fb950;font-size:var(--text-base);margin-bottom:var(--space-3);">Fundamentos &amp; Protocolos</h3>
+        <ul style="font-size:var(--text-sm);color:var(--text-muted);padding-left:var(--space-4);">
+          <li>Definição e Terminologia de AM</li>
+          <li>Abordagens: Supervisionada / Não-Supervisionada / Por Reforço</li>
+          <li>Tarefas: Classificação, Regressão, Agrupamento</li>
+          <li>Protocolo Holdout e K-Fold Cross-Validation</li>
+          <li>Métricas: Acurácia, F1, AUC-ROC, Silhueta</li>
+          <li>Trade-off Viés-Variância</li>
+        </ul>
+      </div>
+
+      <div class="card" data-reveal>
+        <h3 style="color:#f0883e;font-size:var(--text-base);margin-bottom:var(--space-3);">Técnicas Rasas — Preditivas</h3>
+        <ul style="font-size:var(--text-sm);color:var(--text-muted);padding-left:var(--space-4);">
+          <li>Árvores de Decisão — ID3, Entropia, Ganho de Informação</li>
+          <li>k-NN — Espaço Euclidiano, escolha de k</li>
+          <li>Naive Bayes — Teorema de Bayes, independência condicional</li>
+          <li>MLP — Perceptron, Backpropagation, Descida do Gradiente</li>
+          <li>SVM — Margem Máxima, Kernels (Linear, Polinomial, RBF)</li>
+          <li>Ensembles — Bagging, Boosting, Random Forest, Heterogêneos</li>
+        </ul>
+      </div>
+
+      <div class="card" data-reveal>
+        <h3 style="color:#bc8cff;font-size:var(--text-base);margin-bottom:var(--space-3);">Modelos Descritivos</h3>
+        <ul style="font-size:var(--text-sm);color:var(--text-muted);padding-left:var(--space-4);">
+          <li>K-Means — Inicialização, convergência, Elbow Method</li>
+          <li>Dispersão Intra-Cluster</li>
+          <li>Coeficiente de Silhueta</li>
+          <li>Fusão e Seleção de Classificadores</li>
+          <li>Regras: Voto, Média, Produto</li>
+        </ul>
+      </div>
+
+      <div class="card" data-reveal>
+        <h3 style="color:#58a6ff;font-size:var(--text-base);margin-bottom:var(--space-3);">Técnicas Profundas (Deep Learning)</h3>
+        <ul style="font-size:var(--text-sm);color:var(--text-muted);padding-left:var(--space-4);">
+          <li>CNN — Convolução 2D, Pooling, Feature Maps, Stride</li>
+          <li>Redes Siamesas — Aprendizado Métrico</li>
+          <li>RNN Simples — Dependências temporais</li>
+          <li>LSTM — Vanishing Gradient, Gates (forget/input/output)</li>
+          <li>Transformer — Self-Attention, Multi-Head, Encoder-Decoder</li>
+          <li>Modelos Generativos (GPT, BERT)</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Aprendizagem de Máquina · PPGIA/PUC-PR · 2026</strong><br>
+      Prof. <a href="mailto:alceu@ppgia.pucpr.br">Alceu de Souza Britto Jr.</a> ·
+      Aluno: <a href="mailto:fsd.dantas@gmail.com">Fernando Dantas</a>
+    </div>
+    <div>
+      <a href="https://github.com/fsd-dantas/ppgia-puc-pr-am" target="_blank" rel="noopener">github.com/fsd-dantas/ppgia-puc-pr-am</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>

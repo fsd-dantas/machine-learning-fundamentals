@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aprendizagem de Máquina — PPGIA/PUC-PR 2026</title>
+  <meta name="description" content="Repositório acadêmico da disciplina de Aprendizagem de Máquina do Mestrado PPGIA/PUC-PR 2026. Prof. Alceu de Souza Britto Jr.">
+  <meta property="og:title" content="Aprendizagem de Máquina — PPGIA/PUC-PR 2026">
+  <meta property="og:description" content="Atividades, mapa mental e estratégia de estudo — MSc Fernando Dantas.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- Neural canvas -->
+<canvas id="neural-canvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.35;"></canvas>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-label="AM logo">
+      <circle cx="14" cy="14" r="13" stroke="#58a6ff" stroke-width="1.5"/>
+      <!-- Neural net mark: 3 input, 2 hidden, 1 output nodes -->
+      <circle cx="5"  cy="8"  r="2" fill="#3fb950"/>
+      <circle cx="5"  cy="14" r="2" fill="#3fb950"/>
+      <circle cx="5"  cy="20" r="2" fill="#3fb950"/>
+      <circle cx="14" cy="11" r="2.2" fill="#58a6ff"/>
+      <circle cx="14" cy="17" r="2.2" fill="#58a6ff"/>
+      <circle cx="23" cy="14" r="2.5" fill="#bc8cff"/>
+      <line x1="7" y1="8"  x2="12" y2="11" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="8"  x2="12" y2="17" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="14" x2="12" y2="11" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="14" x2="12" y2="17" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="20" x2="12" y2="11" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="20" x2="12" y2="17" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="16.2" y1="11" x2="20.5" y2="14" stroke="#bc8cff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="16.2" y1="17" x2="20.5" y2="14" stroke="#bc8cff" stroke-width="0.8" stroke-opacity="0.5"/>
+    </svg>
+    <div>
+      <div>AM · PPGIA/PUC-PR</div>
+      <div class="tagline">Aprendizagem de Máquina · 2026</div>
+    </div>
+  </div>
+  <nav>
+    <a href="index.html" class="active">Início</a>
+    <a href="pages/atividade-1.html">Atividade 1</a>
+    <a href="pages/mapa-mental.html">Mapa Mental</a>
+    <a href="https://github.com/fsd-dantas/ppgia-puc-pr-am" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:inline;vertical-align:middle;margin-right:4px"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </a>
+  </nav>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    PPGIA · PUC-PR · MSc 2026 — 1º Semestre
+  </div>
+  <h1 class="fade-up">Aprendizagem<br>de Máquina</h1>
+  <p class="hero-sub fade-up delay-1">
+    Repositório acadêmico da disciplina ministrada pelo
+    <a href="mailto:alceu@ppgia.pucpr.br">Prof. Alceu de Souza Britto Jr.</a>
+    — atividades avaliativas, estratégia de estudo e mapa mental.
+  </p>
+  <div class="hero-meta fade-up delay-2">
+    <span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      30 h/a · 4 h/aula semanal
+    </span>
+    <span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Fernando Dantas · fsd.dantas@gmail.com
+    </span>
+    <span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Salvador, Bahia — Brasil
+    </span>
+  </div>
+  <div class="hero-actions fade-up delay-3">
+    <a href="pages/atividade-1.html" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Ver Atividade 1
+    </a>
+    <a href="pages/mapa-mental.html" class="btn btn-ghost">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      Mapa Mental
+    </a>
+    <a href="https://github.com/fsd-dantas/ppgia-puc-pr-am" target="_blank" class="btn btn-ghost">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      Código-Fonte
+    </a>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- Ementa -->
+<section class="section-pad" style="position:relative;z-index:1;">
+  <div class="container">
+    <div class="section-label">Conteúdo Programático</div>
+    <h2 class="section-title">Ementa da Disciplina</h2>
+    <p class="section-desc mb-8">Carga horária total de 30 h/a dividida em três camadas de complexidade crescente — Fundamentos, Técnicas Rasas (Shallow) e Técnicas Profundas (Deep Learning).</p>
+
+    <div class="card-grid card-grid-3">
+
+      <!-- F1 Fundamentos -->
+      <div class="card module-card" style="--module-color:#3fb950" data-reveal>
+        <div class="module-num">Módulo 1 · Semana 1</div>
+        <h3>Fundamentos &amp; Protocolos</h3>
+        <ul>
+          <li>Definição de Aprendizagem de Máquina</li>
+          <li>Abordagens: supervisionada, não supervisionada, por reforço</li>
+          <li>Terminologia e tarefas principais</li>
+          <li>Validação cruzada (K-Fold)</li>
+          <li>Métricas: Acurácia, F1, AUC-ROC</li>
+        </ul>
+      </div>
+
+      <!-- F2 Técnicas Rasas -->
+      <div class="card module-card" style="--module-color:#f0883e" data-reveal>
+        <div class="module-num">Módulo 2 · Semanas 2–5</div>
+        <h3>Técnicas Rasas (Shallow)</h3>
+        <ul>
+          <li>Árvores de Decisão — ID3, Entropia, Ganho de Info</li>
+          <li>k-NN — Espaço Euclidiano</li>
+          <li>Naive Bayes — Teorema de Bayes</li>
+          <li>Redes Neurais — Perceptron, MLP, Backpropagation</li>
+          <li>SVM — Margem máxima, Kernels</li>
+          <li>Ensembles — Bagging, Boosting, Random Forest</li>
+        </ul>
+      </div>
+
+      <!-- F3 Descritivos -->
+      <div class="card module-card" style="--module-color:#bc8cff" data-reveal>
+        <div class="module-num">Módulo 3 · Semana 5</div>
+        <h3>Modelos Descritivos</h3>
+        <ul>
+          <li>Agrupamentos: K-Means</li>
+          <li>Métricas: Dispersão intra-cluster</li>
+          <li>Coeficiente de Silhueta</li>
+          <li>Fusão e Seleção de Classificadores</li>
+        </ul>
+      </div>
+
+      <!-- F4 CNN -->
+      <div class="card module-card" style="--module-color:#58a6ff" data-reveal>
+        <div class="module-num">Módulo 4 · Semana 6</div>
+        <h3>Redes Convolucionais (CNN)</h3>
+        <ul>
+          <li>Operação de Convolução 2D</li>
+          <li>Pooling, Stride, Padding</li>
+          <li>Feature Maps e arquiteturas (LeNet, ResNet)</li>
+          <li>Redes Siamesas — aprendizado métrico</li>
+        </ul>
+      </div>
+
+      <!-- F5 RNN/LSTM -->
+      <div class="card module-card" style="--module-color:#d29922" data-reveal>
+        <div class="module-num">Módulo 5 · Semana 7</div>
+        <h3>Redes Recorrentes (RNN / LSTM)</h3>
+        <ul>
+          <li>RNN simples — dependências temporais</li>
+          <li>Vanishing gradient problem</li>
+          <li>LSTM — gates (forget, input, output)</li>
+          <li>Aplicações em séries temporais e NLP</li>
+        </ul>
+      </div>
+
+      <!-- F6 Transformer -->
+      <div class="card module-card" style="--module-color:#f85149" data-reveal>
+        <div class="module-num">Módulo 6 · Semana 8</div>
+        <h3>Transformer &amp; Modelos Generativos</h3>
+        <ul>
+          <li>Self-Attention — Q, K, V</li>
+          <li>Multi-Head Attention</li>
+          <li>Arquitetura Encoder-Decoder</li>
+          <li>Modelos generativos (GPT, BERT)</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- Estratégia de Estudo -->
+<section class="section-pad" style="background:linear-gradient(180deg, transparent, rgba(88,166,255,0.03), transparent); position:relative;z-index:1;">
+  <div class="container">
+    <div class="section-label">Plano de Estudo</div>
+    <h2 class="section-title">Estratégia de Aprendizagem</h2>
+    <p class="section-desc mb-8">8 semanas estruturadas com ciclo teoria → derivação matemática → implementação → experimento → revisão.</p>
+
+    <!-- Timeline -->
+    <div class="timeline" data-reveal>
+
+      <div class="timeline-item" data-week="S1">
+        <div class="timeline-week">Semana 1</div>
+        <h3>Fundamentos &amp; Protocolos Experimentais</h3>
+        <p>Terminologia, abordagens de AM, protocolos (holdout, K-Fold), métricas de avaliação (Acurácia, F1, AUC-ROC). Trade-off viés-variância.</p>
+        <div class="timeline-tags">
+          <span class="tag green">Teoria</span>
+          <span class="tag blue">sklearn</span>
+          <span class="tag">Mitchell (1997)</span>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-week="S2">
+        <div class="timeline-week">Semana 2</div>
+        <h3>Árvores de Decisão &amp; k-NN</h3>
+        <p>Algoritmo ID3, Entropia de Shannon, Ganho de Informação. Maldição da dimensionalidade. Distância Euclidiana e escolha de k.</p>
+        <div class="timeline-tags">
+          <span class="tag green">Implementação</span>
+          <span class="tag blue">NumPy</span>
+          <span class="tag">Derivação manual</span>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-week="S3">
+        <div class="timeline-week">Semana 3</div>
+        <h3>Naive Bayes &amp; SVM</h3>
+        <p>Teorema de Bayes, independência condicional (Naive Bayes). SVM: hiperplano de separação com margem máxima, vetores de suporte, kernels (Linear, Polinomial, RBF).</p>
+        <div class="timeline-tags">
+          <span class="tag green">Experimento</span>
+          <span class="tag purple">Kernels</span>
+          <span class="tag">Bishop (2006)</span>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-week="S4">
+        <div class="timeline-week">Semana 4</div>
+        <h3>Redes Neurais — MLP &amp; Backpropagation</h3>
+        <p>Perceptron, funções de ativação (ReLU, sigmoid), descida do gradiente, regra da cadeia, backpropagation. Diagnóstico de overfitting e regularização.</p>
+        <div class="timeline-tags">
+          <span class="tag orange">P0 — Base de tudo</span>
+          <span class="tag blue">NumPy puro</span>
+          <span class="tag">Goodfellow (2016)</span>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-week="S5">
+        <div class="timeline-week">Semana 5</div>
+        <h3>Ensembles &amp; K-Means</h3>
+        <p>Bagging (reduz variância), Boosting (reduz viés), Random Forest. K-Means: Elbow Method, coeficiente de Silhueta.</p>
+        <div class="timeline-tags">
+          <span class="tag green">Comparação</span>
+          <span class="tag yellow">Breiman (2001)</span>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-week="S6">
+        <div class="timeline-week">Semana 6</div>
+        <h3>Redes Convolucionais (CNN)</h3>
+        <p>Convolução discreta 2D, dimensão do feature map, pooling, stride, padding. Redes Siamesas para aprendizado métrico. PyTorch — MNIST/CIFAR-10.</p>
+        <div class="timeline-tags">
+          <span class="tag blue">PyTorch</span>
+          <span class="tag purple">LeCun (1998)</span>
+          <span class="tag">He et al. (2016)</span>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-week="S7">
+        <div class="timeline-week">Semana 7</div>
+        <h3>RNN &amp; LSTM</h3>
+        <p>Vanishing gradient, gates LSTM (forget, input, output, cell state). Séries temporais em PyTorch. Comparação RNN vs. LSTM em sequências longas.</p>
+        <div class="timeline-tags">
+          <span class="tag blue">PyTorch</span>
+          <span class="tag yellow">Hochreiter (1997)</span>
+        </div>
+      </div>
+
+      <div class="timeline-item" data-week="S8">
+        <div class="timeline-week">Semana 8</div>
+        <h3>Transformer &amp; Fusão de Classificadores</h3>
+        <p>Self-Attention, Multi-Head Attention, Encoder-Decoder. Regras de combinação: voto majoritário, média, produto. Revisão geral da disciplina.</p>
+        <div class="timeline-tags">
+          <span class="tag purple">Vaswani (2017)</span>
+          <span class="tag blue">PyTorch</span>
+          <span class="tag green">Revisão Final</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- Priority Table -->
+<section class="section-pad" style="position:relative;z-index:1;">
+  <div class="container">
+    <div class="section-label">Priorização</div>
+    <h2 class="section-title">Matriz de Relevância</h2>
+    <p class="section-desc mb-8">Classificação por relevância para pesquisa de doutorado (SDN / Smart Grid) e complexidade técnica.</p>
+
+    <div class="card" data-reveal>
+      <div class="result-table-wrap">
+        <table class="priority-table">
+          <thead>
+            <tr>
+              <th>Tópico</th>
+              <th>Relevância (PhD)</th>
+              <th>Complexidade</th>
+              <th>Prioridade</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Fundamentos + Protocolos</td><td>Alta</td><td>Baixa</td><td><span class="badge-p0">P0</span></td></tr>
+            <tr><td>Backpropagation / MLP</td><td>Muito Alta</td><td>Média</td><td><span class="badge-p0">P0</span></td></tr>
+            <tr><td>SVM + Kernels</td><td>Alta</td><td>Alta</td><td><span class="badge-p1">P1</span></td></tr>
+            <tr><td>Ensembles</td><td>Alta</td><td>Média</td><td><span class="badge-p1">P1</span></td></tr>
+            <tr><td>CNN</td><td>Muito Alta</td><td>Alta</td><td><span class="badge-p1">P1</span></td></tr>
+            <tr><td>Transformer</td><td>Muito Alta</td><td>Muito Alta</td><td><span class="badge-p1">P1</span></td></tr>
+            <tr><td>LSTM / RNN</td><td>Alta</td><td>Alta</td><td><span class="badge-p2">P2</span></td></tr>
+            <tr><td>Naive Bayes</td><td>Média</td><td>Baixa</td><td><span class="badge-p2">P2</span></td></tr>
+            <tr><td>Árvores + k-NN</td><td>Média</td><td>Baixa</td><td><span class="badge-p2">P2</span></td></tr>
+            <tr><td>K-Means</td><td>Média</td><td>Baixa</td><td><span class="badge-p3">P3</span></td></tr>
+            <tr><td>Fusão de Classificadores</td><td>Média</td><td>Média</td><td><span class="badge-p3">P3</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- Atividades -->
+<section class="section-pad" style="position:relative;z-index:1;">
+  <div class="container">
+    <div class="section-label">Avaliações</div>
+    <h2 class="section-title">Atividades Avaliativas</h2>
+    <div class="card-grid card-grid-2">
+      <a href="pages/atividade-1.html" class="card" style="text-decoration:none;" data-reveal>
+        <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4);">
+          <div style="width:40px;height:40px;border-radius:var(--radius-md);background:rgba(63,185,80,0.15);border:1px solid rgba(63,185,80,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3fb950" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div>
+            <div style="font-size:var(--text-xs);color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;">Avaliação Formativa</div>
+            <div style="font-weight:700;font-family:var(--font-display);">Atividade 1 — Modelos Rasos</div>
+          </div>
+        </div>
+        <p style="font-size:var(--text-sm);color:var(--text-muted);">
+          Classificação de câncer de mama (Wisconsin Breast Cancer) e regressão de diabetes. Comparação de Árvores de Decisão, k-NN, Naive Bayes, SVM, MLP e Ensembles com 5-fold CV.
+        </p>
+        <div class="timeline-tags" style="margin-top:var(--space-4);">
+          <span class="tag green">sklearn</span>
+          <span class="tag blue">5-fold CV</span>
+          <span class="tag purple">Classificação</span>
+          <span class="tag orange">Regressão</span>
+        </div>
+      </a>
+
+      <div class="card" style="opacity:0.5;" data-reveal>
+        <div style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-4);">
+          <div style="width:40px;height:40px;border-radius:var(--radius-md);background:rgba(139,148,158,0.1);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-faint)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          </div>
+          <div>
+            <div style="font-size:var(--text-xs);color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;">Em breve</div>
+            <div style="font-weight:700;font-family:var(--font-display);color:var(--text-faint);">Próximas Atividades</div>
+          </div>
+        </div>
+        <p style="font-size:var(--text-sm);color:var(--text-faint);">
+          Deep Learning — CNN, RNN/LSTM e Transformer. Serão adicionadas conforme o calendário da disciplina.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Aprendizagem de Máquina · PPGIA/PUC-PR · 2026</strong><br>
+      Prof. <a href="mailto:alceu@ppgia.pucpr.br">Alceu de Souza Britto Jr.</a> ·
+      Aluno: <a href="mailto:fsd.dantas@gmail.com">Fernando Dantas</a>
+    </div>
+    <div>
+      <a href="https://github.com/fsd-dantas/ppgia-puc-pr-am" target="_blank" rel="noopener">github.com/fsd-dantas/ppgia-puc-pr-am</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>

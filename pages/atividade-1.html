@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atividade 1 — Modelos Rasos · AM PPGIA/PUC-PR</title>
+  <meta name="description" content="Avaliação formativa — Classificação de câncer de mama e regressão de diabetes com modelos rasos. 5-fold cross-validation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+<canvas id="neural-canvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.25;"></canvas>
+
+<header class="site-header">
+  <div class="logo">
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-label="AM logo">
+      <circle cx="14" cy="14" r="13" stroke="#58a6ff" stroke-width="1.5"/>
+      <circle cx="5"  cy="8"  r="2" fill="#3fb950"/>
+      <circle cx="5"  cy="14" r="2" fill="#3fb950"/>
+      <circle cx="5"  cy="20" r="2" fill="#3fb950"/>
+      <circle cx="14" cy="11" r="2.2" fill="#58a6ff"/>
+      <circle cx="14" cy="17" r="2.2" fill="#58a6ff"/>
+      <circle cx="23" cy="14" r="2.5" fill="#bc8cff"/>
+      <line x1="7" y1="8"  x2="12" y2="11" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="8"  x2="12" y2="17" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="14" x2="12" y2="11" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="14" x2="12" y2="17" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="20" x2="12" y2="11" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="7" y1="20" x2="12" y2="17" stroke="#58a6ff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="16.2" y1="11" x2="20.5" y2="14" stroke="#bc8cff" stroke-width="0.8" stroke-opacity="0.5"/>
+      <line x1="16.2" y1="17" x2="20.5" y2="14" stroke="#bc8cff" stroke-width="0.8" stroke-opacity="0.5"/>
+    </svg>
+    <div>
+      <div>AM · PPGIA/PUC-PR</div>
+      <div class="tagline">Aprendizagem de Máquina · 2026</div>
+    </div>
+  </div>
+  <nav>
+    <a href="../index.html">Início</a>
+    <a href="atividade-1.html" class="active">Atividade 1</a>
+    <a href="mapa-mental.html">Mapa Mental</a>
+    <a href="https://github.com/fsd-dantas/ppgia-puc-pr-am" target="_blank" rel="noopener">GitHub</a>
+  </nav>
+</header>
+
+<!-- Page Hero -->
+<section class="hero activity-hero" style="min-height:38vh;padding-top:var(--space-16);padding-bottom:var(--space-12);">
+  <div style="max-width:var(--content-default);margin:0 auto;text-align:left;width:100%;padding:0 var(--space-6);">
+    <div class="hero-badge" style="margin-bottom:var(--space-4);">
+      <span class="dot"></span>
+      Avaliação Formativa · Modelos Rasos
+    </div>
+    <h1 class="fade-up" style="font-size:var(--text-2xl);margin-bottom:var(--space-4);">Atividade 1</h1>
+    <p class="fade-up delay-1" style="font-size:var(--text-base);color:var(--text-muted);max-width:60ch;">
+      Treinamento e avaliação de modelos rasos (shallow) para dois problemas clássicos de aprendizagem supervisionada, com protocolo de validação cruzada (5-fold CV).
+    </p>
+    <div class="timeline-tags fade-up delay-2" style="margin-top:var(--space-5);">
+      <span class="tag green">sklearn</span>
+      <span class="tag blue">5-fold Cross-Validation</span>
+      <span class="tag purple">Classificação</span>
+      <span class="tag orange">Regressão</span>
+      <span class="tag">Breast Cancer Wisconsin</span>
+      <span class="tag">Diabetes Dataset</span>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- PARTE A -->
+<section class="section-pad" style="position:relative;z-index:1;">
+  <div class="container">
+    <div class="section-label">Parte A · Classificação</div>
+    <h2 class="section-title">Câncer de Mama — Wisconsin</h2>
+    <p class="section-desc mb-8">
+      Base criada por pesquisadores da Universidade de Wisconsin. Diagnóstico binário (maligno / benigno) a partir de 30 atributos contínuos extraídos de imagens digitais do núcleo de células.
+    </p>
+
+    <!-- Dataset card -->
+    <div class="card-grid card-grid-3 mb-8">
+      <div class="card" data-reveal>
+        <div class="section-label">Base de Dados</div>
+        <div style="font-size:var(--text-xl);font-weight:800;font-family:var(--font-display);color:var(--accent);margin:var(--space-2) 0;">569</div>
+        <div style="font-size:var(--text-sm);color:var(--text-muted);">Instâncias totais</div>
+        <div style="margin-top:var(--space-4);font-size:var(--text-xs);color:var(--text-faint);">
+          212 malignos (classe 0) · 357 benignos (classe 1)
+        </div>
+      </div>
+      <div class="card" data-reveal>
+        <div class="section-label">Atributos</div>
+        <div style="font-size:var(--text-xl);font-weight:800;font-family:var(--font-display);color:var(--green);margin:var(--space-2) 0;">30</div>
+        <div style="font-size:var(--text-sm);color:var(--text-muted);">Atributos contínuos + 1 classe</div>
+        <div style="margin-top:var(--space-4);font-size:var(--text-xs);color:var(--text-faint);">
+          Numéricos — extraídos por visão computacional
+        </div>
+      </div>
+      <div class="card" data-reveal>
+        <div class="section-label">Protocolo</div>
+        <div style="font-size:var(--text-xl);font-weight:800;font-family:var(--font-display);color:var(--purple);margin:var(--space-2) 0;">5-Fold</div>
+        <div style="font-size:var(--text-sm);color:var(--text-muted);">Validação Cruzada (CV)</div>
+        <div style="margin-top:var(--space-4);font-size:var(--text-xs);color:var(--text-faint);">
+          Média das métricas sobre os 5 folds
+        </div>
+      </div>
+    </div>
+
+    <!-- Code block -->
+    <div class="card mb-8" data-reveal>
+      <div style="font-size:var(--text-xs);color:var(--text-faint);margin-bottom:var(--space-3);font-family:var(--font-mono);">leitura_dataset_a.py</div>
+      <pre class="code-block"><span class="cm"># Parte A — Classificação: Breast Cancer Wisconsin</span>
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_breast_cancer
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> cross_validate, StratifiedKFold
+<span class="kw">from</span> sklearn.tree <span class="kw">import</span> DecisionTreeClassifier
+<span class="kw">from</span> sklearn.neighbors <span class="kw">import</span> KNeighborsClassifier
+<span class="kw">from</span> sklearn.naive_bayes <span class="kw">import</span> GaussianNB
+<span class="kw">from</span> sklearn.svm <span class="kw">import</span> SVC
+<span class="kw">from</span> sklearn.neural_network <span class="kw">import</span> MLPClassifier
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier, BaggingClassifier, AdaBoostClassifier
+<span class="kw">from</span> xgboost <span class="kw">import</span> XGBClassifier
+
+X, y = load_breast_cancer(return_X_y=<span class="kw">True</span>)
+
+cv = StratifiedKFold(n_splits=<span class="num">5</span>, shuffle=<span class="kw">True</span>, random_state=<span class="num">42</span>)
+scoring = [<span class="str">'accuracy'</span>, <span class="str">'f1'</span>, <span class="str">'precision'</span>, <span class="str">'recall'</span>]
+
+classifiers = {
+    <span class="str">'DecisionTree'</span>:  DecisionTreeClassifier(random_state=<span class="num">42</span>),
+    <span class="str">'KNN'</span>:           KNeighborsClassifier(),
+    <span class="str">'NaiveBayes'</span>:    GaussianNB(),
+    <span class="str">'SVM'</span>:           SVC(kernel=<span class="str">'rbf'</span>, C=<span class="num">1</span>, gamma=<span class="str">'scale'</span>),
+    <span class="str">'MLP'</span>:           MLPClassifier(hidden_layer_sizes=(<span class="num">100</span>,), max_iter=<span class="num">500</span>),
+    <span class="str">'RandomForest'</span>:  RandomForestClassifier(n_estimators=<span class="num">100</span>, random_state=<span class="num">42</span>),
+    <span class="str">'Bagging'</span>:       BaggingClassifier(n_estimators=<span class="num">50</span>, random_state=<span class="num">42</span>),
+    <span class="str">'AdaBoost'</span>:      AdaBoostClassifier(n_estimators=<span class="num">50</span>, random_state=<span class="num">42</span>),
+    <span class="str">'XGBoost'</span>:       XGBClassifier(use_label_encoder=<span class="kw">False</span>, eval_metric=<span class="str">'logloss'</span>),
+}
+
+<span class="kw">for</span> name, clf <span class="kw">in</span> classifiers.items():
+    scores = cross_validate(clf, X, y, cv=cv, scoring=scoring)
+    <span class="fn">print</span>(f<span class="str">"{name}: Acc={scores['test_accuracy'].mean():.4f} "
+          f"F1={scores['test_f1'].mean():.4f}"</span>)</pre>
+    </div>
+
+    <!-- Results table A -->
+    <h3 style="font-size:var(--text-lg);margin-bottom:var(--space-4);">Tabela de Resultados — Parte A</h3>
+    <div class="card result-table-wrap mb-8" data-reveal>
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>Indutor</th>
+            <th>Acurácia (%)</th>
+            <th>F1-Score</th>
+            <th>Precisão</th>
+            <th>Recall</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Árvore de Decisão</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>k-NN</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>Naive Bayes</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>SVM (RBF)</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>MLP</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>Random Forest</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>Bagging</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>AdaBoost</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr class="best-row"><td>⭐ Melhor Indutor</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Questions A -->
+    <div class="card" data-reveal>
+      <h3 style="font-size:var(--text-base);margin-bottom:var(--space-4);">Perguntas — Melhor Resultado (Parte A)</h3>
+      <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+        <div style="padding:var(--space-4);background:var(--surface-2);border-radius:var(--radius-lg);border:1px solid var(--border-light);">
+          <div style="font-size:var(--text-xs);color:var(--accent);font-weight:600;margin-bottom:var(--space-2);">A.1</div>
+          <p style="font-size:var(--text-sm);margin-bottom:var(--space-2);">Qual a taxa de acerto de cada classe (maligno / benigno)?</p>
+          <div style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;">R: a preencher após execução dos experimentos</div>
+        </div>
+        <div style="padding:var(--space-4);background:var(--surface-2);border-radius:var(--radius-lg);border:1px solid var(--border-light);">
+          <div style="font-size:var(--text-xs);color:var(--accent);font-weight:600;margin-bottom:var(--space-2);">A.2</div>
+          <p style="font-size:var(--text-sm);margin-bottom:var(--space-2);">Informe a matriz de confusão do melhor modelo.</p>
+          <div style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;">R: a preencher após execução dos experimentos</div>
+        </div>
+        <div style="padding:var(--space-4);background:var(--surface-2);border-radius:var(--radius-lg);border:1px solid var(--border-light);">
+          <div style="font-size:var(--text-xs);color:var(--accent);font-weight:600;margin-bottom:var(--space-2);">A.3</div>
+          <p style="font-size:var(--text-sm);margin-bottom:var(--space-2);">Informe o valor dos parâmetros utilizados no treinamento.</p>
+          <div style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;">R: a preencher após execução dos experimentos</div>
+        </div>
+        <div style="padding:var(--space-4);background:var(--surface-2);border-radius:var(--radius-lg);border:1px solid var(--border-light);">
+          <div style="font-size:var(--text-xs);color:var(--accent);font-weight:600;margin-bottom:var(--space-2);">A.4</div>
+          <p style="font-size:var(--text-sm);margin-bottom:var(--space-2);">Há diferença significativa entre Acurácia e F1-Score?</p>
+          <div style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;">R: a preencher após execução dos experimentos</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- PARTE B -->
+<section class="section-pad" style="position:relative;z-index:1;">
+  <div class="container">
+    <div class="section-label">Parte B · Regressão</div>
+    <h2 class="section-title">Progressão do Diabetes</h2>
+    <p class="section-desc mb-8">
+      Base clássica com 442 instâncias e 10 atributos numéricos (idade, sexo, IMC, pressão arterial, entre outros). Alvo: valor contínuo representando a progressão do diabetes (25–346).
+    </p>
+
+    <div class="card-grid card-grid-3 mb-8">
+      <div class="card" data-reveal>
+        <div class="section-label">Instâncias</div>
+        <div style="font-size:var(--text-xl);font-weight:800;font-family:var(--font-display);color:var(--orange);margin:var(--space-2) 0;">442</div>
+        <div style="font-size:var(--text-sm);color:var(--text-muted);">Pacientes</div>
+      </div>
+      <div class="card" data-reveal>
+        <div class="section-label">Atributos</div>
+        <div style="font-size:var(--text-xl);font-weight:800;font-family:var(--font-display);color:var(--yellow);margin:var(--space-2) 0;">10</div>
+        <div style="font-size:var(--text-sm);color:var(--text-muted);">Numéricos contínuos</div>
+      </div>
+      <div class="card" data-reveal>
+        <div class="section-label">Alvo</div>
+        <div style="font-size:var(--text-xl);font-weight:800;font-family:var(--font-display);color:var(--red);margin:var(--space-2) 0;">Contínuo</div>
+        <div style="font-size:var(--text-sm);color:var(--text-muted);">Progressão diabetes (25–346)</div>
+      </div>
+    </div>
+
+    <!-- Code block B -->
+    <div class="card mb-8" data-reveal>
+      <div style="font-size:var(--text-xs);color:var(--text-faint);margin-bottom:var(--space-3);font-family:var(--font-mono);">leitura_dataset_b.py</div>
+      <pre class="code-block"><span class="cm"># Parte B — Regressão: Diabetes Dataset</span>
+<span class="kw">from</span> sklearn <span class="kw">import</span> datasets
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> cross_validate, KFold
+<span class="kw">from</span> sklearn.tree <span class="kw">import</span> DecisionTreeRegressor
+<span class="kw">from</span> sklearn.neighbors <span class="kw">import</span> KNeighborsRegressor
+<span class="kw">from</span> sklearn.svm <span class="kw">import</span> SVR
+<span class="kw">from</span> sklearn.neural_network <span class="kw">import</span> MLPRegressor
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestRegressor, BaggingRegressor
+<span class="kw">from</span> xgboost <span class="kw">import</span> XGBRegressor
+
+X, y = datasets.load_diabetes(return_X_y=<span class="kw">True</span>)
+
+cv = KFold(n_splits=<span class="num">5</span>, shuffle=<span class="kw">True</span>, random_state=<span class="num">42</span>)
+scoring = [<span class="str">'r2'</span>, <span class="str">'neg_mean_absolute_error'</span>]
+
+regressors = {
+    <span class="str">'DecisionTree'</span>: DecisionTreeRegressor(random_state=<span class="num">42</span>),
+    <span class="str">'KNN'</span>:          KNeighborsRegressor(n_neighbors=<span class="num">5</span>),
+    <span class="str">'SVR'</span>:          SVR(kernel=<span class="str">'rbf'</span>, C=<span class="num">100</span>, gamma=<span class="str">'scale'</span>),
+    <span class="str">'MLP'</span>:          MLPRegressor(hidden_layer_sizes=(<span class="num">100</span>, <span class="num">50</span>), max_iter=<span class="num">1000</span>),
+    <span class="str">'RandomForest'</span>: RandomForestRegressor(n_estimators=<span class="num">100</span>, random_state=<span class="num">42</span>),
+    <span class="str">'Bagging'</span>:      BaggingRegressor(n_estimators=<span class="num">50</span>, random_state=<span class="num">42</span>),
+    <span class="str">'XGBoost'</span>:      XGBRegressor(n_estimators=<span class="num">100</span>, random_state=<span class="num">42</span>),
+}
+
+<span class="kw">for</span> name, reg <span class="kw">in</span> regressors.items():
+    scores = cross_validate(reg, X, y, cv=cv, scoring=scoring)
+    mae = -scores[<span class="str">'test_neg_mean_absolute_error'</span>].mean()
+    <span class="fn">print</span>(f<span class="str">"{name}: R²={scores['test_r2'].mean():.4f}  MAE={mae:.2f}"</span>)</pre>
+    </div>
+
+    <!-- Results table B -->
+    <h3 style="font-size:var(--text-lg);margin-bottom:var(--space-4);">Tabela de Resultados — Parte B</h3>
+    <div class="card result-table-wrap mb-8" data-reveal>
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>Indutor</th>
+            <th>R² (Coef. Determinação)</th>
+            <th>MAE (Erro Médio Absoluto)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Árvore de Regressão</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>k-NN</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>SVR (RBF)</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>MLP</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>Random Forest</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>Bagging</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr><td>XGBoost</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
+          <tr class="best-row"><td>⭐ Melhor Regressor</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Question B -->
+    <div class="card" data-reveal>
+      <h3 style="font-size:var(--text-base);margin-bottom:var(--space-4);">Perguntas — Melhor Resultado (Parte B)</h3>
+      <div style="padding:var(--space-4);background:var(--surface-2);border-radius:var(--radius-lg);border:1px solid var(--border-light);">
+        <div style="font-size:var(--text-xs);color:var(--accent);font-weight:600;margin-bottom:var(--space-2);">B.1</div>
+        <p style="font-size:var(--text-sm);margin-bottom:var(--space-2);">Informe o valor dos parâmetros utilizados no treinamento do modelo com melhor R².</p>
+        <div style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;">R: a preencher após execução dos experimentos</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <strong>Aprendizagem de Máquina · PPGIA/PUC-PR · 2026</strong><br>
+      Prof. <a href="mailto:alceu@ppgia.pucpr.br">Alceu de Souza Britto Jr.</a> ·
+      Aluno: <a href="mailto:fsd.dantas@gmail.com">Fernando Dantas</a>
+    </div>
+    <div>
+      <a href="https://github.com/fsd-dantas/ppgia-puc-pr-am" target="_blank" rel="noopener">github.com/fsd-dantas/ppgia-puc-pr-am</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
