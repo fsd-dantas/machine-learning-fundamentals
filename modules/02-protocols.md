@@ -14,6 +14,23 @@ This module covers the design of evaluation experiments — how to split data, h
 
 ---
 
+## How to Use This Module (Exam Prep)
+
+**After this module you should be able to:**
+- Explain **why** you never evaluate on the training set.
+- Draw and describe **k-fold cross-validation**, including stratification.
+- Build a **confusion matrix** and compute accuracy, precision, recall, F1, specificity from raw counts.
+- Choose the right metric for the task (and explain when accuracy lies).
+- Say which **statistical test** to use to compare methods, and why.
+
+**⭐ High-yield for exams:** confusion-matrix metrics (compute by hand) · precision vs. recall trade-off · how k-fold CV works · when accuracy is misleading · R² can be negative.
+
+**If you only read one thing:** §3 Evaluation Metrics — the confusion-matrix calculations are the single most commonly examined skill in the course.
+
+**Suggested time:** ~75 min reading + ~45 min on the [Worked Examples](#worked-examples) and [Self-Check](#self-check).
+
+---
+
 ## 1. The Generalisation Problem
 
 A model trained on data $\mathcal{D}_\text{train}$ must perform well on unseen data drawn from the same distribution. **Generalisation error** is the expected loss on the true data-generating distribution $p(\mathbf{x}, y)$:
@@ -33,6 +50,18 @@ This is estimated empirically using held-out data. The choice of estimation proc
 The dataset is split once into train and test sets (typically 70/30 or 80/20). Simple but high variance — the result depends heavily on which samples land in which split, especially for small datasets.
 
 ### k-Fold Cross-Validation
+
+> **💡 Intuition:** A single train/test split wastes data and depends on luck — you might get an easy test set. k-fold CV gives **every sample a turn at being tested** while keeping training and testing separate, then averages. You trade compute (train $k$ times) for a more trustworthy, lower-variance estimate.
+>
+> ```
+> 5-Fold CV  (■ = test fold, □ = train folds)
+>   Round 1:  ■ □ □ □ □   → score₁
+>   Round 2:  □ ■ □ □ □   → score₂
+>   Round 3:  □ □ ■ □ □   → score₃
+>   Round 4:  □ □ □ ■ □   → score₄
+>   Round 5:  □ □ □ □ ■   → score₅
+>                              CV estimate = mean(score₁..score₅)
+> ```
 
 The dataset is partitioned into $k$ equally-sized folds. The model is trained $k$ times, each time using $k-1$ folds for training and 1 fold for evaluation. The final estimate is the mean over folds:
 
@@ -67,6 +96,25 @@ For a binary classifier with predictions $\hat{y} \in \{0, 1\}$ and ground truth
 | Specificity | $\frac{TN}{TN + FP}$ | True negative rate |
 
 The **confusion matrix** is the primary diagnostic tool — aggregate metrics can mask systematic errors on specific classes.
+
+> **💡 Intuition:** Every prediction lands in one of four boxes. **TP/TN** = correct. **FP** = false alarm (predicted positive, wasn't). **FN** = miss (predicted negative, was positive). **Precision** asks *"when I shout positive, am I right?"*; **recall** asks *"of all real positives, how many did I catch?"* A spam filter wants high precision (don't trash real mail); a cancer screen wants high recall (don't miss a tumour).
+
+> **📝 Worked Example — compute every metric from a confusion matrix**
+> A classifier on 100 patients (positive = "has disease") produces:
+>
+> ```
+>                  Predicted +    Predicted −
+>   Actual +          TP = 40       FN = 10
+>   Actual −          FP =  5       TN = 45
+> ```
+>
+> - **Accuracy** $= \frac{TP+TN}{n} = \frac{40+45}{100} = \mathbf{0.85}$
+> - **Precision** $= \frac{TP}{TP+FP} = \frac{40}{45} \approx \mathbf{0.889}$ — of those flagged, 89% truly had it
+> - **Recall** $= \frac{TP}{TP+FN} = \frac{40}{50} = \mathbf{0.80}$ — caught 80% of real cases (missed 10)
+> - **Specificity** $= \frac{TN}{TN+FP} = \frac{45}{50} = \mathbf{0.90}$
+> - **F1** $= \frac{2 \cdot 0.889 \cdot 0.80}{0.889 + 0.80} \approx \mathbf{0.842}$ — harmonic mean of precision & recall
+>
+> **Watch the trade-off:** lowering the decision threshold would catch more of the 10 misses (↑recall) but raise false alarms (↓precision). F1 balances the two.
 
 **ROC and AUC:** The Receiver Operating Characteristic curve plots TPR vs. FPR across all decision thresholds. Area Under the Curve (AUC) summarises discrimination ability independently of threshold choice.
 
@@ -111,6 +159,64 @@ When comparing $m > 2$ classifiers across multiple datasets:
 2. **Nemenyi post-hoc test:** Pairwise comparisons with family-wise error rate control.
 
 This is the standard protocol in ML benchmarking literature (Demšar, 2006).
+
+> **💡 Intuition — which test when?** Two methods, one dataset → **paired t-test** (if differences look normal) or **Wilcoxon** (if not). Many methods, many datasets → **Friedman** (are they all equal?) then **Nemenyi** (which pairs differ?). The golden rule: *a difference you can't defend with a test is not a result.*
+
+---
+
+## Worked Examples
+
+Collected for revision: **all five confusion-matrix metrics from raw counts** (§3) and the **5-fold CV diagram** (§2). The confusion-matrix calculation is the most heavily examined skill in this module — practise it until the four boxes (TP/FP/FN/TN) are automatic.
+
+---
+
+## Self-Check
+
+<details>
+<summary><strong>Q1.</strong> Your model scores 95% accuracy on a dataset that is 95% one class. Should you be impressed? (§3)</summary>
+
+No — a "always predict the majority class" baseline also scores 95%. Report precision/recall/F1 and compare against that trivial baseline.
+</details>
+
+<details>
+<summary><strong>Q2.</strong> Confusion matrix: TP=80, FP=20, FN=10, TN=90. Compute precision and recall. (§3)</summary>
+
+Precision $= 80/(80+20) = \mathbf{0.80}$. Recall $= 80/(80+10) \approx \mathbf{0.889}$. (This model is more likely to miss a false alarm than a real positive.)
+</details>
+
+<details>
+<summary><strong>Q3.</strong> Why use <em>stratified</em> k-fold instead of plain k-fold? (§2)</summary>
+
+Stratification keeps each fold's class proportions equal to the full dataset. Without it, on an imbalanced dataset a fold might contain few or zero minority-class samples, making that fold's metrics meaningless.
+</details>
+
+<details>
+<summary><strong>Q4.</strong> Can R² be negative? What would that mean? (§3)</summary>
+
+Yes. R² < 0 means the model predicts **worse than just outputting the mean** of the target — a real red flag (we saw it for the single Decision Tree in [Atividade 1](../activities/atividade-1.md#part-b--regression)).
+</details>
+
+<details>
+<summary><strong>Q5.</strong> You want to <em>never miss a fraud</em>, even at the cost of false alarms. Optimise precision or recall? (§3)</summary>
+
+**Recall** — you want to catch every true positive (fraud). High recall tolerates more false positives; the cost of a miss outweighs the cost of a false alarm.
+</details>
+
+---
+
+## 🔑 Quick Revision
+
+| Concept | One-line takeaway |
+|---|---|
+| Don't test on train | Training error is optimistically biased; the gap grows with model capacity |
+| k-fold CV | Train $k$ times, every sample tested once, average the scores |
+| Stratified k-fold | Preserves class ratios per fold — use it for imbalance/classification |
+| Accuracy | $\frac{TP+TN}{n}$ — **lies under class imbalance** |
+| Precision | $\frac{TP}{TP+FP}$ — "when I say positive, am I right?" |
+| Recall | $\frac{TP}{TP+FN}$ — "did I catch all the positives?" |
+| F1 | harmonic mean of precision & recall — balances the two |
+| R² / MAE | R² = variance explained (can be < 0); always report MAE too |
+| Significance | Wilcoxon (2 methods) · Friedman+Nemenyi (many) |
 
 ---
 

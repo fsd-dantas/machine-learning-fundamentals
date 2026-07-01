@@ -362,6 +362,153 @@ section { position: relative; z-index: 1; }
 .legend-item { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--text-muted); }
 .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
+.mindmap-shell {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-md);
+}
+.mindmap-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+.mindmap-filter {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  padding: var(--space-2) var(--space-3);
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+.mindmap-filter:hover,
+.mindmap-filter.active {
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface-2));
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  color: var(--accent);
+}
+.mindmap-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: var(--space-4);
+  align-items: stretch;
+}
+.mindmap-stage {
+  min-height: 520px;
+  overflow: auto;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--text-faint) 22%, transparent) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+#interactive-mindmap {
+  display: block;
+  min-width: 920px;
+  width: 100%;
+  height: auto;
+}
+.mindmap-edge {
+  stroke: color-mix(in srgb, var(--text-faint) 60%, transparent);
+  stroke-width: 1.5;
+  transition: opacity var(--transition), stroke var(--transition), stroke-width var(--transition);
+}
+.mindmap-edge.selected {
+  stroke: var(--accent);
+  stroke-width: 2.4;
+}
+.mindmap-edge.muted {
+  opacity: 0.12;
+}
+.mindmap-node {
+  cursor: pointer;
+  transition: opacity var(--transition), filter var(--transition), transform var(--transition);
+}
+.mindmap-node rect {
+  stroke: color-mix(in srgb, #fff 72%, transparent);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12));
+}
+.mindmap-node text {
+  fill: #fff;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  pointer-events: none;
+}
+.mindmap-node.concept rect {
+  fill-opacity: 0.88;
+}
+.mindmap-node.root text {
+  font-size: 15px;
+}
+.mindmap-node.selected rect {
+  stroke: #fff;
+  stroke-width: 3;
+}
+.mindmap-node.muted {
+  opacity: 0.18;
+}
+.mindmap-node:hover,
+.mindmap-node:focus {
+  filter: brightness(1.08);
+  outline: none;
+}
+.mindmap-detail {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  background: var(--surface-2);
+  min-height: 100%;
+}
+.mindmap-detail-kicker {
+  color: var(--accent);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-2);
+}
+.mindmap-detail h2 {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-3);
+}
+.mindmap-detail p {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+.mindmap-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+}
+.mindmap-detail-tags span {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  padding: 2px var(--space-3);
+}
+.mindmap-detail-link {
+  display: inline-flex;
+  align-items: center;
+  color: #fff;
+  background: var(--accent);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  padding: var(--space-2) var(--space-4);
+}
+.mindmap-detail-link:hover {
+  color: #fff;
+  background: var(--accent-hover);
+}
+
 /* ─── Neural canvas (dark only) ──────────────────────────────── */
 #neural-canvas { transition: opacity 0.5s; }
 [data-theme="light"] #neural-canvas { opacity: 0.08 !important; }
@@ -396,5 +543,8 @@ section { position: relative; z-index: 1; }
   .site-header { flex-direction: column; align-items: flex-start; }
   .hero h1 { letter-spacing: -0.02em; }
   .timeline { padding-left: var(--space-6); }
+  .mindmap-layout { grid-template-columns: 1fr; }
+  .mindmap-stage { min-height: 440px; }
+  #interactive-mindmap { min-width: 860px; }
   .footer-inner { flex-direction: column; text-align: center; }
 }

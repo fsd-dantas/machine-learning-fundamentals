@@ -1,0 +1,594 @@
+{
+  "_comment": "SOURCE OF TRUTH for the mind map. Edit here, then run `python scripts/build_mindmap.py` to regenerate mind-map.md and the data block in pages/mapa-mental.html.",
+  "modules": {
+    "foundations": {
+      "label": "Fundamentos",
+      "color": "#2f9e44",
+      "order": 1,
+      "blurb": "álgebra · Bayes · viés-variância"
+    },
+    "protocols": {
+      "label": "Protocolos",
+      "color": "#b7791f",
+      "order": 2,
+      "blurb": "CV · métricas · testes"
+    },
+    "shallow": {
+      "label": "Técnicas Rasas",
+      "color": "#c2410c",
+      "order": 3,
+      "blurb": "linear · SVM · árvores · ensembles"
+    },
+    "descriptive": {
+      "label": "Modelos Descritivos",
+      "color": "#7c3aed",
+      "order": 4,
+      "blurb": "k-means · PCA · DBSCAN"
+    },
+    "deep": {
+      "label": "Técnicas Profundas",
+      "color": "#2563eb",
+      "order": 5,
+      "blurb": "perceptron · CNN · RNN · transformer"
+    }
+  },
+  "nodes": [
+    {
+      "id": "ml",
+      "label": "Aprendizagem\nde Máquina",
+      "x": 600,
+      "y": 380,
+      "w": 170,
+      "h": 70,
+      "type": "root",
+      "module": "all",
+      "link": "../README.md",
+      "desc": "Entrada conceitual: conecta fundamentos matemáticos, protocolo experimental, técnicas preditivas, modelos descritivos e arquiteturas profundas."
+    },
+    {
+      "id": "foundations",
+      "label": "Fundamentos",
+      "x": 600,
+      "y": 135,
+      "w": 150,
+      "h": 58,
+      "type": "module",
+      "module": "foundations",
+      "link": "../modules/01-foundations.md",
+      "desc": "Base matemática da disciplina: representação vetorial, geometria de decisão, incerteza e inferência."
+    },
+    {
+      "id": "linear-algebra",
+      "label": "Álgebra\nLinear",
+      "x": 400,
+      "y": 55,
+      "module": "foundations",
+      "link": "../modules/01-foundations.md#1-linear-algebra",
+      "desc": "Vetores, matrizes, rank, autovalores e SVD: a linguagem das representações e transformações."
+    },
+    {
+      "id": "geometry",
+      "label": "Geometria",
+      "x": 260,
+      "y": 160,
+      "module": "foundations",
+      "link": "../modules/01-foundations.md#2-analytical-geometry",
+      "desc": "Distância, similaridade, hiperplanos, margens e projeções: a intuição espacial por trás de k-NN, SVM e PCA."
+    },
+    {
+      "id": "probability",
+      "label": "Probabilidade\nEstatística",
+      "x": 600,
+      "y": 42,
+      "module": "foundations",
+      "link": "../modules/01-foundations.md#3-probability--statistics",
+      "desc": "Variáveis aleatórias, distribuições, esperança, variância e teste de hipóteses."
+    },
+    {
+      "id": "bayes-mle",
+      "label": "Bayes\nMLE",
+      "x": 810,
+      "y": 55,
+      "module": "foundations",
+      "link": "../modules/01-foundations.md#maximum-likelihood-estimation-mle",
+      "desc": "Bayes sustenta Naive Bayes; MLE explica perdas como cross-entropy e MSE sob hipóteses probabilísticas."
+    },
+    {
+      "id": "bias-variance",
+      "label": "Viés\nVariância",
+      "x": 930,
+      "y": 160,
+      "module": "foundations",
+      "link": "../modules/01-foundations.md#expectation-and-variance",
+      "desc": "Lente central para regularização, capacidade do modelo, ensembles e interpretação do erro de generalização."
+    },
+    {
+      "id": "protocols",
+      "label": "Protocolos\nExperimentais",
+      "x": 220,
+      "y": 360,
+      "w": 160,
+      "h": 60,
+      "type": "module",
+      "module": "protocols",
+      "link": "../modules/02-protocols.md",
+      "desc": "Metodologia para medir desempenho sem autoengano: divisão correta, métricas adequadas e comparação estatística."
+    },
+    {
+      "id": "splits",
+      "label": "Holdout\nK-Fold CV",
+      "x": 90,
+      "y": 230,
+      "module": "protocols",
+      "link": "../modules/02-protocols.md#2-data-partitioning-strategies",
+      "desc": "Formas de estimar erro de generalização; validação cruzada reduz dependência de uma única divisão dos dados."
+    },
+    {
+      "id": "stratification",
+      "label": "Estratificação",
+      "x": 90,
+      "y": 325,
+      "module": "protocols",
+      "link": "../modules/02-protocols.md#stratified-k-fold",
+      "desc": "Preserva proporções de classe em cada fold, essencial em bases desbalanceadas."
+    },
+    {
+      "id": "metrics",
+      "label": "Métricas",
+      "x": 80,
+      "y": 460,
+      "module": "protocols",
+      "link": "../modules/02-protocols.md#3-evaluation-metrics",
+      "desc": "Acurácia, precisão, recall, F1, AUC, R2, MAE e RMSE: cada métrica responde uma pergunta diferente."
+    },
+    {
+      "id": "confusion",
+      "label": "Matriz de\nConfusão",
+      "x": 210,
+      "y": 535,
+      "module": "protocols",
+      "link": "../activities/atividade-1.md#part-a--classification",
+      "desc": "Mostra o tipo de erro. Em diagnóstico médico, falso negativo e falso positivo têm custos diferentes."
+    },
+    {
+      "id": "leakage",
+      "label": "Pipeline\nsem Vazamento",
+      "x": 365,
+      "y": 500,
+      "module": "protocols",
+      "link": "../activities/atividade-1.md#implementation-notes",
+      "desc": "Pré-processamento deve ser ajustado dentro de cada fold; StandardScaler fora do fold vaza informação."
+    },
+    {
+      "id": "stats-tests",
+      "label": "Wilcoxon\nFriedman",
+      "x": 360,
+      "y": 230,
+      "module": "protocols",
+      "link": "../modules/02-protocols.md#4-comparing-classifiers-statistically",
+      "desc": "Testes estatísticos evitam declarar vencedor quando a diferença está dentro da variação dos folds."
+    },
+    {
+      "id": "shallow",
+      "label": "Técnicas Rasas\nPreditivas",
+      "x": 425,
+      "y": 625,
+      "w": 160,
+      "h": 60,
+      "type": "module",
+      "module": "shallow",
+      "link": "../modules/03-shallow.md",
+      "desc": "Modelos supervisionados com viés indutivo explícito e forte valor como baseline em dados tabulares."
+    },
+    {
+      "id": "linear-models",
+      "label": "Linear\nRidge Lasso",
+      "x": 140,
+      "y": 645,
+      "module": "shallow",
+      "link": "../modules/03-shallow.md#1-linear-models",
+      "desc": "Baseline regressivo: simples, interpretável e competitivo quando o sinal é aproximadamente linear."
+    },
+    {
+      "id": "logistic",
+      "label": "Regressão\nLogística",
+      "x": 210,
+      "y": 700,
+      "module": "shallow",
+      "link": "../modules/03-shallow.md#logistic-regression",
+      "desc": "Classificador linear probabilístico; referência obrigatória antes de usar modelos mais complexos."
+    },
+    {
+      "id": "knn-nb",
+      "label": "k-NN\nNaive Bayes",
+      "x": 340,
+      "y": 715,
+      "module": "shallow",
+      "link": "../modules/03-shallow.md#2-instance-based-methods",
+      "desc": "k-NN usa localidade geométrica; Naive Bayes usa independência condicional e probabilidade."
+    },
+    {
+      "id": "svm-svr",
+      "label": "SVM\nSVR",
+      "x": 545,
+      "y": 720,
+      "module": "shallow",
+      "link": "../modules/03-shallow.md#4-geometric-methods",
+      "desc": "Métodos de margem máxima; kernels permitem fronteiras não lineares via produto interno implícito."
+    },
+    {
+      "id": "trees",
+      "label": "Árvores\nID3 CART",
+      "x": 650,
+      "y": 675,
+      "module": "shallow",
+      "link": "../modules/03-shallow.md#5-tree-based-methods",
+      "desc": "Particionamento recursivo do espaço; interpretável, mas de alta variância quando não regularizado."
+    },
+    {
+      "id": "ensembles",
+      "label": "Ensembles",
+      "x": 690,
+      "y": 580,
+      "module": "shallow",
+      "link": "../modules/03-shallow.md#6-ensemble-methods",
+      "desc": "Bagging reduz variância; boosting reduz viés; Random Forest e XGBoost são baselines fortes em tabular."
+    },
+    {
+      "id": "mlp-baseline",
+      "label": "MLP\nBaseline",
+      "x": 515,
+      "y": 540,
+      "module": "shallow",
+      "link": "../modules/03-shallow.md#mlp-as-a-shallow-baseline",
+      "desc": "Transição para deep learning: rede rasa que ainda compete como modelo tabular supervisionado."
+    },
+    {
+      "id": "descriptive",
+      "label": "Modelos\nDescritivos",
+      "x": 855,
+      "y": 610,
+      "w": 160,
+      "h": 60,
+      "type": "module",
+      "module": "descriptive",
+      "link": "../modules/04-descriptive.md",
+      "desc": "Aprendizagem sem rótulos: revelar grupos, manifolds, projeções e estrutura latente dos dados."
+    },
+    {
+      "id": "kmeans",
+      "label": "K-Means",
+      "x": 845,
+      "y": 715,
+      "module": "descriptive",
+      "link": "../modules/04-descriptive.md#k-means",
+      "desc": "Minimiza variância intra-cluster; assume grupos aproximadamente esféricos e exige escolher K."
+    },
+    {
+      "id": "hierarchical",
+      "label": "Hierárquico",
+      "x": 1015,
+      "y": 705,
+      "module": "descriptive",
+      "link": "../modules/04-descriptive.md#hierarchical-clustering",
+      "desc": "Gera dendrograma e revela estrutura aninhada sem escolher K antecipadamente."
+    },
+    {
+      "id": "dbscan",
+      "label": "DBSCAN",
+      "x": 1110,
+      "y": 625,
+      "module": "descriptive",
+      "link": "../modules/04-descriptive.md#dbscan",
+      "desc": "Agrupamento por densidade; encontra formas arbitrárias e marca ruído/outliers."
+    },
+    {
+      "id": "cluster-metrics",
+      "label": "Silhueta\nDavies-Bouldin",
+      "x": 1080,
+      "y": 520,
+      "module": "descriptive",
+      "link": "../modules/04-descriptive.md#cluster-validity-indices",
+      "desc": "Índices internos e externos ajudam a avaliar qualidade de agrupamento sem depender apenas de inspeção visual."
+    },
+    {
+      "id": "pca-lda",
+      "label": "PCA\nLDA",
+      "x": 900,
+      "y": 500,
+      "module": "descriptive",
+      "link": "../modules/04-descriptive.md#2-dimensionality-reduction",
+      "desc": "PCA preserva variância sem rótulos; LDA usa rótulos para maximizar separação entre classes."
+    },
+    {
+      "id": "tsne-umap",
+      "label": "t-SNE\nUMAP",
+      "x": 770,
+      "y": 525,
+      "module": "descriptive",
+      "link": "../modules/04-descriptive.md#t-sne",
+      "desc": "Métodos não lineares para visualização de estrutura; t-SNE é exploratório, UMAP pode generalizar melhor."
+    },
+    {
+      "id": "deep",
+      "label": "Técnicas\nProfundas",
+      "x": 1000,
+      "y": 345,
+      "w": 160,
+      "h": 60,
+      "type": "module",
+      "module": "deep",
+      "link": "../modules/05-deep.md",
+      "desc": "Arquiteturas que aprendem representações hierárquicas e especializadas para imagens, sequências, pares e geração."
+    },
+    {
+      "id": "perceptron",
+      "label": "Perceptron\nXOR",
+      "x": 1020,
+      "y": 215,
+      "module": "deep",
+      "link": "../modules/05-deep.md#1-biological-motivation-and-the-perceptron",
+      "desc": "Unidade linear aprendível; a limitação XOR motiva composição e camadas ocultas."
+    },
+    {
+      "id": "backprop",
+      "label": "Backprop\nOtimização",
+      "x": 1120,
+      "y": 265,
+      "module": "deep",
+      "link": "../modules/05-deep.md#3-backpropagation-and-gradient-based-optimisation",
+      "desc": "Regra da cadeia para crédito entre camadas; SGD, momentum, RMSprop e Adam ajustam os pesos."
+    },
+    {
+      "id": "mlp",
+      "label": "MLP",
+      "x": 1120,
+      "y": 365,
+      "module": "deep",
+      "link": "../modules/05-deep.md#4-multilayer-perceptron-mlp",
+      "desc": "Rede totalmente conectada; base prática para funções não lineares em dados vetoriais/tabulares."
+    },
+    {
+      "id": "cnn",
+      "label": "CNN",
+      "x": 1110,
+      "y": 455,
+      "module": "deep",
+      "link": "../modules/05-deep.md#5-convolutional-neural-networks-cnn",
+      "desc": "Convolução, pooling e compartilhamento de parâmetros para dados com estrutura espacial."
+    },
+    {
+      "id": "rnn",
+      "label": "RNN\nLSTM GRU",
+      "x": 930,
+      "y": 230,
+      "module": "deep",
+      "link": "../modules/05-deep.md#6-recurrent-neural-networks-rnn",
+      "desc": "Modelos sequenciais com estado; LSTM/GRU mitigam gradientes desaparecentes em dependências longas."
+    },
+    {
+      "id": "siamese",
+      "label": "Redes\nSiamesas",
+      "x": 815,
+      "y": 300,
+      "module": "deep",
+      "link": "../modules/05-deep.md#7-siamese-networks",
+      "desc": "Aprendizagem de similaridade com encoders compartilhados; útil em verificação e few-shot learning."
+    },
+    {
+      "id": "transformer",
+      "label": "Transformer",
+      "x": 820,
+      "y": 400,
+      "module": "deep",
+      "link": "../modules/05-deep.md#8-transformer-and-generative-models",
+      "desc": "Self-attention e multi-head attention para dependências longas e processamento paralelo de sequências."
+    },
+    {
+      "id": "generative",
+      "label": "Generativos\nGPT VAE GAN",
+      "x": 930,
+      "y": 470,
+      "module": "deep",
+      "link": "../modules/05-deep.md#transformer-as-a-generative-model",
+      "desc": "Panorama de mecanismos generativos: autoregressivo, latente, adversarial e difusão."
+    }
+  ],
+  "edges": [
+    [
+      "ml",
+      "foundations"
+    ],
+    [
+      "ml",
+      "protocols"
+    ],
+    [
+      "ml",
+      "shallow"
+    ],
+    [
+      "ml",
+      "descriptive"
+    ],
+    [
+      "ml",
+      "deep"
+    ],
+    [
+      "foundations",
+      "linear-algebra"
+    ],
+    [
+      "foundations",
+      "geometry"
+    ],
+    [
+      "foundations",
+      "probability"
+    ],
+    [
+      "foundations",
+      "bayes-mle"
+    ],
+    [
+      "foundations",
+      "bias-variance"
+    ],
+    [
+      "protocols",
+      "splits"
+    ],
+    [
+      "protocols",
+      "stratification"
+    ],
+    [
+      "protocols",
+      "metrics"
+    ],
+    [
+      "protocols",
+      "confusion"
+    ],
+    [
+      "protocols",
+      "leakage"
+    ],
+    [
+      "protocols",
+      "stats-tests"
+    ],
+    [
+      "shallow",
+      "linear-models"
+    ],
+    [
+      "shallow",
+      "logistic"
+    ],
+    [
+      "shallow",
+      "knn-nb"
+    ],
+    [
+      "shallow",
+      "svm-svr"
+    ],
+    [
+      "shallow",
+      "trees"
+    ],
+    [
+      "shallow",
+      "ensembles"
+    ],
+    [
+      "shallow",
+      "mlp-baseline"
+    ],
+    [
+      "descriptive",
+      "kmeans"
+    ],
+    [
+      "descriptive",
+      "hierarchical"
+    ],
+    [
+      "descriptive",
+      "dbscan"
+    ],
+    [
+      "descriptive",
+      "cluster-metrics"
+    ],
+    [
+      "descriptive",
+      "pca-lda"
+    ],
+    [
+      "descriptive",
+      "tsne-umap"
+    ],
+    [
+      "deep",
+      "perceptron"
+    ],
+    [
+      "deep",
+      "backprop"
+    ],
+    [
+      "deep",
+      "mlp"
+    ],
+    [
+      "deep",
+      "cnn"
+    ],
+    [
+      "deep",
+      "rnn"
+    ],
+    [
+      "deep",
+      "siamese"
+    ],
+    [
+      "deep",
+      "transformer"
+    ],
+    [
+      "deep",
+      "generative"
+    ]
+  ],
+  "prerequisites": [
+    {
+      "from": "foundations",
+      "to": "protocols"
+    },
+    {
+      "from": "foundations",
+      "to": "shallow"
+    },
+    {
+      "from": "foundations",
+      "to": "descriptive"
+    },
+    {
+      "from": "foundations",
+      "to": "deep"
+    },
+    {
+      "from": "protocols",
+      "to": "shallow",
+      "label": "evaluates",
+      "dotted": true
+    },
+    {
+      "from": "protocols",
+      "to": "descriptive",
+      "label": "evaluates",
+      "dotted": true
+    },
+    {
+      "from": "protocols",
+      "to": "deep",
+      "label": "evaluates",
+      "dotted": true
+    },
+    {
+      "from": "shallow",
+      "to": "deep",
+      "label": "MLP baseline → MLP"
+    },
+    {
+      "from": "descriptive",
+      "to": "shallow",
+      "label": "PCA as pre-processing",
+      "dotted": true
+    }
+  ]
+}

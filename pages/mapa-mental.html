@@ -43,7 +43,7 @@
       <a href="../index.html">Início</a>
       <a href="atividade-1.html">Atividade 1</a>
       <a href="mapa-mental.html">Mapa Mental</a>
-      <a href="https://github.com/fsd-dantas/ppgia-puc-pr-am" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/fsd-dantas/machine-learning-fundamentals" target="_blank" rel="noopener">GitHub</a>
     </nav>
     <button class="theme-toggle" data-theme-toggle aria-label="Alternar tema"></button>
   </div>
@@ -65,34 +65,46 @@
 
 <hr class="section-divider">
 
-<!-- Mind map image -->
+<!-- Interactive mind map -->
 <section class="section-pad" style="position:relative;z-index:1;">
   <div class="container-wide">
 
-    <div class="card" data-reveal style="padding:var(--space-4);">
-      <!-- Dark version (shown in dark mode) -->
-      <img
-        src="../assets/img/mindmap.png"
-        alt="Mapa mental — versão escura"
-        class="mindmap-img mindmap-dark"
-        loading="lazy"
-      >
-      <!-- Light version (shown in light mode) -->
-      <img
-        src="../assets/img/mindmap-light.png"
-        alt="Mapa mental — versão clara"
-        class="mindmap-img mindmap-light"
-        loading="lazy"
-      >
-    </div>
+    <div class="mindmap-shell" data-reveal>
+      <div class="mindmap-toolbar" aria-label="Filtros do mapa mental">
+        <button class="mindmap-filter active" type="button" data-filter="all">Todos</button>
+        <button class="mindmap-filter" type="button" data-filter="foundations">Fundamentos</button>
+        <button class="mindmap-filter" type="button" data-filter="protocols">Protocolos</button>
+        <button class="mindmap-filter" type="button" data-filter="shallow">Rasas</button>
+        <button class="mindmap-filter" type="button" data-filter="descriptive">Descritivos</button>
+        <button class="mindmap-filter" type="button" data-filter="deep">Profundas</button>
+      </div>
 
-    <!-- Legend -->
-    <div class="mindmap-legend mt-4" data-reveal>
-      <div class="legend-item"><div class="legend-dot" style="background:#3fb950;"></div>Fundamentos &amp; Terminologia</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#d29922;"></div>Protocolos Experimentais</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#f0883e;"></div>Técnicas Rasas (Shallow)</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#bc8cff;"></div>Modelos Descritivos</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#f0883e;"></div>Técnicas Profundas (Deep)</div>
+      <div class="mindmap-layout">
+        <div class="mindmap-stage" aria-label="Mapa mental interativo">
+          <svg id="interactive-mindmap" viewBox="0 0 1200 760" role="img" aria-labelledby="mindmap-title mindmap-desc">
+            <title id="mindmap-title">Mapa mental interativo de fundamentos de Aprendizagem de Máquina</title>
+            <desc id="mindmap-desc">Grafo com cinco módulos: fundamentos, protocolos experimentais, técnicas rasas, modelos descritivos e técnicas profundas.</desc>
+          </svg>
+        </div>
+
+        <aside class="mindmap-detail" aria-live="polite">
+          <div class="mindmap-detail-kicker" id="mindmap-detail-module">Mapa</div>
+          <h2 id="mindmap-detail-title">Aprendizagem de Máquina</h2>
+          <p id="mindmap-detail-text">
+            Selecione um módulo ou conceito para inspecionar a função dele dentro da trilha de fundamentos.
+          </p>
+          <div class="mindmap-detail-tags" id="mindmap-detail-tags"></div>
+          <a class="mindmap-detail-link" id="mindmap-detail-link" href="../README.md">Abrir referência</a>
+        </aside>
+      </div>
+
+      <div class="mindmap-legend" aria-label="Legenda dos módulos">
+        <div class="legend-item"><div class="legend-dot" style="background:#2f9e44;"></div>Fundamentos</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#b7791f;"></div>Protocolos Experimentais</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c2410c;"></div>Técnicas Rasas</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#7c3aed;"></div>Modelos Descritivos</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#2563eb;"></div>Técnicas Profundas</div>
+      </div>
     </div>
 
   </div>
@@ -109,49 +121,42 @@
     <div class="card-grid card-grid-2">
 
       <div class="card" data-reveal>
-        <h3 style="color:#3fb950;font-size:var(--text-base);margin-bottom:var(--space-3);">Fundamentos &amp; Protocolos</h3>
+        <h3 style="color:#2f9e44;font-size:var(--text-base);margin-bottom:var(--space-3);">Fundamentos</h3>
         <ul style="font-size:var(--text-sm);color:var(--text-muted);padding-left:var(--space-4);">
-          <li>Definição e Terminologia de AM</li>
-          <li>Abordagens: Supervisionada / Não-Supervisionada / Por Reforço</li>
-          <li>Tarefas: Classificação, Regressão, Agrupamento</li>
-          <li>Protocolo Holdout e K-Fold Cross-Validation</li>
-          <li>Métricas: Acurácia, F1, AUC-ROC, Silhueta</li>
-          <li>Trade-off Viés-Variância</li>
+          <li>Álgebra linear, geometria, probabilidade e estatística.</li>
+          <li>SVD/PCA, Bayes, MLE e decomposição viés-variância.</li>
+        </ul>
+      </div>
+
+      <div class="card" data-reveal>
+        <h3 style="color:#b7791f;font-size:var(--text-base);margin-bottom:var(--space-3);">Protocolos Experimentais</h3>
+        <ul style="font-size:var(--text-sm);color:var(--text-muted);padding-left:var(--space-4);">
+          <li>Divisão de dados, validação cruzada, estratificação e prevenção de vazamento.</li>
+          <li>Métricas, matriz de confusão, testes estatísticos e comparação honesta.</li>
         </ul>
       </div>
 
       <div class="card" data-reveal>
         <h3 style="color:#f0883e;font-size:var(--text-base);margin-bottom:var(--space-3);">Técnicas Rasas — Preditivas</h3>
         <ul style="font-size:var(--text-sm);color:var(--text-muted);padding-left:var(--space-4);">
-          <li>Árvores de Decisão — ID3, Entropia, Ganho de Informação</li>
-          <li>k-NN — Espaço Euclidiano, escolha de k</li>
-          <li>Naive Bayes — Teorema de Bayes, independência condicional</li>
-          <li>MLP — Perceptron, Backpropagation, Descida do Gradiente</li>
-          <li>SVM — Margem Máxima, Kernels (Linear, Polinomial, RBF)</li>
-          <li>Ensembles — Bagging, Boosting, Random Forest, Heterogêneos</li>
+          <li>Regressão linear/Ridge/Lasso, regressão logística, k-NN, Naive Bayes e SVM/SVR.</li>
+          <li>Árvores, ensembles e MLP como baseline de transição.</li>
         </ul>
       </div>
 
       <div class="card" data-reveal>
         <h3 style="color:#bc8cff;font-size:var(--text-base);margin-bottom:var(--space-3);">Modelos Descritivos</h3>
         <ul style="font-size:var(--text-sm);color:var(--text-muted);padding-left:var(--space-4);">
-          <li>K-Means — Inicialização, convergência, Elbow Method</li>
-          <li>Dispersão Intra-Cluster</li>
-          <li>Coeficiente de Silhueta</li>
-          <li>Fusão e Seleção de Classificadores</li>
-          <li>Regras: Voto, Média, Produto</li>
+          <li>K-Means, hierárquico, DBSCAN e validade de clusters.</li>
+          <li>PCA, LDA, t-SNE e UMAP para redução de dimensionalidade.</li>
         </ul>
       </div>
 
       <div class="card" data-reveal>
         <h3 style="color:#58a6ff;font-size:var(--text-base);margin-bottom:var(--space-3);">Técnicas Profundas (Deep Learning)</h3>
         <ul style="font-size:var(--text-sm);color:var(--text-muted);padding-left:var(--space-4);">
-          <li>CNN — Convolução 2D, Pooling, Feature Maps, Stride</li>
-          <li>Redes Siamesas — Aprendizado Métrico</li>
-          <li>RNN Simples — Dependências temporais</li>
-          <li>LSTM — Vanishing Gradient, Gates (forget/input/output)</li>
-          <li>Transformer — Self-Attention, Multi-Head, Encoder-Decoder</li>
-          <li>Modelos Generativos (GPT, BERT)</li>
+          <li>Perceptron, backpropagation, MLP, CNN, RNN/LSTM/GRU e redes siamesas.</li>
+          <li>Transformer e panorama de modelos generativos: GPT, VAE, GAN e difusão.</li>
         </ul>
       </div>
 
@@ -168,11 +173,695 @@
       Aluno: <a href="mailto:fsd.dantas@gmail.com">Fernando Dantas</a>
     </div>
     <div>
-      <a href="https://github.com/fsd-dantas/ppgia-puc-pr-am" target="_blank" rel="noopener">github.com/fsd-dantas/ppgia-puc-pr-am</a>
+      <a href="https://github.com/fsd-dantas/machine-learning-fundamentals" target="_blank" rel="noopener">github.com/fsd-dantas/machine-learning-fundamentals</a>
     </div>
   </div>
 </footer>
 
 <script src="../assets/js/main.js"></script>
+<script>
+(function () {
+  const svg = document.getElementById('interactive-mindmap');
+  if (!svg) return;
+
+  // BEGIN GENERATED: mindmap-data — source of truth is mind-map.json; run scripts/build_mindmap.py to regenerate. DO NOT EDIT BY HAND.
+  const modules = {
+  "foundations": {
+    "label": "Fundamentos",
+    "color": "#2f9e44"
+  },
+  "protocols": {
+    "label": "Protocolos",
+    "color": "#b7791f"
+  },
+  "shallow": {
+    "label": "Técnicas Rasas",
+    "color": "#c2410c"
+  },
+  "descriptive": {
+    "label": "Modelos Descritivos",
+    "color": "#7c3aed"
+  },
+  "deep": {
+    "label": "Técnicas Profundas",
+    "color": "#2563eb"
+  }
+};
+
+  const nodes = [
+  {
+    "id": "ml",
+    "label": "Aprendizagem\nde Máquina",
+    "x": 600,
+    "y": 380,
+    "w": 170,
+    "h": 70,
+    "type": "root",
+    "module": "all",
+    "link": "../README.md",
+    "desc": "Entrada conceitual: conecta fundamentos matemáticos, protocolo experimental, técnicas preditivas, modelos descritivos e arquiteturas profundas."
+  },
+  {
+    "id": "foundations",
+    "label": "Fundamentos",
+    "x": 600,
+    "y": 135,
+    "w": 150,
+    "h": 58,
+    "type": "module",
+    "module": "foundations",
+    "link": "../modules/01-foundations.md",
+    "desc": "Base matemática da disciplina: representação vetorial, geometria de decisão, incerteza e inferência."
+  },
+  {
+    "id": "linear-algebra",
+    "label": "Álgebra\nLinear",
+    "x": 400,
+    "y": 55,
+    "module": "foundations",
+    "link": "../modules/01-foundations.md#1-linear-algebra",
+    "desc": "Vetores, matrizes, rank, autovalores e SVD: a linguagem das representações e transformações."
+  },
+  {
+    "id": "geometry",
+    "label": "Geometria",
+    "x": 260,
+    "y": 160,
+    "module": "foundations",
+    "link": "../modules/01-foundations.md#2-analytical-geometry",
+    "desc": "Distância, similaridade, hiperplanos, margens e projeções: a intuição espacial por trás de k-NN, SVM e PCA."
+  },
+  {
+    "id": "probability",
+    "label": "Probabilidade\nEstatística",
+    "x": 600,
+    "y": 42,
+    "module": "foundations",
+    "link": "../modules/01-foundations.md#3-probability--statistics",
+    "desc": "Variáveis aleatórias, distribuições, esperança, variância e teste de hipóteses."
+  },
+  {
+    "id": "bayes-mle",
+    "label": "Bayes\nMLE",
+    "x": 810,
+    "y": 55,
+    "module": "foundations",
+    "link": "../modules/01-foundations.md#maximum-likelihood-estimation-mle",
+    "desc": "Bayes sustenta Naive Bayes; MLE explica perdas como cross-entropy e MSE sob hipóteses probabilísticas."
+  },
+  {
+    "id": "bias-variance",
+    "label": "Viés\nVariância",
+    "x": 930,
+    "y": 160,
+    "module": "foundations",
+    "link": "../modules/01-foundations.md#expectation-and-variance",
+    "desc": "Lente central para regularização, capacidade do modelo, ensembles e interpretação do erro de generalização."
+  },
+  {
+    "id": "protocols",
+    "label": "Protocolos\nExperimentais",
+    "x": 220,
+    "y": 360,
+    "w": 160,
+    "h": 60,
+    "type": "module",
+    "module": "protocols",
+    "link": "../modules/02-protocols.md",
+    "desc": "Metodologia para medir desempenho sem autoengano: divisão correta, métricas adequadas e comparação estatística."
+  },
+  {
+    "id": "splits",
+    "label": "Holdout\nK-Fold CV",
+    "x": 90,
+    "y": 230,
+    "module": "protocols",
+    "link": "../modules/02-protocols.md#2-data-partitioning-strategies",
+    "desc": "Formas de estimar erro de generalização; validação cruzada reduz dependência de uma única divisão dos dados."
+  },
+  {
+    "id": "stratification",
+    "label": "Estratificação",
+    "x": 90,
+    "y": 325,
+    "module": "protocols",
+    "link": "../modules/02-protocols.md#stratified-k-fold",
+    "desc": "Preserva proporções de classe em cada fold, essencial em bases desbalanceadas."
+  },
+  {
+    "id": "metrics",
+    "label": "Métricas",
+    "x": 80,
+    "y": 460,
+    "module": "protocols",
+    "link": "../modules/02-protocols.md#3-evaluation-metrics",
+    "desc": "Acurácia, precisão, recall, F1, AUC, R2, MAE e RMSE: cada métrica responde uma pergunta diferente."
+  },
+  {
+    "id": "confusion",
+    "label": "Matriz de\nConfusão",
+    "x": 210,
+    "y": 535,
+    "module": "protocols",
+    "link": "../activities/atividade-1.md#part-a--classification",
+    "desc": "Mostra o tipo de erro. Em diagnóstico médico, falso negativo e falso positivo têm custos diferentes."
+  },
+  {
+    "id": "leakage",
+    "label": "Pipeline\nsem Vazamento",
+    "x": 365,
+    "y": 500,
+    "module": "protocols",
+    "link": "../activities/atividade-1.md#implementation-notes",
+    "desc": "Pré-processamento deve ser ajustado dentro de cada fold; StandardScaler fora do fold vaza informação."
+  },
+  {
+    "id": "stats-tests",
+    "label": "Wilcoxon\nFriedman",
+    "x": 360,
+    "y": 230,
+    "module": "protocols",
+    "link": "../modules/02-protocols.md#4-comparing-classifiers-statistically",
+    "desc": "Testes estatísticos evitam declarar vencedor quando a diferença está dentro da variação dos folds."
+  },
+  {
+    "id": "shallow",
+    "label": "Técnicas Rasas\nPreditivas",
+    "x": 425,
+    "y": 625,
+    "w": 160,
+    "h": 60,
+    "type": "module",
+    "module": "shallow",
+    "link": "../modules/03-shallow.md",
+    "desc": "Modelos supervisionados com viés indutivo explícito e forte valor como baseline em dados tabulares."
+  },
+  {
+    "id": "linear-models",
+    "label": "Linear\nRidge Lasso",
+    "x": 140,
+    "y": 645,
+    "module": "shallow",
+    "link": "../modules/03-shallow.md#1-linear-models",
+    "desc": "Baseline regressivo: simples, interpretável e competitivo quando o sinal é aproximadamente linear."
+  },
+  {
+    "id": "logistic",
+    "label": "Regressão\nLogística",
+    "x": 210,
+    "y": 700,
+    "module": "shallow",
+    "link": "../modules/03-shallow.md#logistic-regression",
+    "desc": "Classificador linear probabilístico; referência obrigatória antes de usar modelos mais complexos."
+  },
+  {
+    "id": "knn-nb",
+    "label": "k-NN\nNaive Bayes",
+    "x": 340,
+    "y": 715,
+    "module": "shallow",
+    "link": "../modules/03-shallow.md#2-instance-based-methods",
+    "desc": "k-NN usa localidade geométrica; Naive Bayes usa independência condicional e probabilidade."
+  },
+  {
+    "id": "svm-svr",
+    "label": "SVM\nSVR",
+    "x": 545,
+    "y": 720,
+    "module": "shallow",
+    "link": "../modules/03-shallow.md#4-geometric-methods",
+    "desc": "Métodos de margem máxima; kernels permitem fronteiras não lineares via produto interno implícito."
+  },
+  {
+    "id": "trees",
+    "label": "Árvores\nID3 CART",
+    "x": 650,
+    "y": 675,
+    "module": "shallow",
+    "link": "../modules/03-shallow.md#5-tree-based-methods",
+    "desc": "Particionamento recursivo do espaço; interpretável, mas de alta variância quando não regularizado."
+  },
+  {
+    "id": "ensembles",
+    "label": "Ensembles",
+    "x": 690,
+    "y": 580,
+    "module": "shallow",
+    "link": "../modules/03-shallow.md#6-ensemble-methods",
+    "desc": "Bagging reduz variância; boosting reduz viés; Random Forest e XGBoost são baselines fortes em tabular."
+  },
+  {
+    "id": "mlp-baseline",
+    "label": "MLP\nBaseline",
+    "x": 515,
+    "y": 540,
+    "module": "shallow",
+    "link": "../modules/03-shallow.md#mlp-as-a-shallow-baseline",
+    "desc": "Transição para deep learning: rede rasa que ainda compete como modelo tabular supervisionado."
+  },
+  {
+    "id": "descriptive",
+    "label": "Modelos\nDescritivos",
+    "x": 855,
+    "y": 610,
+    "w": 160,
+    "h": 60,
+    "type": "module",
+    "module": "descriptive",
+    "link": "../modules/04-descriptive.md",
+    "desc": "Aprendizagem sem rótulos: revelar grupos, manifolds, projeções e estrutura latente dos dados."
+  },
+  {
+    "id": "kmeans",
+    "label": "K-Means",
+    "x": 845,
+    "y": 715,
+    "module": "descriptive",
+    "link": "../modules/04-descriptive.md#k-means",
+    "desc": "Minimiza variância intra-cluster; assume grupos aproximadamente esféricos e exige escolher K."
+  },
+  {
+    "id": "hierarchical",
+    "label": "Hierárquico",
+    "x": 1015,
+    "y": 705,
+    "module": "descriptive",
+    "link": "../modules/04-descriptive.md#hierarchical-clustering",
+    "desc": "Gera dendrograma e revela estrutura aninhada sem escolher K antecipadamente."
+  },
+  {
+    "id": "dbscan",
+    "label": "DBSCAN",
+    "x": 1110,
+    "y": 625,
+    "module": "descriptive",
+    "link": "../modules/04-descriptive.md#dbscan",
+    "desc": "Agrupamento por densidade; encontra formas arbitrárias e marca ruído/outliers."
+  },
+  {
+    "id": "cluster-metrics",
+    "label": "Silhueta\nDavies-Bouldin",
+    "x": 1080,
+    "y": 520,
+    "module": "descriptive",
+    "link": "../modules/04-descriptive.md#cluster-validity-indices",
+    "desc": "Índices internos e externos ajudam a avaliar qualidade de agrupamento sem depender apenas de inspeção visual."
+  },
+  {
+    "id": "pca-lda",
+    "label": "PCA\nLDA",
+    "x": 900,
+    "y": 500,
+    "module": "descriptive",
+    "link": "../modules/04-descriptive.md#2-dimensionality-reduction",
+    "desc": "PCA preserva variância sem rótulos; LDA usa rótulos para maximizar separação entre classes."
+  },
+  {
+    "id": "tsne-umap",
+    "label": "t-SNE\nUMAP",
+    "x": 770,
+    "y": 525,
+    "module": "descriptive",
+    "link": "../modules/04-descriptive.md#t-sne",
+    "desc": "Métodos não lineares para visualização de estrutura; t-SNE é exploratório, UMAP pode generalizar melhor."
+  },
+  {
+    "id": "deep",
+    "label": "Técnicas\nProfundas",
+    "x": 1000,
+    "y": 345,
+    "w": 160,
+    "h": 60,
+    "type": "module",
+    "module": "deep",
+    "link": "../modules/05-deep.md",
+    "desc": "Arquiteturas que aprendem representações hierárquicas e especializadas para imagens, sequências, pares e geração."
+  },
+  {
+    "id": "perceptron",
+    "label": "Perceptron\nXOR",
+    "x": 1020,
+    "y": 215,
+    "module": "deep",
+    "link": "../modules/05-deep.md#1-biological-motivation-and-the-perceptron",
+    "desc": "Unidade linear aprendível; a limitação XOR motiva composição e camadas ocultas."
+  },
+  {
+    "id": "backprop",
+    "label": "Backprop\nOtimização",
+    "x": 1120,
+    "y": 265,
+    "module": "deep",
+    "link": "../modules/05-deep.md#3-backpropagation-and-gradient-based-optimisation",
+    "desc": "Regra da cadeia para crédito entre camadas; SGD, momentum, RMSprop e Adam ajustam os pesos."
+  },
+  {
+    "id": "mlp",
+    "label": "MLP",
+    "x": 1120,
+    "y": 365,
+    "module": "deep",
+    "link": "../modules/05-deep.md#4-multilayer-perceptron-mlp",
+    "desc": "Rede totalmente conectada; base prática para funções não lineares em dados vetoriais/tabulares."
+  },
+  {
+    "id": "cnn",
+    "label": "CNN",
+    "x": 1110,
+    "y": 455,
+    "module": "deep",
+    "link": "../modules/05-deep.md#5-convolutional-neural-networks-cnn",
+    "desc": "Convolução, pooling e compartilhamento de parâmetros para dados com estrutura espacial."
+  },
+  {
+    "id": "rnn",
+    "label": "RNN\nLSTM GRU",
+    "x": 930,
+    "y": 230,
+    "module": "deep",
+    "link": "../modules/05-deep.md#6-recurrent-neural-networks-rnn",
+    "desc": "Modelos sequenciais com estado; LSTM/GRU mitigam gradientes desaparecentes em dependências longas."
+  },
+  {
+    "id": "siamese",
+    "label": "Redes\nSiamesas",
+    "x": 815,
+    "y": 300,
+    "module": "deep",
+    "link": "../modules/05-deep.md#7-siamese-networks",
+    "desc": "Aprendizagem de similaridade com encoders compartilhados; útil em verificação e few-shot learning."
+  },
+  {
+    "id": "transformer",
+    "label": "Transformer",
+    "x": 820,
+    "y": 400,
+    "module": "deep",
+    "link": "../modules/05-deep.md#8-transformer-and-generative-models",
+    "desc": "Self-attention e multi-head attention para dependências longas e processamento paralelo de sequências."
+  },
+  {
+    "id": "generative",
+    "label": "Generativos\nGPT VAE GAN",
+    "x": 930,
+    "y": 470,
+    "module": "deep",
+    "link": "../modules/05-deep.md#transformer-as-a-generative-model",
+    "desc": "Panorama de mecanismos generativos: autoregressivo, latente, adversarial e difusão."
+  }
+];
+
+  const edges = [
+  [
+    "ml",
+    "foundations"
+  ],
+  [
+    "ml",
+    "protocols"
+  ],
+  [
+    "ml",
+    "shallow"
+  ],
+  [
+    "ml",
+    "descriptive"
+  ],
+  [
+    "ml",
+    "deep"
+  ],
+  [
+    "foundations",
+    "linear-algebra"
+  ],
+  [
+    "foundations",
+    "geometry"
+  ],
+  [
+    "foundations",
+    "probability"
+  ],
+  [
+    "foundations",
+    "bayes-mle"
+  ],
+  [
+    "foundations",
+    "bias-variance"
+  ],
+  [
+    "protocols",
+    "splits"
+  ],
+  [
+    "protocols",
+    "stratification"
+  ],
+  [
+    "protocols",
+    "metrics"
+  ],
+  [
+    "protocols",
+    "confusion"
+  ],
+  [
+    "protocols",
+    "leakage"
+  ],
+  [
+    "protocols",
+    "stats-tests"
+  ],
+  [
+    "shallow",
+    "linear-models"
+  ],
+  [
+    "shallow",
+    "logistic"
+  ],
+  [
+    "shallow",
+    "knn-nb"
+  ],
+  [
+    "shallow",
+    "svm-svr"
+  ],
+  [
+    "shallow",
+    "trees"
+  ],
+  [
+    "shallow",
+    "ensembles"
+  ],
+  [
+    "shallow",
+    "mlp-baseline"
+  ],
+  [
+    "descriptive",
+    "kmeans"
+  ],
+  [
+    "descriptive",
+    "hierarchical"
+  ],
+  [
+    "descriptive",
+    "dbscan"
+  ],
+  [
+    "descriptive",
+    "cluster-metrics"
+  ],
+  [
+    "descriptive",
+    "pca-lda"
+  ],
+  [
+    "descriptive",
+    "tsne-umap"
+  ],
+  [
+    "deep",
+    "perceptron"
+  ],
+  [
+    "deep",
+    "backprop"
+  ],
+  [
+    "deep",
+    "mlp"
+  ],
+  [
+    "deep",
+    "cnn"
+  ],
+  [
+    "deep",
+    "rnn"
+  ],
+  [
+    "deep",
+    "siamese"
+  ],
+  [
+    "deep",
+    "transformer"
+  ],
+  [
+    "deep",
+    "generative"
+  ]
+];
+  // END GENERATED: mindmap-data
+
+  const nodeById = new Map(nodes.map(node => [node.id, node]));
+  const detailModule = document.getElementById('mindmap-detail-module');
+  const detailTitle = document.getElementById('mindmap-detail-title');
+  const detailText = document.getElementById('mindmap-detail-text');
+  const detailTags = document.getElementById('mindmap-detail-tags');
+  const detailLink = document.getElementById('mindmap-detail-link');
+
+  function ns(tag) {
+    return document.createElementNS('http://www.w3.org/2000/svg', tag);
+  }
+
+  function colorFor(node) {
+    if (node.type === 'root') return '#1f2937';
+    return modules[node.module].color;
+  }
+
+  function splitLabel(label) {
+    return label.split('\n');
+  }
+
+  function render() {
+    const edgeLayer = ns('g');
+    edgeLayer.setAttribute('class', 'mindmap-edges');
+    svg.appendChild(edgeLayer);
+
+    edges.forEach(([sourceId, targetId]) => {
+      const source = nodeById.get(sourceId);
+      const target = nodeById.get(targetId);
+      const line = ns('line');
+      line.setAttribute('x1', source.x);
+      line.setAttribute('y1', source.y);
+      line.setAttribute('x2', target.x);
+      line.setAttribute('y2', target.y);
+      line.setAttribute('class', 'mindmap-edge');
+      line.dataset.source = sourceId;
+      line.dataset.target = targetId;
+      edgeLayer.appendChild(line);
+    });
+
+    const nodeLayer = ns('g');
+    nodeLayer.setAttribute('class', 'mindmap-nodes');
+    svg.appendChild(nodeLayer);
+
+    nodes.forEach(node => {
+      const width = node.w || 126;
+      const height = node.h || 48;
+      const group = ns('g');
+      group.setAttribute('class', `mindmap-node ${node.type || 'concept'}`);
+      group.setAttribute('tabindex', '0');
+      group.setAttribute('role', 'button');
+      group.setAttribute('aria-label', node.label.replace(/\n/g, ' '));
+      group.dataset.id = node.id;
+      group.dataset.module = node.module;
+      group.setAttribute('transform', `translate(${node.x - width / 2},${node.y - height / 2})`);
+
+      const rect = ns('rect');
+      rect.setAttribute('width', width);
+      rect.setAttribute('height', height);
+      rect.setAttribute('rx', node.type === 'root' ? 8 : 7);
+      rect.setAttribute('fill', colorFor(node));
+      group.appendChild(rect);
+
+      const text = ns('text');
+      text.setAttribute('x', width / 2);
+      text.setAttribute('y', height / 2 - (splitLabel(node.label).length - 1) * 7);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dominant-baseline', 'middle');
+      splitLabel(node.label).forEach((line, index) => {
+        const tspan = ns('tspan');
+        tspan.setAttribute('x', width / 2);
+        tspan.setAttribute('dy', index === 0 ? 0 : 16);
+        tspan.textContent = line;
+        text.appendChild(tspan);
+      });
+      group.appendChild(text);
+
+      group.addEventListener('click', () => selectNode(node.id));
+      group.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          selectNode(node.id);
+        }
+      });
+
+      nodeLayer.appendChild(group);
+    });
+
+    selectNode('ml');
+  }
+
+  function selectNode(id) {
+    const node = nodeById.get(id);
+    document.querySelectorAll('.mindmap-node').forEach(el => {
+      el.classList.toggle('selected', el.dataset.id === id);
+    });
+    document.querySelectorAll('.mindmap-edge').forEach(el => {
+      el.classList.toggle('selected', el.dataset.source === id || el.dataset.target === id);
+    });
+
+    const module = node.module === 'all' ? 'Mapa' : modules[node.module].label;
+    detailModule.textContent = module;
+    detailTitle.textContent = node.label.replace(/\n/g, ' ');
+    detailText.textContent = node.desc;
+    detailLink.href = node.link || '../README.md';
+    detailTags.innerHTML = '';
+
+    const tags = node.type === 'root'
+      ? ['fundamentos', 'protocolos', 'modelos']
+      : [module, node.type === 'module' ? 'módulo' : 'conceito'];
+    tags.forEach(tag => {
+      const span = document.createElement('span');
+      span.textContent = tag;
+      detailTags.appendChild(span);
+    });
+  }
+
+  function setFilter(filter) {
+    document.querySelectorAll('.mindmap-filter').forEach(button => {
+      button.classList.toggle('active', button.dataset.filter === filter);
+    });
+    document.querySelectorAll('.mindmap-node').forEach(el => {
+      const visible = filter === 'all' || el.dataset.module === filter || el.dataset.module === 'all';
+      el.classList.toggle('muted', !visible);
+    });
+    document.querySelectorAll('.mindmap-edge').forEach(el => {
+      const source = nodeById.get(el.dataset.source);
+      const target = nodeById.get(el.dataset.target);
+      const visible = filter === 'all' || source.module === filter || target.module === filter;
+      el.classList.toggle('muted', !visible);
+    });
+    selectNode(filter === 'all' ? 'ml' : filter);
+  }
+
+  document.querySelectorAll('.mindmap-filter').forEach(button => {
+    button.addEventListener('click', () => setFilter(button.dataset.filter));
+  });
+
+  render();
+})();
+</script>
 </body>
 </html>

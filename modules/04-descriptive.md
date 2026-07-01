@@ -14,6 +14,23 @@ These techniques are foundational in exploratory data analysis, feature engineer
 
 ---
 
+## How to Use This Module (Exam Prep)
+
+**After this module you should be able to:**
+- Explain what "unsupervised" means and when you'd use it (no labels).
+- Run one iteration of **k-means** by hand and state its assumptions/weaknesses.
+- Compare **k-means vs. hierarchical vs. DBSCAN** — what each can and can't do.
+- Explain **PCA** as variance maximisation and compute proportion of variance explained.
+- Distinguish **PCA vs. LDA** (unsupervised vs. supervised) and **PCA vs. t-SNE** (linear vs. non-linear, reusable vs. visualisation-only).
+
+**⭐ High-yield for exams:** k-means algorithm + its assumptions · choosing $K$ (elbow/silhouette) · DBSCAN's core/border/noise points · PCA = eigenvectors of the covariance · PCA vs. LDA vs. t-SNE differences.
+
+**If you only read one thing:** §1 Clustering (k-means mechanics) and the **PCA** part of §2.
+
+**Suggested time:** ~75 min reading + ~40 min on the [Worked Examples](#worked-examples) and [Self-Check](#self-check).
+
+---
+
 ## 1. Clustering
 
 Clustering partitions a dataset $\mathcal{D} = \{\mathbf{x}_i\}_{i=1}^n$ into groups such that intra-cluster similarity is high and inter-cluster similarity is low. The definition of "similarity" is determined by the algorithm's inductive bias.
@@ -31,6 +48,15 @@ $$\min_{\{\mu_k\}, \{C_k\}} \sum_{k=1}^K \sum_{\mathbf{x}_i \in C_k} \|\mathbf{x
 4. Repeat steps 2–3 until convergence.
 
 **Key hyperparameters:** $K$ (number of clusters), initialisation strategy, distance metric.
+
+> **💡 Intuition:** k-means alternates two cheap steps until nothing moves: **(1) assign** each point to the nearest centroid, **(2) move** each centroid to the mean of its points. Like dropping $K$ flags, sending each person to their closest flag, then moving each flag to the middle of its crowd — repeat. It only finds *spherical, equal-sized* blobs, and the result depends on where you drop the flags.
+
+> **📝 Worked Example — one k-means iteration ($K=2$)**
+> 1-D points: $\{1, 2, 3, 10, 11, 12\}$. Initial centroids $\mu_1 = 1$, $\mu_2 = 11$.
+> 1. **Assign** (nearest centroid): $\{1,2,3\} \to \mu_1$ (distances 0,1,2 beat 10,9,8); $\{10,11,12\} \to \mu_2$.
+> 2. **Update**: $\mu_1 = \text{mean}(1,2,3) = \mathbf{2}$; $\mu_2 = \text{mean}(10,11,12) = \mathbf{11}$.
+> 3. **Re-assign**: no point changes cluster → **converged**. Final clusters $\{1,2,3\}$ and $\{10,11,12\}$.
+> Try $\mu_1=1, \mu_2=2$ instead and you reach a *worse* solution — proof that **initialisation matters** (hence k-means++ and multiple restarts).
 
 **Common pitfalls:** Sensitivity to initialisation (mitigated by k-means++, multiple restarts); assumes spherical clusters of equal size; $K$ must be specified a priori. The **elbow method** and **silhouette score** are standard heuristics for selecting $K$.
 
@@ -82,7 +108,14 @@ Finds the $q$ orthogonal directions of maximum variance in the data. Given centr
 
 $$\mathbf{Z} = \mathbf{X} \mathbf{V}_q$$
 
+> **💡 Intuition:** PCA finds new axes (principal components) ordered by how much the data *spreads* along them. Component 1 is the single direction of greatest variance; component 2 is the next, at right angles; and so on. Keep the first few and you compress the data while losing as little spread (information) as possible. The eigenvalue $\lambda_j$ literally *is* the variance captured by component $j$.
+
 **Proportion of variance explained** by component $j$: $\frac{\lambda_j}{\sum_k \lambda_k}$. The **scree plot** shows this as a function of $j$.
+
+> **📝 Worked Example — how many components to keep?**
+> A 5-feature dataset gives covariance eigenvalues $\lambda = [6.0,\ 2.5,\ 1.0,\ 0.4,\ 0.1]$ (total = 10).
+> - PC1 explains $6.0/10 = \mathbf{60\%}$; PC2 adds $2.5/10 = 25\%$ → cumulative **85%**; PC3 adds 10% → **95%**.
+> - To retain **≥ 95% variance**, keep the **first 3 components** — reducing 5 dimensions to 3 while discarding only the last 5% (likely noise). That threshold rule is the standard exam answer for "how many components?"
 
 **Key hyperparameters:** $q$ (number of components) or explained variance threshold (e.g., 95%).
 
@@ -107,6 +140,63 @@ Stochastic Neighbour Embedding with Student-$t$ kernel: a non-linear technique f
 ### UMAP
 
 Uniform Manifold Approximation and Projection: a manifold learning method that is faster than t-SNE, scales to larger datasets, and (unlike t-SNE) can be used for supervised dimensionality reduction and generalises to new data.
+
+> **💡 Intuition — PCA vs. LDA vs. t-SNE (exam favourite):** **PCA** = unsupervised, keeps directions of max *variance*. **LDA** = supervised, keeps directions that best *separate classes*. **t-SNE/UMAP** = non-linear, for *visualising* clusters in 2-D — t-SNE can't be reused on new points, UMAP can.
+
+---
+
+## Worked Examples
+
+Collected for revision: **one k-means iteration** (§1) and **PCA variance-explained / component selection** (§2). Re-run the k-means assign→update loop from scratch — that two-step cycle is the most likely hand-trace on the exam.
+
+---
+
+## Self-Check
+
+<details>
+<summary><strong>Q1.</strong> What two steps does k-means alternate, and when does it stop? (§1)</summary>
+
+**Assign** each point to its nearest centroid, then **update** each centroid to the mean of its assigned points. It stops when assignments no longer change (convergence).
+</details>
+
+<details>
+<summary><strong>Q2.</strong> Your clusters are crescent-shaped (non-spherical) with some outliers. k-means or DBSCAN? (§1)</summary>
+
+**DBSCAN** — it finds arbitrary shapes by density and labels outliers as noise. k-means assumes round, equal-sized blobs and forces every point into a cluster.
+</details>
+
+<details>
+<summary><strong>Q3.</strong> Eigenvalues [4, 3, 2, 1]. What % of variance do the first two components explain? (§2)</summary>
+
+Total = 10; first two = 4 + 3 = 7 → **70%**.
+</details>
+
+<details>
+<summary><strong>Q4.</strong> You have class labels and want a projection that separates classes best. PCA or LDA? (§2)</summary>
+
+**LDA** — it's supervised and maximises between-class vs. within-class scatter. PCA ignores labels and only maximises total variance.
+</details>
+
+<details>
+<summary><strong>Q5.</strong> Why should you not feed a t-SNE embedding into a classifier as features? (§2)</summary>
+
+t-SNE is non-deterministic and **does not generalise to new points** — there's no reusable mapping. It's for visualisation only; use PCA or UMAP for pre-processing.
+</details>
+
+---
+
+## 🔑 Quick Revision
+
+| Concept | One-line takeaway |
+|---|---|
+| k-means | assign → update → repeat; spherical clusters; needs $K$; init-sensitive |
+| Choosing $K$ | elbow method + silhouette score |
+| Hierarchical | dendrogram, no $K$ upfront; linkage = single/complete/average/Ward |
+| DBSCAN | density-based; finds any shape; flags noise; knobs $\varepsilon$, MinPts |
+| PCA | eigenvectors of covariance; max variance; **unsupervised**; linear |
+| LDA | max class separation; **supervised**; ≤ $K-1$ components |
+| t-SNE / UMAP | non-linear visualisation; t-SNE viz-only, UMAP reusable |
+| Variance explained | $\lambda_j / \sum_k \lambda_k$; keep components to reach ~95% |
 
 ---
 

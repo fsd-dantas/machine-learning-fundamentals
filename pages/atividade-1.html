@@ -43,7 +43,7 @@
       <a href="../index.html">Início</a>
       <a href="atividade-1.html">Atividade 1</a>
       <a href="mapa-mental.html">Mapa Mental</a>
-      <a href="https://github.com/fsd-dantas/ppgia-puc-pr-am" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/fsd-dantas/machine-learning-fundamentals" target="_blank" rel="noopener">GitHub</a>
     </nav>
     <button class="theme-toggle" data-theme-toggle aria-label="Alternar tema"></button>
   </div>
@@ -112,6 +112,9 @@
 
     <!-- Code block -->
     <div class="card mb-8" data-reveal>
+      <p style="font-size:var(--text-xs);color:var(--text-muted);margin-bottom:var(--space-3);">
+        Trecho ilustrativo. A fonte executável canônica é <code>activities/atividade-1.py</code>, que inclui baseline linear, <code>Pipeline</code> e <code>StandardScaler</code> por fold para evitar vazamento de dados.
+      </p>
       <div style="font-size:var(--text-xs);color:var(--text-faint);margin-bottom:var(--space-3);font-family:var(--font-mono);">leitura_dataset_a.py</div>
       <pre class="code-block"><span class="cm"># Parte A — Classificação: Breast Cancer Wisconsin</span>
 <span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_breast_cancer
@@ -161,15 +164,17 @@ classifiers = {
           </tr>
         </thead>
         <tbody>
-          <tr><td>Árvore de Decisão</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>k-NN</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>Naive Bayes</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>SVM (RBF)</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>MLP</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>Random Forest</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>Bagging</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>AdaBoost</td><td class="pending">—</td><td class="pending">—</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr class="best-row"><td>⭐ Melhor Indutor</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>Regressão Logística <em>(baseline linear)</em></td><td>97.37</td><td>0.9714</td><td>0.9773</td><td>0.9676</td></tr>
+          <tr><td>Árvore de Decisão</td><td>91.04</td><td>0.9028</td><td>0.9080</td><td>0.9000</td></tr>
+          <tr><td>k-NN</td><td>96.31</td><td>0.9599</td><td>0.9664</td><td>0.9553</td></tr>
+          <tr><td>Naive Bayes</td><td>93.85</td><td>0.9331</td><td>0.9428</td><td>0.9280</td></tr>
+          <tr><td>SVM (RBF)</td><td>97.72</td><td>0.9754</td><td>0.9783</td><td>0.9732</td></tr>
+          <tr><td>MLP</td><td>97.72</td><td>0.9753</td><td>0.9797</td><td>0.9723</td></tr>
+          <tr><td>Random Forest</td><td>95.61</td><td>0.9529</td><td>0.9557</td><td>0.9527</td></tr>
+          <tr><td>Bagging</td><td>95.43</td><td>0.9512</td><td>0.9514</td><td>0.9520</td></tr>
+          <tr><td>AdaBoost</td><td>95.25</td><td>0.9487</td><td>0.9523</td><td>0.9469</td></tr>
+          <tr><td>XGBoost</td><td>96.31</td><td>0.9604</td><td>0.9635</td><td>0.9592</td></tr>
+          <tr class="best-row"><td>⭐ Melhor Indutor — SVM / MLP (empate)</td><td>97.72</td><td>0.9754</td><td>0.9797</td><td>0.9732</td></tr>
         </tbody>
       </table>
     </div>
@@ -181,22 +186,22 @@ classifiers = {
         <div style="padding:var(--space-4);background:var(--surface-2);border-radius:var(--radius-lg);border:1px solid var(--border-light);">
           <div style="font-size:var(--text-xs);color:var(--accent);font-weight:600;margin-bottom:var(--space-2);">A.1</div>
           <p style="font-size:var(--text-sm);margin-bottom:var(--space-2);">Qual a taxa de acerto de cada classe (maligno / benigno)?</p>
-          <div style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;">R: a preencher após execução dos experimentos</div>
+          <div style="font-size:var(--text-xs);color:var(--text-muted);">R: Para o melhor modelo (SVM), a taxa de acerto por classe (recall) é <strong>maligno = 203/212 = 95,75%</strong> e <strong>benigno = 353/357 = 98,88%</strong>. A classe maligna é a mais difícil — exatamente a direção clinicamente crítica, pois um falso negativo adia o tratamento.</div>
         </div>
         <div style="padding:var(--space-4);background:var(--surface-2);border-radius:var(--radius-lg);border:1px solid var(--border-light);">
           <div style="font-size:var(--text-xs);color:var(--accent);font-weight:600;margin-bottom:var(--space-2);">A.2</div>
           <p style="font-size:var(--text-sm);margin-bottom:var(--space-2);">Informe a matriz de confusão do melhor modelo.</p>
-          <div style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;">R: a preencher após execução dos experimentos</div>
+          <div style="font-size:var(--text-xs);color:var(--text-muted);">R: SVM (predições out-of-fold agregadas, linhas = verdade, colunas = predito): <code>[[203, 9], [4, 353]]</code> — 9 malignos previstos como benignos (falsos negativos) e 4 benignos previstos como malignos (falsos positivos).</div>
         </div>
         <div style="padding:var(--space-4);background:var(--surface-2);border-radius:var(--radius-lg);border:1px solid var(--border-light);">
           <div style="font-size:var(--text-xs);color:var(--accent);font-weight:600;margin-bottom:var(--space-2);">A.3</div>
           <p style="font-size:var(--text-sm);margin-bottom:var(--space-2);">Informe o valor dos parâmetros utilizados no treinamento.</p>
-          <div style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;">R: a preencher após execução dos experimentos</div>
+          <div style="font-size:var(--text-xs);color:var(--text-muted);">R: Melhores modelos (com <code>StandardScaler</code> por fold, <code>random_state=42</code>): <strong>SVM</strong> — <code>C=1.0, kernel='rbf', gamma='scale'</code>; <strong>MLP</strong> — <code>hidden_layer_sizes=(100,), activation='relu', solver='adam', alpha=1e-4, max_iter=1000</code>. Demais indutores em configuração padrão do scikit-learn.</div>
         </div>
         <div style="padding:var(--space-4);background:var(--surface-2);border-radius:var(--radius-lg);border:1px solid var(--border-light);">
           <div style="font-size:var(--text-xs);color:var(--accent);font-weight:600;margin-bottom:var(--space-2);">A.4</div>
           <p style="font-size:var(--text-sm);margin-bottom:var(--space-2);">Há diferença significativa entre Acurácia e F1-Score?</p>
-          <div style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;">R: a preencher após execução dos experimentos</div>
+          <div style="font-size:var(--text-xs);color:var(--text-muted);">R: Não — para os melhores modelos a diferença é de ~0,2 pp (SVM: acurácia 0,9772 vs F1-macro 0,9754). O F1-macro fica levemente abaixo porque pondera igualmente as duas classes e a classe minoritária (maligna) tem recall um pouco menor. Com o desbalanceamento moderado (62,7% / 37,3%) as duas métricas concordam. Um teste de Wilcoxon entre os dois melhores (SVM vs MLP) dá <code>p=0,875</code>: empate estatístico.</div>
         </div>
       </div>
     </div>
@@ -235,6 +240,9 @@ classifiers = {
 
     <!-- Code block B -->
     <div class="card mb-8" data-reveal>
+      <p style="font-size:var(--text-xs);color:var(--text-muted);margin-bottom:var(--space-3);">
+        Trecho ilustrativo. A fonte executável canônica é <code>activities/atividade-1.py</code>, que inclui Ridge como baseline linear e aplica pré-processamento dentro de cada fold.
+      </p>
       <div style="font-size:var(--text-xs);color:var(--text-faint);margin-bottom:var(--space-3);font-family:var(--font-mono);">leitura_dataset_b.py</div>
       <pre class="code-block"><span class="cm"># Parte B — Regressão: Diabetes Dataset</span>
 <span class="kw">from</span> sklearn <span class="kw">import</span> datasets
@@ -279,14 +287,15 @@ regressors = {
           </tr>
         </thead>
         <tbody>
-          <tr><td>Árvore de Regressão</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>k-NN</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>SVR (RBF)</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>MLP</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>Random Forest</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>Bagging</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr><td>XGBoost</td><td class="pending">—</td><td class="pending">a preencher</td></tr>
-          <tr class="best-row"><td>⭐ Melhor Regressor</td><td>—</td><td>—</td></tr>
+          <tr><td>Linear (Ridge) <em>(baseline linear)</em></td><td>0.4791</td><td>44.24</td></tr>
+          <tr><td>Árvore de Regressão</td><td>−0.1325</td><td>63.64</td></tr>
+          <tr><td>k-NN</td><td>0.3912</td><td>46.76</td></tr>
+          <tr><td>SVR (RBF)</td><td>0.1492</td><td>58.89</td></tr>
+          <tr><td>MLP</td><td>0.4686</td><td>44.05</td></tr>
+          <tr><td>Random Forest</td><td>0.4294</td><td>46.69</td></tr>
+          <tr><td>Bagging</td><td>0.3761</td><td>48.81</td></tr>
+          <tr><td>XGBoost</td><td>0.3290</td><td>50.20</td></tr>
+          <tr class="best-row"><td>⭐ Melhor R²: Ridge · Menor MAE: MLP</td><td>0.4791</td><td>44.05</td></tr>
         </tbody>
       </table>
     </div>
@@ -297,7 +306,7 @@ regressors = {
       <div style="padding:var(--space-4);background:var(--surface-2);border-radius:var(--radius-lg);border:1px solid var(--border-light);">
         <div style="font-size:var(--text-xs);color:var(--accent);font-weight:600;margin-bottom:var(--space-2);">B.1</div>
         <p style="font-size:var(--text-sm);margin-bottom:var(--space-2);">Informe o valor dos parâmetros utilizados no treinamento do modelo com melhor R².</p>
-        <div style="font-size:var(--text-xs);color:var(--text-faint);font-style:italic;">R: a preencher após execução dos experimentos</div>
+        <div style="font-size:var(--text-xs);color:var(--text-muted);">R: Melhor R² = <strong>Ridge</strong> (R²=0,4791) com <code>alpha=1.0</code> e <code>StandardScaler</code> por fold (<code>random_state=42</code>). Observação importante: o ranking não é consistente entre métricas — o <strong>MLP</strong> obtém o menor MAE (44,05) apesar de R² ligeiramente inferior, pois o R² é dominado pelos erros quadráticos (resíduos grandes) e o MAE pondera todos os erros linearmente. Em uma base de sinal baixo (melhor R² ≈ 0,48), um modelo linear regularizado é o padrão acertado.</div>
       </div>
     </div>
 
@@ -313,7 +322,7 @@ regressors = {
       Aluno: <a href="mailto:fsd.dantas@gmail.com">Fernando Dantas</a>
     </div>
     <div>
-      <a href="https://github.com/fsd-dantas/ppgia-puc-pr-am" target="_blank" rel="noopener">github.com/fsd-dantas/ppgia-puc-pr-am</a>
+      <a href="https://github.com/fsd-dantas/machine-learning-fundamentals" target="_blank" rel="noopener">github.com/fsd-dantas/machine-learning-fundamentals</a>
     </div>
   </div>
 </footer>

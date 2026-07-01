@@ -14,6 +14,79 @@ This module covers the biological motivation and the Perceptron as the atomic un
 
 ---
 
+## How to Use This Module (Exam Prep)
+
+**After this module you should be able to:**
+- Explain the **perceptron**, its update rule, and **why XOR forced the move to multiple layers**.
+- Describe **backpropagation** in words (forward pass → loss → chain-rule gradients backward).
+- Apply one **gradient-descent** weight update from numbers.
+- State what **CNNs** (spatial locality, parameter sharing) and **RNN/LSTM** (sequence memory, gates) are *for*.
+- Explain **self-attention** at a high level and why transformers beat RNNs on long sequences.
+- Match each architecture to a data type (images→CNN, sequences→RNN/Transformer, tabular→MLP).
+
+**⭐ High-yield for exams:** perceptron + XOR limitation · what backprop does · vanishing-gradient problem (and how LSTM gates fix it) · CNN parameter sharing · attention vs. recurrence · activation functions (ReLU, sigmoid, softmax).
+
+**If you only read one thing:** §1 Perceptron and §3 Backpropagation — they explain *how every neural network learns*.
+
+**Suggested time:** ~2 h reading + ~45 min on the [Worked Examples](#worked-examples) and [Self-Check](#self-check). Architectures (§5–8) are often awareness-level; confirm depth with your instructor.
+
+---
+
+## 1. Biological Motivation and the Perceptron
+
+### From Biological Neuron to Computational Unit
+
+A biological neuron integrates incoming signals at its dendrites, and fires an output spike along its axon once the aggregated input crosses a threshold. The **McCulloch–Pitts neuron** (1943) abstracts this into a binary thresholded sum of inputs — establishing that networks of simple thresholding units can, in principle, compute logical functions. This is the conceptual seed of all neural computation: a unit that performs a weighted aggregation followed by a non-linearity.
+
+### The Perceptron
+
+Rosenblatt's **Perceptron** (1958) makes the McCulloch–Pitts unit *learnable* by attaching adjustable weights and a learning rule. Given input $\mathbf{x} \in \mathbb{R}^d$, weights $\mathbf{w}$, and bias $b$, it computes:
+
+$$\hat{y} = \text{sign}(\mathbf{w}^\top \mathbf{x} + b)$$
+
+The decision surface $\mathbf{w}^\top \mathbf{x} + b = 0$ is exactly the hyperplane from [Module 1 — Analytical Geometry](01-foundations.md#2-analytical-geometry). The perceptron is therefore a **linear classifier**; what is new relative to Module 3 is not the model but the *online, error-driven* way it is fit.
+
+### Perceptron Learning Rule
+
+For each misclassified example $(\mathbf{x}_i, y_i)$ with labels $y_i \in \{-1, +1\}$, the weights are nudged toward correcting that example:
+
+$$\mathbf{w} \leftarrow \mathbf{w} + \eta \, y_i \, \mathbf{x}_i, \qquad b \leftarrow b + \eta \, y_i$$
+
+where $\eta > 0$ is the learning rate. The **Perceptron Convergence Theorem** (Novikoff, 1962) guarantees that this procedure terminates in a finite number of updates **if and only if the training data is linearly separable**.
+
+> **📝 Worked Example — one perceptron update**
+> Weights $\mathbf{w} = [0, 0]$, $b = 0$, learning rate $\eta = 1$. Training point $\mathbf{x} = [2, 1]$ with true label $y = +1$.
+> 1. **Predict:** $\mathbf{w}^\top\mathbf{x} + b = 0 \Rightarrow \text{sign}(0)$ — treat as wrong (not $+1$).
+> 2. **Update** (misclassified): $\mathbf{w} \leftarrow [0,0] + (1)(+1)[2,1] = [2, 1]$; $b \leftarrow 0 + 1 = 1$.
+> 3. **Re-check:** $\mathbf{w}^\top\mathbf{x} + b = (2)(2)+(1)(1)+1 = 6 > 0 \Rightarrow +1$ ✓ now correct.
+>
+> The rule simply **nudges the boundary toward getting that point right**. Repeat over all points until none are misclassified (guaranteed only if the data is linearly separable).
+
+### The XOR Limitation — Why Depth Is Necessary
+
+A single perceptron can represent AND, OR, and NOT, but **not XOR**: no single hyperplane separates $\{(0,0),(1,1)\}$ from $\{(0,1),(1,0)\}$. Minsky and Papert's *Perceptrons* (1969) formalised this limitation and is commonly cited as a trigger for the first "AI winter."
+
+```
+   XOR is not linearly separable — no single straight line splits ● from ○:
+
+     x2
+      1 │  ●(0,1)        ○(1,1)
+        │
+        │        (no line works)
+      0 │  ○(0,0)        ●(1,1→1,0)
+        └────────────────────────  x1
+           0              1
+     ● = class 1 (output 1):  (0,1),(1,0)
+     ○ = class 0 (output 0):  (0,0),(1,1)
+   Fix: stack perceptrons — a hidden layer carves TWO lines and combines them.
+```
+
+The resolution is **composition**: stacking perceptrons into hidden layers lets the network carve the input space with multiple hyperplanes and recombine them, representing non-linearly-separable functions such as XOR. This is the direct motivation for the Multilayer Perceptron (§4) and for the depth argument that follows. Two ingredients were required to make the stack trainable: a **differentiable** activation replacing the non-differentiable $\text{sign}(\cdot)$, and **backpropagation** (§3) to assign credit across layers.
+
+**Common pitfall:** Treating the perceptron as obsolete. Its update rule is the conceptual ancestor of stochastic gradient descent, and the linear-separability lens remains the right first question to ask of any classification problem before reaching for capacity.
+
+---
+
 ## 2. Universal Approximation and the Case for Depth
 
 A single hidden-layer MLP with a non-polynomial activation function can approximate any continuous function on a compact set to arbitrary precision — the **Universal Approximation Theorem** (Cybenko, 1989; Hornik, 1991). This establishes theoretical expressiveness but does not address efficiency.
@@ -32,6 +105,8 @@ $$\mathbf{a}^{(l)} = \sigma\left(\mathbf{W}^{(l)} \mathbf{a}^{(l-1)} + \mathbf{b
 
 ### Backpropagation
 
+> **💡 Intuition:** Training a net = "turn each knob (weight) the direction that lowers the error." Backprop is just the **chain rule** computing, efficiently, *how much each weight contributed to the error* — by propagating the error signal **backwards** from the output layer to the input layer. Forward pass makes a prediction; backward pass assigns blame; the optimiser nudges every weight a little against its gradient. Repeat.
+
 Computes the gradient of the loss $\mathcal{L}$ with respect to all parameters via the chain rule. The gradient at layer $l$:
 
 $$\boldsymbol{\delta}^{(l)} = \left(\mathbf{W}^{(l+1)\top} \boldsymbol{\delta}^{(l+1)}\right) \odot \sigma'\left(\mathbf{z}^{(l)}\right)$$
@@ -46,6 +121,14 @@ where $\mathbf{z}^{(l)} = \mathbf{W}^{(l)} \mathbf{a}^{(l-1)} + \mathbf{b}^{(l)}
 | Momentum | Accumulates gradient history | Dampens oscillations |
 | RMSprop | Adapts learning rate per parameter | Effective for non-stationary objectives |
 | Adam | Combines momentum + RMSprop | Default for most tasks; $\beta_1=0.9$, $\beta_2=0.999$ |
+
+> **📝 Worked Example — one gradient-descent step**
+> Minimise $\mathcal{L}(w) = w^2$ (gradient $\nabla\mathcal{L} = 2w$). Start $w = 4$, learning rate $\eta = 0.1$.
+> - Step 1: $w \leftarrow 4 - 0.1(2\cdot4) = 4 - 0.8 = \mathbf{3.2}$
+> - Step 2: $w \leftarrow 3.2 - 0.1(2\cdot3.2) = 3.2 - 0.64 = \mathbf{2.56}$
+> - … each step moves $w$ **downhill** toward the minimum at $w=0$.
+>
+> **Learning-rate lesson:** too small ($\eta=0.001$) → crawls; too large ($\eta=1$) → $w \leftarrow 4 - 1(8) = -4$, then $+4$… it **oscillates and diverges**. Picking $\eta$ is the single most important hyperparameter.
 
 ### Activation Functions
 
@@ -114,6 +197,8 @@ $$\mathbf{c}_t = \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \tanh(
 
 The cell state acts as a long-term memory that can be selectively read, written, and erased — resolving the vanishing gradient problem for sequences of practical length.
 
+> **💡 Intuition:** A plain RNN forgets the start of a long sentence by the time it reaches the end (gradients vanish). An LSTM adds a **conveyor-belt memory** (the cell state) plus three gates that decide what to **forget**, what to **add**, and what to **output**. Because information can ride the belt unchanged, gradients survive over long sequences. GRU is the slimmed-down version (two gates, no separate cell state).
+
 ### Gated Recurrent Unit (GRU)
 
 A simplified variant of LSTM with two gates (reset and update) and no separate cell state. Competitive performance with fewer parameters.
@@ -173,6 +258,8 @@ $$\mathbf{Q} = \mathbf{X}\mathbf{W}^Q, \quad \mathbf{K} = \mathbf{X}\mathbf{W}^K
 
 $$\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\left(\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{d_k}}\right)\mathbf{V}$$
 
+> **💡 Intuition:** Self-attention lets every word **look at every other word** and decide how much each one matters for understanding it ("it" → which noun?). Think database lookup: each token issues a **query**, every token offers a **key**; the match scores (softmax) say how much of each token's **value** to mix in. Unlike an RNN, this happens for all positions **at once** (parallel) and connects distant words in one step — at the cost of $O(n^2)$ comparisons.
+
 The $\frac{1}{\sqrt{d_k}}$ scaling prevents dot products from saturating the softmax as $d_k$ grows. **Multi-head attention** runs $h$ independent attention heads in parallel, concatenates their outputs, and projects the result — allowing simultaneous attention to different representation subspaces.
 
 **Key advantage over RNNs:** All positions are processed in parallel; long-range dependencies are modelled in $O(1)$ sequential operations (vs. $O(n)$ for RNNs). Trade-off: $O(n^2)$ memory and compute in sequence length $n$.
@@ -203,6 +290,77 @@ Broader generative model landscape:
 | Diffusion model | Iterative denoising of Gaussian noise toward data distribution |
 
 **Graph Neural Networks (GNNs)** extend deep learning to graph-structured data — directly relevant to SDN topology modelling. They are surveyed in Extended Reading below.
+
+---
+
+## Worked Examples
+
+Collected for revision: **one perceptron update** (§1), the **XOR non-separability picture** (§1), and **one gradient-descent step** (§3). The perceptron update and the GD step are the two hand-computations most likely to appear; the XOR argument is the most likely *conceptual* question.
+
+---
+
+## Self-Check
+
+<details>
+<summary><strong>Q1.</strong> Why can't a single perceptron solve XOR, and what fixes it? (§1)</summary>
+
+XOR isn't **linearly separable** — no single straight line splits its two classes. Adding a **hidden layer** (stacking perceptrons) lets the network combine multiple lines to carve a non-linear boundary.
+</details>
+
+<details>
+<summary><strong>Q2.</strong> In one sentence each: what do the forward pass and the backward pass do? (§3)</summary>
+
+**Forward:** feed input through the layers to produce a prediction and compute the loss. **Backward:** use the chain rule to compute each weight's gradient (its share of the blame), so the optimiser can update it.
+</details>
+
+<details>
+<summary><strong>Q3.</strong> $\mathcal{L}(w)=w^2$, $w=2$, $\eta=0.1$. What is $w$ after one GD step? (§3)</summary>
+
+$\nabla = 2w = 4$; $w \leftarrow 2 - 0.1(4) = \mathbf{1.6}$. (Moving downhill toward 0.)
+</details>
+
+<details>
+<summary><strong>Q4.</strong> What problem do LSTM gates solve that plain RNNs suffer from? (§6)</summary>
+
+The **vanishing/exploding gradient** problem over long sequences. The cell state + gates let information (and gradients) flow across many time steps without decaying.
+</details>
+
+<details>
+<summary><strong>Q5.</strong> Why do CNNs use far fewer parameters than a fully connected net on images? (§5)</summary>
+
+**Parameter sharing** — the same small kernel slides across the whole image, so one set of weights detects a feature everywhere, instead of separate weights per pixel.
+</details>
+
+<details>
+<summary><strong>Q6.</strong> One advantage and one cost of self-attention vs. an RNN. (§8)</summary>
+
+**Advantage:** processes all positions in parallel and links distant tokens in one step (great for long-range dependencies). **Cost:** $O(n^2)$ memory/compute in sequence length.
+</details>
+
+<details>
+<summary><strong>Q7.</strong> Which activation for a hidden layer, for a binary output, for a multiclass output? (§3)</summary>
+
+Hidden: **ReLU**. Binary output: **sigmoid**. Multiclass output: **softmax**.
+</details>
+
+---
+
+## 🔑 Quick Revision
+
+| Concept | One-line takeaway |
+|---|---|
+| Perceptron | linear classifier + error-driven update; can't do XOR |
+| Depth | stacking layers represents non-linear functions (XOR fix) |
+| Backprop | chain rule assigns error-blame to every weight, output→input |
+| Gradient descent | $w \leftarrow w - \eta\nabla\mathcal{L}$; $\eta$ too big diverges, too small crawls |
+| Activations | ReLU (hidden), sigmoid (binary), softmax (multiclass) |
+| Regularisation | dropout, L2/weight decay, batch-norm, early stopping |
+| CNN | local filters + parameter sharing → images |
+| RNN → LSTM/GRU | sequence memory; gates fix vanishing gradients |
+| Siamese | shared encoder; similarity/few-shot learning |
+| Transformer | self-attention; parallel; long-range; $O(n^2)$; powers GPT |
+
+**Two mantras:** *Forward predicts, backward assigns blame, optimiser updates.* *XOR broke the single perceptron — depth fixed it.*
 
 ---
 
