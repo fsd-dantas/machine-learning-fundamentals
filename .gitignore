@@ -1,0 +1,7 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Assistant profile (never committed)
+CLAUDE.md
