@@ -225,16 +225,16 @@ Minimising a loss = maximising likelihood under an assumed noise model: **Gaussi
 
 ## 🔑 Quick Revision
 
-| Concept | One-line takeaway |
-|---|---|
-| $\mathbf{X} \in \mathbb{R}^{n \times d}$ | $n$ rows (samples), $d$ columns (features) — memorise this shape |
-| SVD | rotate → stretch → rotate; big singular values = main directions (powers PCA) |
-| Norms | $\ell_2$ = Euclidean (margins, k-NN); $\ell_1$ = sparsity (Lasso) |
-| Distance + scaling | large-magnitude features dominate distance → **standardise** for k-NN/SVM/MLP |
-| Bayes' theorem | posterior ∝ likelihood × prior; rare priors keep posteriors low |
-| Bias–variance | simple = bias/underfit; complex = variance/overfit; aim for the U-curve bottom |
-| MLE | Gaussian → MSE; Bernoulli/categorical → cross-entropy |
-| Significance tests | Wilcoxon (2 methods), Friedman+Nemenyi (many) — never trust a 1–2% gap alone |
+| Concept                                  | One-line takeaway                                                              |
+| ---------------------------------------- | ------------------------------------------------------------------------------ |
+| $\mathbf{X} \in \mathbb{R}^{n \times d}$ | $n$ rows (samples), $d$ columns (features) — memorise this shape               |
+| SVD                                      | rotate → stretch → rotate; big singular values = main directions (powers PCA)  |
+| Norms                                    | $\ell_2$ = Euclidean (margins, k-NN); $\ell_1$ = sparsity (Lasso)              |
+| Distance + scaling                       | large-magnitude features dominate distance → **standardise** for k-NN/SVM/MLP  |
+| Bayes' theorem                           | posterior ∝ likelihood × prior; rare priors keep posteriors low                |
+| Bias–variance                            | simple = bias/underfit; complex = variance/overfit; aim for the U-curve bottom |
+| MLE                                      | Gaussian → MSE; Bernoulli/categorical → cross-entropy                          |
+| Significance tests                       | Wilcoxon (2 methods), Friedman+Nemenyi (many) — never trust a 1–2% gap alone   |
 
 ---
 

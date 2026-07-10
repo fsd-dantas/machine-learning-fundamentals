@@ -22,15 +22,13 @@ Supporting files: **[glossary.md](glossary.md)** (every acronym, one line each) 
 
 The modules have prerequisites, so follow the numeric order. Rough budget for a from-scratch pass:
 
-| Order | Module | Read | Practice | Why this order |
-|---|---|---|---|---|
-| 1 | [01 — Foundations](modules/01-foundations.md) | 90 min | 45 min | Notation + Bayes + bias–variance underpin everything |
-| 2 | [02 — Protocols](modules/02-protocols.md) | 75 min | 45 min | You must know *how results are measured* before judging methods |
-| 3 | [03 — Shallow](modules/03-shallow.md) | 2.5 h | 60 min | The core of the course; largest module |
-| 4 | [04 — Descriptive](modules/04-descriptive.md) | 75 min | 40 min | Unsupervised — lighter, mostly conceptual |
-| 5 | [05 — Deep](modules/05-deep.md) | 2 h | 45 min | Builds on the MLP/perceptron from Module 3 |
-
-**Total ≈ 13 hours** for a thorough first pass. Split across a week, that's < 2 h/day.
+| Order | Module                                        | Why this order                                                  |
+| ----- | --------------------------------------------- | --------------------------------------------------------------- |
+| 1     | [01 – Foundations](modules/01-foundations.md) | Notation + Bayes + bias–variance underpin everything            |
+| 2     | [02 – Protocols](modules/02-protocols.md)     | You must know *how results are measured* before judging methods |
+| 3     | [03 – Shallow](modules/03-shallow.md)         | The core of the course; largest module                          |
+| 4     | [04 – Descriptive](modules/04-descriptive.md) | Unsupervised — lighter, mostly conceptual                       |
+| 5     | [05 – Deep](modules/05-deep.md)               | Builds on the MLP/perceptron from Module 3                      |
 
 **Crunched for time (one evening)?** Read every module's **How to Use** + **Quick Revision** + **Worked Examples** only (~2 h), then drill [flashcards.md](flashcards.md).
 
@@ -57,13 +55,13 @@ These recur across the modules' high-yield flags. If you master nothing else, ma
 
 The exam may ask you to *calculate*, not just explain. Drill these five:
 
-| Computation | Recipe | Where |
-|---|---|---|
-| Information gain | parent entropy − weighted child entropy; biggest wins | [M3 §5](modules/03-shallow.md#5-tree-based-methods) |
-| Confusion-matrix metrics | precision = TP/(TP+FP); recall = TP/(TP+FN); F1 = harmonic mean | [M2 §3](modules/02-protocols.md#3-evaluation-metrics) |
-| Bayes' theorem | posterior = (likelihood × prior) / total prob. of evidence | [M1 §3](modules/01-foundations.md#3-probability--statistics) |
-| Gradient-descent step | $w \leftarrow w - \eta\,\nabla\mathcal{L}$ | [M5 §3](modules/05-deep.md#3-backpropagation-and-gradient-based-optimisation) |
-| k-means iteration | assign to nearest centroid → move centroid to mean → repeat | [M4 §1](modules/04-descriptive.md#1-clustering) |
+| Computation              | Recipe                                                          | Where                                                                         |
+| ------------------------ | --------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Information gain         | parent entropy − weighted child entropy; biggest wins           | [M3 §5](modules/03-shallow.md#5-tree-based-methods)                           |
+| Confusion-matrix metrics | precision = TP/(TP+FP); recall = TP/(TP+FN); F1 = harmonic mean | [M2 §3](modules/02-protocols.md#3-evaluation-metrics)                         |
+| Bayes' theorem           | posterior = (likelihood × prior) / total prob. of evidence      | [M1 §3](modules/01-foundations.md#3-probability--statistics)                  |
+| Gradient-descent step    | $w \leftarrow w - \eta\,\nabla\mathcal{L}$                      | [M5 §3](modules/05-deep.md#3-backpropagation-and-gradient-based-optimisation) |
+| k-means iteration        | assign to nearest centroid → move centroid to mean → repeat     | [M4 §1](modules/04-descriptive.md#1-clustering)                               |
 
 ---
 
