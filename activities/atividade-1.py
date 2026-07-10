@@ -97,6 +97,7 @@ def part_a():
 
     cv = StratifiedKFold(n_splits=N_SPLITS, shuffle=True, random_state=SEED)
     rows, per_fold_acc, per_fold_f1 = [], {}, {}
+    per_fold_prec, per_fold_rec = {}, {}
 
     for name, clf in classifiers.items():
         res = cross_validate(
@@ -104,6 +105,8 @@ def part_a():
         )
         per_fold_acc[name] = res["test_accuracy"]
         per_fold_f1[name] = res["test_f1"]
+        per_fold_prec[name] = res["test_precision"]
+        per_fold_rec[name] = res["test_recall"]
         rows.append(
             {
                 "Classifier": name,
@@ -127,6 +130,7 @@ def part_a():
           f"W={stat:.3f}, p={p:.4f} -> "
           f"{'significant' if p < 0.05 else 'NOT significant'} at alpha=0.05")
     return {"df": df, "acc": per_fold_acc, "f1": per_fold_f1,
+            "prec": per_fold_prec, "rec": per_fold_rec,
             "classifiers": classifiers, "X": X, "y": y, "cv": cv}
 
 
@@ -219,6 +223,14 @@ def respostas_docx(a, b):
           f"Wilcoxon por dobra: W={stat}, p={p:.4f} -> empate estatistico, "
           f"sem evidencia para vencedor unico")
 
+    print("\nMetricas do grupo de empate (media ± dp entre dobras):")
+    for name in (best, second):
+        vals = [(lbl, a[key][name]) for lbl, key in
+                (("acc", "acc"), ("F1_macro", "f1"),
+                 ("prec_macro", "prec"), ("rec_macro", "rec"))]
+        print(f"      {name}: " + " | ".join(
+            f"{lbl} {v.mean():.4f} ± {v.std(ddof=1):.4f}" for lbl, v in vals))
+
     for name in (best, second):
         yhat = cross_val_predict(
             make_pipeline(name, a["classifiers"][name]), a["X"], a["y"], cv=a["cv"]
@@ -231,9 +243,10 @@ def respostas_docx(a, b):
               f"maligno {cm[0, 0]}/{cm[0].sum()} = {cm[0, 0] / cm[0].sum():.4f} | "
               f"benigno {cm[1, 1]}/{cm[1].sum()} = {cm[1, 1] / cm[1].sum():.4f}")
 
-    print(f"\n[A.3] Parametros do treinamento ({best}; padrao da biblioteca, "
-          f"sem busca de hiperparametros):")
-    print(a["classifiers"][best].get_params())
+    for name in (best, second):
+        print(f"\n[A.3] Parametros do treinamento ({name}; padrao da biblioteca, "
+              f"sem busca de hiperparametros):")
+        print(a["classifiers"][name].get_params())
 
     acc, f1 = a["acc"][best], a["f1"][best]
     print(f"\n[A.4] {best} por dobra:")

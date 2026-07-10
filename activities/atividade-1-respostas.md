@@ -20,13 +20,22 @@ Os experimentos seguiram o protocolo especificado no enunciado: **validação cr
 
 ### Melhor Resultado Observado
 
+**Dois indutores são reportados, em empate técnico:**
+
 | Indutor | Taxa de Acerto (%) | F1_score | Precisão | Recall |
 |---|---|---|---|---|
-| **MLP (Perceptron Multicamadas)** | **97,72 ± 1,33** | 0,9753 ± 0,0145 | 0,9797 | 0,9723 |
+| **MLP (Perceptron Multicamadas)** | **97,72 ± 1,33** | 0,9753 ± 0,0145 | 0,9797 ± 0,0103 | 0,9723 ± 0,0189 |
+| **SVM (`SVC`, kernel RBF)** | **97,72 ± 1,82** | 0,9754 ± 0,0196 | 0,9783 ± 0,0172 | 0,9732 ± 0,0224 |
 
 *F1, precisão e recall em média macro; dispersões são desvios-padrão entre as cinco dobras.*
 
-**MLP e SVM formam o grupo de melhor desempenho e constituem empate estatístico** (ambos com taxa de acerto média de 97,72%; teste de postos sinalizados de Wilcoxon sobre as acurácias por dobra: W = 4,0; p = 0,875): **não há evidência suficiente para declarar um vencedor único.** O campo "Indutor" foi preenchido com o MLP apenas por exigência de nome único no formulário; registre-se que o critério de desempate adotado (precisão macro marginalmente superior) é *post hoc*, não pré-declarado. Pelo critério alternativo de recall da classe maligna — mais relevante no contexto da tarefa —, a SVM apresentaria pequena vantagem (9 contra 10 falsos negativos; ver A.2).
+**Justificativa do empate técnico.** Os dois indutores são reportados conjuntamente porque nenhum critério defensável os separa:
+
+1. **Taxa de acerto média idêntica** (97,72% em ambos, coincidindo até a quarta casa decimal), e o teste de postos sinalizados de Wilcoxon sobre as acurácias por dobra não distingue os modelos (W = 4,0; p = 0,875) — as diferenças por dobra alternam de sinal (MLP vence nas dobras 2 e 5, SVM nas dobras 1 e 3, com empate exato na dobra 4; ver tabela de estabilidade), comportamento típico de ruído amostral, não de superioridade sistemática.
+2. **A diferença entre eles é uma ordem de grandeza menor que a variação entre dobras** de cada um (DP de 1,33 e 1,82 pontos percentuais, respectivamente).
+3. **As demais métricas se dividem**: a SVM é marginalmente superior em F1 macro (0,9754 vs. 0,9753) e recall macro (0,9732 vs. 0,9723) — incluindo o recall da classe maligna (9 contra 10 falsos negativos; ver A.2) —, enquanto o MLP é marginalmente superior em precisão macro (0,9797 vs. 0,9783). Nenhum critério de desempate foi pré-declarado no protocolo, e qualquer escolha *post hoc* entre essas margens seria arbitrária.
+
+Declarar um vencedor único, portanto, sobreinterpretaria diferenças menores que o ruído entre dobras.
 
 ### Estabilidade dos resultados (acurácia por dobra)
 
@@ -46,12 +55,14 @@ Os valores por dobra alimentam os testes estatísticos reportados neste document
 
 ### A.1) Qual a taxa de acerto de cada classe?
 
-**R:** Considerando as predições *out-of-fold* agregadas das cinco dobras do MLP (indutor reportado na tabela):
+**R:** Considerando as predições *out-of-fold* agregadas das cinco dobras, para os dois indutores reportados:
 
-- **Classe maligna (0): 95,28%** (202 acertos em 212 instâncias);
-- **Classe benigna (1): 99,16%** (354 acertos em 357 instâncias).
+| Classe | MLP | SVM |
+|---|---|---|
+| **Maligna (0)** | 95,28% (202/212) | 95,75% (203/212) |
+| **Benigna (1)** | 99,16% (354/357) | 98,88% (353/357) |
 
-Para a SVM, empatada no grupo de melhor desempenho, os valores correspondentes são 95,75% (203/212) e 98,88% (353/357). Em ambos os modelos, a classe maligna — minoritária e crítica no contexto da tarefa — concentra a maior parte dos erros.
+Em ambos os modelos, a classe maligna — minoritária e crítica no contexto da tarefa — concentra a maior parte dos erros; os dois indutores diferem em apenas uma instância maligna e uma benigna.
 
 ### A.2) Informe a matriz de confusão.
 
@@ -75,7 +86,9 @@ No contexto abstrato da tarefa, os falsos negativos (tumores malignos classifica
 
 ### A.3) Informe o valor dos parâmetros utilizados no treinamento.
 
-**R:** O indutor reportado foi o `MLPClassifier` do scikit-learn, precedido de padronização dos atributos (`StandardScaler` ajustado apenas nas dobras de treinamento). Os parâmetros correspondem aos **valores padrão da biblioteca, sem busca sistemática de hiperparâmetros** (apenas o número máximo de épocas foi elevado para assegurar convergência):
+**R:** Ambos os indutores reportados (`MLPClassifier` e `SVC` do scikit-learn) foram precedidos de padronização dos atributos (`StandardScaler` ajustado apenas nas dobras de treinamento). Os parâmetros correspondem aos **valores padrão das bibliotecas, sem busca sistemática de hiperparâmetros** (no MLP, apenas o número máximo de épocas foi elevado para assegurar convergência).
+
+**MLP (`MLPClassifier`):**
 
 | Parâmetro | Valor |
 |---|---|
@@ -89,9 +102,21 @@ No contexto abstrato da tarefa, os falsos negativos (tumores malignos classifica
 | Critério de parada | tolerância 10⁻⁴ por 10 iterações sem melhora |
 | Semente aleatória | 42 |
 
+**SVM (`SVC`):**
+
+| Parâmetro | Valor |
+|---|---|
+| Kernel | RBF (base radial) |
+| Regularização (C) | 1,0 |
+| Coeficiente do kernel (γ) | `scale` = 1 / (n_atributos · var(X)) |
+| Tolerância de parada | 10⁻³ |
+| *Shrinking* | ativado |
+| Limite de iterações | ilimitado (`max_iter=-1`) |
+| Semente aleatória | 42 |
+
 ### A.4) Há diferença significativa entre acurácia e F1_score?
 
-**R:** A diferença descritiva é pequena: acurácia média de 0,9772 (DP 0,0133) contra F1_score macro médio de 0,9753 (DP 0,0145) — **0,19 ponto percentual**, com o mesmo sinal nas cinco dobras (diferenças por dobra: 0,0016; 0,0030; 0,0034; 0,0006; 0,0007).
+**R:** A diferença descritiva é pequena: acurácia média de 0,9772 (DP 0,0133) contra F1_score macro médio de 0,9753 (DP 0,0145) — **0,19 ponto percentual**, com o mesmo sinal nas cinco dobras (diferenças por dobra: 0,0016; 0,0030; 0,0034; 0,0006; 0,0007). Os valores referem-se ao MLP; o padrão na SVM é análogo (0,9772 vs. 0,9754).
 
 Duas ressalvas impedem tratar essa comparação como teste de hipótese formal. Primeira: acurácia e F1 macro **não são estimativas intercambiáveis da mesma grandeza** — medem propriedades diferentes do desempenho —, de modo que perguntar se "diferem significativamente" não tem a mesma interpretação de comparar dois classificadores pela mesma métrica. Segunda: com apenas cinco pares, um teste pareado bilateral tem potência baixíssima — o menor p alcançável pelo teste de Wilcoxon nessa configuração é 0,0625, valor atingido aqui; um resultado "não significativo" seria, portanto, um piso de potência, e **não constitui evidência de equivalência**.
 
