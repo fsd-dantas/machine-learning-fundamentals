@@ -151,12 +151,14 @@ def part_b():
 
     scoring = {"r2": "r2", "mae": "neg_mean_absolute_error"}
     cv = KFold(n_splits=N_SPLITS, shuffle=True, random_state=SEED)
-    rows = []
+    rows, per_fold_r2, per_fold_mae = [], {}, {}
 
     for name, reg in regressors.items():
         res = cross_validate(
             make_pipeline(name, reg), X, y, cv=cv, scoring=scoring
         )
+        per_fold_r2[name] = res["test_r2"]
+        per_fold_mae[name] = -res["test_mae"]
         mae = -res["test_mae"].mean()
         rows.append(
             {
@@ -176,49 +178,92 @@ def part_b():
     print(f"\n[B.1] Highest R2: {best_r2} ({df['R2'].max():.4f})")
     print(f"[B.1] Lowest MAE: {best_mae} ({df['MAE'].min():.4f})")
     print(f"[B.1] Rankings consistent: {best_r2 == best_mae}")
-    return {"df": df, "regressors": regressors}
+    return {"df": df, "regressors": regressors,
+            "r2": per_fold_r2, "mae": per_fold_mae}
 
 
 # --------------------------------------------------------------------------- #
 # Respostas — enunciado original (docx): melhor indutor apenas
 # --------------------------------------------------------------------------- #
 def respostas_docx(a, b):
-    """Answers to the original assignment questions, best inductor only.
+    """Answers to the original assignment questions (docx inductor list only).
 
     The assignment's inductor lists do not include the linear baselines, so
-    Logistic Regression / Ridge are dropped from the ranking before selecting
-    the winner. Feeds `atividade-1-respostas.md`.
+    Logistic Regression / Ridge are dropped from the rankings; Ridge is still
+    reported alongside Part B as the out-of-list reference. Reports the top
+    group as a statistical tie rather than a single winner, prints per-fold
+    values and standard deviations, and treats the accuracy-vs-F1 question
+    descriptively: the two metrics are not interchangeable estimates of the
+    same quantity, and with 5 pairs the smallest achievable two-sided p of a
+    paired test is 0.0625, so "not significant" would be a power floor, not
+    evidence of equivalence. Feeds `atividade-1-respostas.md`.
     """
     df = a["df"].drop(index="Logistic Regression")
-    best = df["Accuracy"].sort_values(ascending=False).index[0]
-    clf = a["classifiers"][best]
+    ranking = df["Accuracy"].sort_values(ascending=False)
+    best, second = ranking.index[0], ranking.index[1]
 
-    print("\n=== Respostas — enunciado original (melhor indutor) ===")
-    print(f"\nMelhor indutor (Parte A): {best} | "
-          f"acc={df.loc[best, 'Accuracy']:.4f} f1={df.loc[best, 'F1']:.4f} "
-          f"prec={df.loc[best, 'Precision']:.4f} rec={df.loc[best, 'Recall']:.4f}")
+    print("\n=== Respostas — enunciado original (lista de indutores do docx) ===")
 
-    yhat = cross_val_predict(make_pipeline(best, clf), a["X"], a["y"], cv=a["cv"])
-    cm = confusion_matrix(a["y"], yhat)
-    print("\n[A.1] Taxa de acerto por classe (predicoes out-of-fold agregadas):")
-    print(f"      maligno (0): {cm[0, 0]}/{cm[0].sum()} = {cm[0, 0] / cm[0].sum():.4f}")
-    print(f"      benigno (1): {cm[1, 1]}/{cm[1].sum()} = {cm[1, 1] / cm[1].sum():.4f}")
-    print("\n[A.2] Matriz de confusao (linhas=real, colunas=previsto; 0=maligno, 1=benigno):")
-    print(cm)
-    print(f"\n[A.3] Parametros do treinamento ({best}):")
-    print(clf.get_params())
-    w, p = wilcoxon(a["acc"][best], a["f1"][best])
-    print(f"\n[A.4] Acuracia media={a['acc'][best].mean():.4f} vs "
-          f"F1_macro medio={a['f1'][best].mean():.4f} | "
-          f"Wilcoxon pareado por fold: W={w}, p={p:.4f} -> "
-          f"{'diferenca significativa' if p < 0.05 else 'SEM diferenca significativa'} "
-          f"(alfa=0.05)")
+    folds = pd.DataFrame(
+        {name: a["acc"][name] for name in df.index},
+        index=[f"dobra{i + 1}" for i in range(N_SPLITS)],
+    ).T
+    folds["media"] = folds.mean(axis=1)
+    folds["dp"] = folds.iloc[:, :N_SPLITS].std(axis=1, ddof=1)
+    print("\nAcuracia por dobra (estabilidade):")
+    print(folds.sort_values("media", ascending=False).round(4).to_string())
+
+    stat, p = wilcoxon(a["acc"][best], a["acc"][second])
+    print(f"\nGrupo de melhor desempenho: {best} e {second} "
+          f"(acc medias {ranking.iloc[0]:.4f} e {ranking.iloc[1]:.4f}) | "
+          f"Wilcoxon por dobra: W={stat}, p={p:.4f} -> empate estatistico, "
+          f"sem evidencia para vencedor unico")
+
+    for name in (best, second):
+        yhat = cross_val_predict(
+            make_pipeline(name, a["classifiers"][name]), a["X"], a["y"], cv=a["cv"]
+        )
+        cm = confusion_matrix(a["y"], yhat)
+        print(f"\n[A.1/A.2] {name} — matriz de confusao out-of-fold agregada "
+              f"(linhas=real, colunas=previsto; 0=maligno, 1=benigno):")
+        print(cm)
+        print(f"      acerto por classe: "
+              f"maligno {cm[0, 0]}/{cm[0].sum()} = {cm[0, 0] / cm[0].sum():.4f} | "
+              f"benigno {cm[1, 1]}/{cm[1].sum()} = {cm[1, 1] / cm[1].sum():.4f}")
+
+    print(f"\n[A.3] Parametros do treinamento ({best}; padrao da biblioteca, "
+          f"sem busca de hiperparametros):")
+    print(a["classifiers"][best].get_params())
+
+    acc, f1 = a["acc"][best], a["f1"][best]
+    print(f"\n[A.4] {best} por dobra:")
+    print(f"      acuracia  = {np.round(acc, 4)} (media {acc.mean():.4f}, "
+          f"dp {acc.std(ddof=1):.4f})")
+    print(f"      F1_macro  = {np.round(f1, 4)} (media {f1.mean():.4f}, "
+          f"dp {f1.std(ddof=1):.4f})")
+    print(f"      acc - F1  = {np.round(acc - f1, 4)} "
+          f"(diferenca descritiva media {(acc - f1).mean():.4f})")
+    print("      Nota: metricas de grandezas distintas -> comparacao descritiva; "
+          "com 5 pares o menor p bilateral de um teste pareado e 0.0625 "
+          "(sem poder para inferencia).")
 
     dfb = b["df"].drop(index="Linear (Ridge)")
     bestb = dfb["R2"].idxmax()
-    print(f"\nMelhor regressor (Parte B): {bestb} | "
-          f"R2={dfb.loc[bestb, 'R2']:.4f} MAE={dfb.loc[bestb, 'MAE']:.4f}")
-    print(f"\n[B.1] Parametros do treinamento ({bestb}):")
+    r2, mae = b["r2"][bestb], b["mae"][bestb]
+    r2_rdg, mae_rdg = b["r2"]["Linear (Ridge)"], b["mae"]["Linear (Ridge)"]
+    print(f"\nMelhor regressor ENTRE OS SOLICITADOS no enunciado: {bestb}")
+    print(f"      R2 por dobra  = {np.round(r2, 4)} (media {r2.mean():.4f}, "
+          f"dp {r2.std(ddof=1):.4f})")
+    print(f"      MAE por dobra = {np.round(mae, 2)} (media {mae.mean():.2f}, "
+          f"dp {mae.std(ddof=1):.2f})")
+    print(f"      Referencia fora da lista: Ridge R2 medio {r2_rdg.mean():.4f} "
+          f"(dp {r2_rdg.std(ddof=1):.4f}) — maior que {bestb} — e "
+          f"MAE medio {mae_rdg.mean():.2f} (dp {mae_rdg.std(ddof=1):.2f})")
+    print("      Nota: R2 e media de R2 calculados dobra a dobra (referencia = "
+          "media/variancia do alvo do proprio fold de teste), nao variancia "
+          "explicada global.")
+    print(f"\n[B.1] Parametros do treinamento ({bestb}; padrao da biblioteca, "
+          f"sem busca de hiperparametros):")
     print(b["regressors"][bestb].get_params())
 
 

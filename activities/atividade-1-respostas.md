@@ -8,7 +8,11 @@
 
 ## Protocolo Experimental
 
-Os experimentos seguiram o protocolo especificado no enunciado: **validação cruzada com 5 folds**, estratificada na Parte A (preservando a proporção 212/357 entre classes em cada dobra) e com embaralhamento na Parte B. Todos os componentes estocásticos utilizaram semente fixa (42) para garantir reprodutibilidade. Para os indutores sensíveis à escala dos atributos (k-NN, SVM/SVR e MLP), a padronização (*z-score*) foi ajustada exclusivamente nas dobras de treinamento, por meio de *pipeline*, evitando vazamento de dados. As métricas reportadas correspondem à média das cinco dobras. Ambiente: Python 3.13, scikit-learn 1.9.0, XGBoost 3.3.0.
+Os experimentos seguiram o protocolo especificado no enunciado: **validação cruzada com 5 folds**, estratificada na Parte A (preservando a proporção 212/357 entre classes em cada dobra) e com embaralhamento na Parte B. Todos os componentes estocásticos utilizaram semente fixa (42) para garantir reprodutibilidade. Para os indutores sensíveis à escala dos atributos (k-NN, SVM/SVR e MLP), a padronização (*z-score*) foi ajustada exclusivamente nas dobras de treinamento, por meio de *pipeline*, evitando vazamento de dados. As métricas são reportadas como média das cinco dobras, acompanhadas do desvio-padrão entre dobras. Ambiente: Python 3.13, scikit-learn 1.9.0, XGBoost 3.3.0.
+
+**Escopo da comparação.** Todos os indutores foram avaliados com as configurações padrão das respectivas bibliotecas (apenas `max_iter` foi elevado, para garantir convergência do MLP); **não houve busca sistemática de hiperparâmetros**. As conclusões referem-se, portanto, à comparação de *configurações padrão*, e não à superioridade intrínseca dos algoritmos. Um eventual ajuste de hiperparâmetros exigiria validação cruzada aninhada (busca no laço interno, avaliação no laço externo); ajustar e avaliar nas mesmas dobras introduziria viés de seleção.
+
+**Nota sobre inferência estatística.** As dobras de validação cruzada não são independentes (os conjuntos de treinamento se sobrepõem), o que compromete intervalos de confiança convencionais; os desvios-padrão reportados devem ser lidos como medida descritiva de estabilidade, não como base para inferência exata.
 
 ---
 
@@ -18,35 +22,60 @@ Os experimentos seguiram o protocolo especificado no enunciado: **validação cr
 
 | Indutor | Taxa de Acerto (%) | F1_score | Precisão | Recall |
 |---|---|---|---|---|
-| **MLP (Perceptron Multicamadas)** | **97,72** | 0,9753 | 0,9797 | 0,9723 |
+| **MLP (Perceptron Multicamadas)** | **97,72 ± 1,33** | 0,9753 ± 0,0145 | 0,9797 | 0,9723 |
 
-*F1, precisão e recall em média macro. O MLP e a SVM empataram em taxa de acerto (97,72%); o teste de postos sinalizados de Wilcoxon sobre as acurácias por dobra (W = 4,0; p = 0,875) indica que os dois modelos são estatisticamente indistinguíveis neste conjunto de dados. O MLP foi selecionado por apresentar média marginalmente superior em precisão.*
+*F1, precisão e recall em média macro; dispersões são desvios-padrão entre as cinco dobras.*
 
-Ordenação completa por taxa de acerto: MLP ≈ SVM (0,9772) > k-NN ≈ XGBoost (0,9631) > Random Forest (0,9561) > Bagging (0,9543) > AdaBoost (0,9525) > Naive Bayes (0,9385) > Árvore de Decisão (0,9104).
+**MLP e SVM formam o grupo de melhor desempenho e constituem empate estatístico** (ambos com taxa de acerto média de 97,72%; teste de postos sinalizados de Wilcoxon sobre as acurácias por dobra: W = 4,0; p = 0,875): **não há evidência suficiente para declarar um vencedor único.** O campo "Indutor" foi preenchido com o MLP apenas por exigência de nome único no formulário; registre-se que o critério de desempate adotado (precisão macro marginalmente superior) é *post hoc*, não pré-declarado. Pelo critério alternativo de recall da classe maligna — mais relevante no contexto da tarefa —, a SVM apresentaria pequena vantagem (9 contra 10 falsos negativos; ver A.2).
+
+### Estabilidade dos resultados (acurácia por dobra)
+
+| Indutor | Dobra 1 | Dobra 2 | Dobra 3 | Dobra 4 | Dobra 5 | Média | DP |
+|---|---|---|---|---|---|---|---|
+| MLP | 0,9737 | 0,9649 | 0,9649 | 0,9912 | 0,9912 | 0,9772 | 0,0133 |
+| SVM | 0,9912 | 0,9474 | 0,9737 | 0,9912 | 0,9823 | 0,9772 | 0,0182 |
+| k-NN | 0,9825 | 0,9474 | 0,9386 | 0,9825 | 0,9646 | 0,9631 | 0,0200 |
+| XGBoost | 0,9737 | 0,9474 | 0,9737 | 0,9561 | 0,9646 | 0,9631 | 0,0114 |
+| Random Forest | 0,9649 | 0,9386 | 0,9561 | 0,9474 | 0,9735 | 0,9561 | 0,0138 |
+| Bagging | 0,9474 | 0,9386 | 0,9561 | 0,9737 | 0,9558 | 0,9543 | 0,0130 |
+| AdaBoost | 0,9649 | 0,9123 | 0,9649 | 0,9737 | 0,9469 | 0,9525 | 0,0245 |
+| Naive Bayes | 0,9649 | 0,9035 | 0,9298 | 0,9298 | 0,9646 | 0,9385 | 0,0262 |
+| Árvore de Decisão | 0,9298 | 0,8684 | 0,8860 | 0,9386 | 0,9292 | 0,9104 | 0,0312 |
+
+Os valores por dobra alimentam os testes estatísticos reportados neste documento e permitem avaliar a estabilidade de cada indutor: a diferença entre MLP e SVM (e entre estes e o k-NN/XGBoost) é da mesma ordem de grandeza da variação entre dobras.
 
 ### A.1) Qual a taxa de acerto de cada classe?
 
-**R:** Considerando as predições *out-of-fold* agregadas das cinco dobras do melhor modelo (MLP):
+**R:** Considerando as predições *out-of-fold* agregadas das cinco dobras do MLP (indutor reportado na tabela):
 
 - **Classe maligna (0): 95,28%** (202 acertos em 212 instâncias);
 - **Classe benigna (1): 99,16%** (354 acertos em 357 instâncias).
 
-Observa-se que a classe maligna — a minoritária e clinicamente crítica — concentra a maior parte dos erros do modelo.
+Para a SVM, empatada no grupo de melhor desempenho, os valores correspondentes são 95,75% (203/212) e 98,88% (353/357). Em ambos os modelos, a classe maligna — minoritária e crítica no contexto da tarefa — concentra a maior parte dos erros.
 
 ### A.2) Informe a matriz de confusão.
 
-**R:** Matriz de confusão agregada das predições *out-of-fold* do MLP (linhas = classe real; colunas = classe prevista):
+**R:** Matrizes de confusão agregadas das predições *out-of-fold* (linhas = classe real; colunas = classe prevista):
+
+**MLP:**
 
 | | Previsto: maligno (0) | Previsto: benigno (1) |
 |---|---|---|
 | **Real: maligno (0)** — 212 | 202 | 10 |
 | **Real: benigno (1)** — 357 | 3 | 354 |
 
-Os 10 falsos negativos (tumores malignos classificados como benignos) constituem o erro de maior custo no contexto clínico, pois implicam adiamento do tratamento; os 3 falsos positivos implicam apenas exames confirmatórios adicionais.
+**SVM (grupo de empate):**
+
+| | Previsto: maligno (0) | Previsto: benigno (1) |
+|---|---|---|
+| **Real: maligno (0)** — 212 | 203 | 9 |
+| **Real: benigno (1)** — 357 | 4 | 353 |
+
+No contexto abstrato da tarefa, os falsos negativos (tumores malignos classificados como benignos) tendem a apresentar custo potencialmente maior, por implicarem adiamento de investigação; os falsos positivos também têm custo não trivial — exames confirmatórios adicionais envolvem procedimento invasivo (biópsia), com ônus clínico e psicológico. Os custos efetivos, contudo, dependem do fluxo assistencial em que o modelo se inseriria, e nenhuma conclusão sobre uso clínico pode ser extraída de uma base pequena, curada e sem validação externa.
 
 ### A.3) Informe o valor dos parâmetros utilizados no treinamento.
 
-**R:** O modelo vencedor foi o `MLPClassifier` do scikit-learn, precedido de padronização dos atributos (`StandardScaler` ajustado apenas nas dobras de treinamento), com os seguintes parâmetros:
+**R:** O indutor reportado foi o `MLPClassifier` do scikit-learn, precedido de padronização dos atributos (`StandardScaler` ajustado apenas nas dobras de treinamento). Os parâmetros correspondem aos **valores padrão da biblioteca, sem busca sistemática de hiperparâmetros** (apenas o número máximo de épocas foi elevado para assegurar convergência):
 
 | Parâmetro | Valor |
 |---|---|
@@ -62,23 +91,36 @@ Os 10 falsos negativos (tumores malignos classificados como benignos) constituem
 
 ### A.4) Há diferença significativa entre acurácia e F1_score?
 
-**R:** **Não.** A acurácia média (0,9772) supera o F1_score macro médio (0,9753) em apenas 0,19 ponto percentual, e o teste de Wilcoxon pareado sobre os valores por dobra não rejeita a hipótese nula ao nível de 5% (W = 0,0; p = 0,0625). Cabe registrar, contudo, que a diferença, embora pequena, é sistemática — a acurácia excede o F1 em todas as cinco dobras. Isso decorre do desbalanceamento moderado da base (37,3% malignos vs. 62,7% benignos): a acurácia é levemente inflada pelo bom desempenho na classe majoritária (benigna, 99,16% de acerto), ao passo que o F1 macro pondera igualmente as classes e, portanto, penaliza a maior taxa de erro na classe maligna (4,72%). Em síntese, não há diferença estatisticamente significativa, mas o F1 macro é a métrica mais fidedigna para este problema, por refletir melhor o desempenho na classe minoritária e clinicamente relevante.
+**R:** A diferença descritiva é pequena: acurácia média de 0,9772 (DP 0,0133) contra F1_score macro médio de 0,9753 (DP 0,0145) — **0,19 ponto percentual**, com o mesmo sinal nas cinco dobras (diferenças por dobra: 0,0016; 0,0030; 0,0034; 0,0006; 0,0007).
+
+Duas ressalvas impedem tratar essa comparação como teste de hipótese formal. Primeira: acurácia e F1 macro **não são estimativas intercambiáveis da mesma grandeza** — medem propriedades diferentes do desempenho —, de modo que perguntar se "diferem significativamente" não tem a mesma interpretação de comparar dois classificadores pela mesma métrica. Segunda: com apenas cinco pares, um teste pareado bilateral tem potência baixíssima — o menor p alcançável pelo teste de Wilcoxon nessa configuração é 0,0625, valor atingido aqui; um resultado "não significativo" seria, portanto, um piso de potência, e **não constitui evidência de equivalência**.
+
+A leitura adequada é definicional: com o desbalanceamento moderado da base (37,3% malignos vs. 62,7% benignos), a acurácia é levemente inflada pelo bom desempenho na classe majoritária (benigna, 99,16% de acerto), ao passo que o F1 macro pondera as classes igualmente e penaliza a maior taxa de erro na classe maligna (4,72%). As métricas devem ser interpretadas segundo suas definições e sua sensibilidade ao desbalanceamento; para este problema, o F1 macro é a métrica mais informativa, por refletir melhor o desempenho na classe minoritária e mais relevante.
 
 ---
 
 ## Parte B — Regressão (Diabetes)
 
-### Tabela de Resultados (Melhor Regressor)
+### Tabela de Resultados (Melhor Regressor entre os solicitados no enunciado)
 
 | Indutor | Coeficiente de Determinação (R²) | Erro Médio Absoluto (MAE) |
 |---|---|---|
-| **MLP (`MLPRegressor`)** | **0,4686** | **44,05** |
+| **MLP (`MLPRegressor`)** | **0,4686 ± 0,0598** | **44,05 ± 2,01** |
 
-O MLP obteve, simultaneamente, o maior R² e o menor MAE entre os regressores avaliados. Ordenação completa por R²: MLP (0,4686) > Random Forest (0,4294) > k-NN (0,3912) > Bagging (0,3761) > XGBoost (0,3290) > SVR (0,1492) > Árvore de Regressão (−0,1325). Nota-se que a árvore de regressão isolada apresentou R² negativo — desempenho inferior ao de simplesmente predizer a média —, evidenciando a alta variância desse indutor sem regularização. O MAE de 44,05 corresponde a aproximadamente 13,7% da amplitude do alvo (25–346), o que indica que a base possui sinal preditivo limitado para todos os indutores avaliados.
+*Dispersões são desvios-padrão entre as cinco dobras. R² por dobra: 0,4895; 0,5226; 0,3686; 0,4991; 0,4631. MAE por dobra: 41,45; 43,02; 45,87; 46,27; 43,64.*
+
+**Distinção necessária para leitura correta:**
+
+- **Melhor entre os regressores solicitados no enunciado: MLP** — maior R² e menor MAE da lista (árvore de regressão, k-NN, SVR, MLP, Random Forest, Bagging, XGBoost).
+- **Incluindo a baseline linear adicional (fora da lista do enunciado): a regressão Ridge obtém o maior R²** — 0,4791 (DP 0,0933) —, com MAE ligeiramente superior ao do MLP (44,24; DP 2,83).
+
+Ordenação completa por R² entre os solicitados: MLP (0,4686) > Random Forest (0,4294) > k-NN (0,3912) > Bagging (0,3761) > XGBoost (0,3290) > SVR (0,1492) > Árvore de Regressão (−0,1325). A árvore isolada apresentou R² negativo — desempenho inferior ao de simplesmente predizer a média —, evidenciando sua alta variância sem regularização. O fato de uma baseline linear regularizada alcançar o maior R² reforça que a base possui sinal aproximadamente linear e limitado: o MAE de 44,05 corresponde a cerca de 13,7% da amplitude do alvo (25–346).
+
+**Nota metodológica sobre o R².** Os valores reportados são **médias de R² calculados dobra a dobra**: em cada dobra, o R² usa como referência a média e a variância do alvo do próprio conjunto de teste. Não se trata, portanto, de uma fração de "variância explicada" calculada sobre a base completa, e a comparação qualitativa com o MAE médio (sensível a erros quadráticos vs. lineares) deve ser lida sob essa estrutura por dobra.
 
 ### B.1) Informe o valor dos parâmetros utilizados no treinamento do modelo.
 
-**R:** O modelo vencedor foi o `MLPRegressor` do scikit-learn, precedido de padronização dos atributos (`StandardScaler` ajustado apenas nas dobras de treinamento), com os seguintes parâmetros:
+**R:** O indutor reportado foi o `MLPRegressor` do scikit-learn, precedido de padronização dos atributos (`StandardScaler` ajustado apenas nas dobras de treinamento). Os parâmetros correspondem aos **valores padrão da biblioteca, sem busca sistemática de hiperparâmetros** (apenas o número máximo de épocas foi elevado para assegurar convergência):
 
 | Parâmetro | Valor |
 |---|---|
@@ -103,7 +145,7 @@ Todos os resultados podem ser regenerados com:
 python activities/atividade-1.py
 ```
 
-A seção final da saída (`Respostas — enunciado original`) imprime exatamente os valores reportados neste documento: ranking dos indutores, taxa de acerto por classe, matriz de confusão, parâmetros dos modelos vencedores e o teste de significância entre acurácia e F1.
+A seção final da saída (`Respostas — enunciado original`) imprime exatamente os valores reportados neste documento: acurácia por dobra com desvios-padrão, o teste de empate entre MLP e SVM, as duas matrizes de confusão agregadas, os parâmetros dos modelos reportados, a comparação descritiva entre acurácia e F1, e os valores por dobra de R²/MAE — incluindo a referência Ridge fora da lista do enunciado.
 
 ---
 
