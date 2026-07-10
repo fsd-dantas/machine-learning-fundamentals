@@ -6,40 +6,40 @@
 
 ## Acronyms (quick lookup)
 
-| Acronym | Expansion | One-line meaning |
-|---|---|---|
-| **AUC** | Area Under the (ROC) Curve | Threshold-independent measure of classifier discrimination ([M2](modules/02-protocols.md#3-evaluation-metrics)) |
-| **CART** | Classification And Regression Trees | Tree algorithm using Gini impurity, binary splits ([M3](modules/03-shallow.md#5-tree-based-methods)) |
-| **CNN** | Convolutional Neural Network | Deep net for images; local filters + parameter sharing ([M5](modules/05-deep.md#5-convolutional-neural-networks-cnn)) |
-| **CV** | Cross-Validation | Resampling to estimate generalisation error ([M2](modules/02-protocols.md#2-data-partitioning-strategies)) |
-| **DBSCAN** | Density-Based Spatial Clustering of Applications with Noise | Density clustering; arbitrary shapes + outliers ([M4](modules/04-descriptive.md#dbscan)) |
-| **F1** | F1 Score | Harmonic mean of precision and recall ([M2](modules/02-protocols.md#3-evaluation-metrics)) |
-| **FN / FP** | False Negative / False Positive | A miss / a false alarm ([M2](modules/02-protocols.md#3-evaluation-metrics)) |
-| **GELU** | Gaussian Error Linear Unit | Smooth activation used in transformers ([M5](modules/05-deep.md#3-backpropagation-and-gradient-based-optimisation)) |
-| **GNN** | Graph Neural Network | Deep learning on graph-structured data ([M5](modules/05-deep.md#8-transformer-and-generative-models)) |
-| **GRU** | Gated Recurrent Unit | Simplified LSTM, two gates ([M5](modules/05-deep.md#6-recurrent-neural-networks-rnn)) |
-| **ID3** | Iterative Dichotomiser 3 | Original decision tree, uses information gain ([M3](modules/03-shallow.md#5-tree-based-methods)) |
-| **k-NN** | k-Nearest Neighbours | Predict from the $k$ closest training points ([M3](modules/03-shallow.md#2-instance-based-methods)) |
-| **LDA** | Linear Discriminant Analysis | Supervised dimensionality reduction; max class separation ([M4](modules/04-descriptive.md#linear-discriminant-analysis-lda)) |
-| **LSTM** | Long Short-Term Memory | Gated RNN that handles long sequences ([M5](modules/05-deep.md#6-recurrent-neural-networks-rnn)) |
-| **MAE** | Mean Absolute Error | Average absolute regression error; robust to outliers ([M2](modules/02-protocols.md#3-evaluation-metrics)) |
-| **MLE** | Maximum Likelihood Estimation | Pick parameters that make the data most probable ([M1](modules/01-foundations.md#3-probability--statistics)) |
-| **MLP** | Multilayer Perceptron | Fully connected feedforward neural network ([M5](modules/05-deep.md#4-multilayer-perceptron-mlp)) |
-| **MSE / RMSE** | (Root) Mean Squared Error | Squared regression error; penalises large errors ([M2](modules/02-protocols.md#3-evaluation-metrics)) |
-| **PCA** | Principal Component Analysis | Unsupervised max-variance dimensionality reduction ([M4](modules/04-descriptive.md#principal-component-analysis-pca)) |
-| **QDA** | Quadratic Discriminant Analysis | Like LDA but per-class covariance ([M1](modules/01-foundations.md#3-probability--statistics)) |
-| **RBF** | Radial Basis Function | Gaussian kernel for SVM ([M3](modules/03-shallow.md#4-geometric-methods)) |
-| **ReLU** | Rectified Linear Unit | $\max(0,z)$; default hidden activation ([M5](modules/05-deep.md#3-backpropagation-and-gradient-based-optimisation)) |
-| **RNN** | Recurrent Neural Network | Net with a hidden state for sequences ([M5](modules/05-deep.md#6-recurrent-neural-networks-rnn)) |
-| **ROC** | Receiver Operating Characteristic | TPR-vs-FPR curve across thresholds ([M2](modules/02-protocols.md#3-evaluation-metrics)) |
-| **R²** | Coefficient of Determination | Proportion of variance explained (can be < 0) ([M2](modules/02-protocols.md#3-evaluation-metrics)) |
-| **SGD** | Stochastic Gradient Descent | Gradient update on mini-batches ([M5](modules/05-deep.md#3-backpropagation-and-gradient-based-optimisation)) |
-| **SVD** | Singular Value Decomposition | rotate→stretch→rotate matrix factorisation; powers PCA ([M1](modules/01-foundations.md#1-linear-algebra)) |
-| **SVM / SVR** | Support Vector Machine / Regression | Maximum-margin classifier / $\varepsilon$-tube regressor ([M3](modules/03-shallow.md#4-geometric-methods)) |
-| **t-SNE** | t-distributed Stochastic Neighbour Embedding | Non-linear 2-D visualisation; not reusable ([M4](modules/04-descriptive.md#t-sne)) |
-| **TP / TN** | True Positive / True Negative | Correct positive / negative prediction ([M2](modules/02-protocols.md#3-evaluation-metrics)) |
-| **UMAP** | Uniform Manifold Approximation and Projection | Faster, reusable non-linear reduction ([M4](modules/04-descriptive.md#umap)) |
-| **XGBoost** | Extreme Gradient Boosting | Regularised, second-order gradient boosting ([M3](modules/03-shallow.md#xgboost-extreme-gradient-boosting)) |
+| Acronym        | Expansion                                                   | One-line meaning                                                                                                             |
+| -------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **AUC**        | Area Under the (ROC) Curve                                  | Threshold-independent measure of classifier discrimination ([M2](modules/02-protocols.md#3-evaluation-metrics))              |
+| **CART**       | Classification And Regression Trees                         | Tree algorithm using Gini impurity, binary splits ([M3](modules/03-shallow.md#5-tree-based-methods))                         |
+| **CNN**        | Convolutional Neural Network                                | Deep net for images; local filters + parameter sharing ([M5](modules/05-deep.md#5-convolutional-neural-networks-cnn))        |
+| **CV**         | Cross-Validation                                            | Resampling to estimate generalisation error ([M2](modules/02-protocols.md#2-data-partitioning-strategies))                   |
+| **DBSCAN**     | Density-Based Spatial Clustering of Applications with Noise | Density clustering; arbitrary shapes + outliers ([M4](modules/04-descriptive.md#dbscan))                                     |
+| **F1**         | F1 Score                                                    | Harmonic mean of precision and recall ([M2](modules/02-protocols.md#3-evaluation-metrics))                                   |
+| **FN / FP**    | False Negative / False Positive                             | A miss / a false alarm ([M2](modules/02-protocols.md#3-evaluation-metrics))                                                  |
+| **GELU**       | Gaussian Error Linear Unit                                  | Smooth activation used in transformers ([M5](modules/05-deep.md#3-backpropagation-and-gradient-based-optimisation))          |
+| **GNN**        | Graph Neural Network                                        | Deep learning on graph-structured data ([M5](modules/05-deep.md#8-transformer-and-generative-models))                        |
+| **GRU**        | Gated Recurrent Unit                                        | Simplified LSTM, two gates ([M5](modules/05-deep.md#6-recurrent-neural-networks-rnn))                                        |
+| **ID3**        | Iterative Dichotomiser 3                                    | Original decision tree, uses information gain ([M3](modules/03-shallow.md#5-tree-based-methods))                             |
+| **k-NN**       | k-Nearest Neighbours                                        | Predict from the $k$ closest training points ([M3](modules/03-shallow.md#2-instance-based-methods))                          |
+| **LDA**        | Linear Discriminant Analysis                                | Supervised dimensionality reduction; max class separation ([M4](modules/04-descriptive.md#linear-discriminant-analysis-lda)) |
+| **LSTM**       | Long Short-Term Memory                                      | Gated RNN that handles long sequences ([M5](modules/05-deep.md#6-recurrent-neural-networks-rnn))                             |
+| **MAE**        | Mean Absolute Error                                         | Average absolute regression error; robust to outliers ([M2](modules/02-protocols.md#3-evaluation-metrics))                   |
+| **MLE**        | Maximum Likelihood Estimation                               | Pick parameters that make the data most probable ([M1](modules/01-foundations.md#3-probability--statistics))                 |
+| **MLP**        | Multilayer Perceptron                                       | Fully connected feedforward neural network ([M5](modules/05-deep.md#4-multilayer-perceptron-mlp))                            |
+| **MSE / RMSE** | (Root) Mean Squared Error                                   | Squared regression error; penalises large errors ([M2](modules/02-protocols.md#3-evaluation-metrics))                        |
+| **PCA**        | Principal Component Analysis                                | Unsupervised max-variance dimensionality reduction ([M4](modules/04-descriptive.md#principal-component-analysis-pca))        |
+| **QDA**        | Quadratic Discriminant Analysis                             | Like LDA but per-class covariance ([M1](modules/01-foundations.md#3-probability--statistics))                                |
+| **RBF**        | Radial Basis Function                                       | Gaussian kernel for SVM ([M3](modules/03-shallow.md#4-geometric-methods))                                                    |
+| **ReLU**       | Rectified Linear Unit                                       | $\max(0,z)$; default hidden activation ([M5](modules/05-deep.md#3-backpropagation-and-gradient-based-optimisation))          |
+| **RNN**        | Recurrent Neural Network                                    | Net with a hidden state for sequences ([M5](modules/05-deep.md#6-recurrent-neural-networks-rnn))                             |
+| **ROC**        | Receiver Operating Characteristic                           | TPR-vs-FPR curve across thresholds ([M2](modules/02-protocols.md#3-evaluation-metrics))                                      |
+| **R²**         | Coefficient of Determination                                | Proportion of variance explained (can be < 0) ([M2](modules/02-protocols.md#3-evaluation-metrics))                           |
+| **SGD**        | Stochastic Gradient Descent                                 | Gradient update on mini-batches ([M5](modules/05-deep.md#3-backpropagation-and-gradient-based-optimisation))                 |
+| **SVD**        | Singular Value Decomposition                                | rotate→stretch→rotate matrix factorisation; powers PCA ([M1](modules/01-foundations.md#1-linear-algebra))                    |
+| **SVM / SVR**  | Support Vector Machine / Regression                         | Maximum-margin classifier / $\varepsilon$-tube regressor ([M3](modules/03-shallow.md#4-geometric-methods))                   |
+| **t-SNE**      | t-distributed Stochastic Neighbour Embedding                | Non-linear 2-D visualisation; not reusable ([M4](modules/04-descriptive.md#t-sne))                                           |
+| **TP / TN**    | True Positive / True Negative                               | Correct positive / negative prediction ([M2](modules/02-protocols.md#3-evaluation-metrics))                                  |
+| **UMAP**       | Uniform Manifold Approximation and Projection               | Faster, reusable non-linear reduction ([M4](modules/04-descriptive.md#umap))                                                 |
+| **XGBoost**    | Extreme Gradient Boosting                                   | Regularised, second-order gradient boosting ([M3](modules/03-shallow.md#xgboost-extreme-gradient-boosting))                  |
 
 ---
 
