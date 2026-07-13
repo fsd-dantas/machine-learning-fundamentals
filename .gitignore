@@ -5,3 +5,14 @@ __pycache__/
 
 # Assistant profile (never committed)
 CLAUDE.md
+
+# Instructor-provided course material — kept locally, not redistributed
+course-materials/
+
+# Experiment artefacts: datasets, weights, cached features (regenerable, large)
+activities/avaliacao-pratica-1/data/
+activities/avaliacao-pratica-1/checkpoints/
+*.npy
+*.npz
+*.hdf5
+*.keras

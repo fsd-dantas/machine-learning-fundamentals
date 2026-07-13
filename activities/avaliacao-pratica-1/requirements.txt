@@ -1,0 +1,13 @@
+# Avaliação Prática 1 — deep learning stack.
+# Colab already ships TensorFlow, PyTorch and torchvision with matching CUDA builds;
+# pinning them here would fight the runtime, so they are left to the environment and
+# only the missing pieces are installed.
+
+tensorflow>=2.15
+torch>=2.1
+torchvision>=0.16
+transformers>=4.40      # ViT (strategy 5)
+scikit-learn>=1.3
+scipy>=1.11
+numpy>=1.24
+matplotlib>=3.7         # confusion matrix
