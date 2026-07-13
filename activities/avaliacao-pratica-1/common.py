@@ -164,6 +164,48 @@ class Splits:
                 f"test {self.x_test.shape[0]:,} (official split)")
 
 
+def seed_keras_cache() -> str | None:
+    """Point Keras at a locally-attached CIFAR-10 instead of downloading it.
+
+    `cifar10.load_data()` fetches 170 MB from cs.toronto.edu, which on Kaggle has been
+    observed at ~35 KB/s — **78 minutes**, before a single epoch runs. That is longer than
+    the entire training sweep, and it is spent every time the session restarts.
+
+    Keras caches the extracted archive at `~/.keras/datasets/cifar-10-batches-py`, and
+    `get_file(..., untar=True)` skips the download outright when that directory already
+    exists. So if the dataset is attached as a Kaggle input (or left over in a Colab
+    session), copying it into place turns 78 minutes into 2 seconds.
+
+    Returns the source it found, or None if it will have to download after all.
+    """
+    cache = Path.home() / ".keras" / "datasets"
+    target = cache / "cifar-10-batches-py"
+    if target.is_dir():
+        return "keras cache"
+
+    import shutil
+    import tarfile
+
+    for base in (Path("/kaggle/input"), Path("/content"), HERE / "data"):
+        if not base.is_dir():
+            continue
+
+        for found in base.rglob("cifar-10-batches-py"):
+            if found.is_dir() and (found / "data_batch_1").exists():
+                cache.mkdir(parents=True, exist_ok=True)
+                shutil.copytree(found, target)
+                return str(found)
+
+        for archive in base.rglob("cifar-10-python.tar.gz"):
+            cache.mkdir(parents=True, exist_ok=True)
+            with tarfile.open(archive) as tar:
+                tar.extractall(cache)
+            if target.is_dir():
+                return str(archive)
+
+    return None
+
+
 def load_splits(*, rebuild: bool = False) -> Splits:
     """Return the fixed splits, building and caching them on first call.
 
@@ -176,6 +218,10 @@ def load_splits(*, rebuild: bool = False) -> Splits:
         z = np.load(SPLITS_CACHE)
         return Splits(**{k: z[k] for k in
                          ("x_train", "y_train", "x_val", "y_val", "x_test", "y_test")})
+
+    source = seed_keras_cache()
+    print(f"CIFAR-10: {source}" if source
+          else "CIFAR-10: downloading (170 MB — attach it as an input to skip this)")
 
     from tensorflow.keras.datasets import cifar10
 
