@@ -26,7 +26,7 @@ This site exists to:
 
 1. Map the ML concept space as a navigable knowledge graph — following the canonical structure below
 2. Provide curated references per concept cluster — professor-assigned and beyond
-3. Document hands-on experimental work (Atividade 1 and future activities)
+3. Document hands-on experimental work — shallow models, deep vision, and NLP — under one reproducible protocol
 4. Serve as a public-facing academic portfolio page for the MSc journey
 
 **Language:** English throughout, to reach broader audiences and align with international research norms. Original Portuguese course materials are credited faithfully.
@@ -48,11 +48,17 @@ The repository is **Markdown-first**: Markdown files are the source of truth, Gi
 │   └── 05-deep.md                   # Deep Techniques (MLP, CNN, RNN+)
 ├── activities/
 │   ├── atividade-1.md               # Activity 1 — Shallow models: classification & regression
-│   └── atividade-1.py               # Reproducible experiment script (regenerates all results)
+│   ├── atividade-1.py               # Reproducible experiment script (regenerates all results)
+│   ├── avaliacao-pratica-1.md       # Practical 1 — CIFAR-10: five deep-learning strategies
+│   ├── avaliacao-pratica-1/         # Protocol, 5 strategy scripts, 4 ablations, report generator
+│   ├── avaliacao-pratica-2.md       # Practical 2 — Text classification: LSTM vs Transformer
+│   ├── avaliacao-pratica-2/         # Protocol, LSTM, BERTimbau, classical baseline, report generator
+│   └── *-respostas.md               # pt-BR submissions (rendered to PDF for hand-in)
 ├── mind-map.json                    # SOURCE OF TRUTH for the concept graph (nodes, edges, prerequisites)
 ├── mind-map.md                      # Markdown mind map (Mermaid) — generated from mind-map.json
 ├── scripts/
 │   ├── build_mindmap.py             # Regenerates mind-map.md + the HTML graph data from mind-map.json
+│   ├── build_pdf.py                 # Markdown → PDF (pandoc + headless Chrome) for submissions
 │   └── validate_activity_results.py # Checks generated results against the Markdown report
 ├── .github/workflows/
 │   └── validate.yml                 # CI: dependencies + reproducibility checks
@@ -235,6 +241,66 @@ Full write-up: [`activities/atividade-1.md`](activities/atividade-1.md)
 
 ---
 
+### Avaliação Prática 1 — CIFAR-10: Five Deep-Learning Strategies
+
+Full write-up: [`activities/avaliacao-pratica-1.md`](activities/avaliacao-pratica-1.md) · Code: [`avaliacao-pratica-1/`](activities/avaliacao-pratica-1/) · Runner: [`colab.ipynb`](activities/avaliacao-pratica-1/colab.ipynb)
+
+One CNN trained from scratch, one frozen ImageNet backbone with a shallow classifier, one
+fine-tuned CNN, the same with data augmentation, and a fine-tuned ViT — all on an **equal
+budget**: the same stratified 10,000-image subsample, the same validation set, and a single
+scoring pass on the full official 10,000-image test set.
+
+The equal budget is what makes the comparison legal. The five strategies differ ~50× in cost,
+and a free-tier T4 cannot afford all of them on the full 50,000 images. Given that, the choice
+is between *all strategies on 10,000 images* and *some strategies on more data than others* —
+and only the first is an experiment. The consequence is declared rather than buried: 10,000
+images is a low-data regime, which is exactly where transfer learning is strongest.
+
+Four **controlled ablations** answer the open questions — one variable moves, everything else
+is pinned: backbone swap (MobileNetV2 / ResNet50 / InceptionV3), `Flatten()` vs
+`GlobalMaxPooling2D()` vs `GlobalAveragePooling2D()`, optimiser, and augmentation policy
+(including the lecture notebook's own, which omits horizontal flip — the single most effective
+label-preserving transform on CIFAR-10).
+
+> **Status:** core strategies complete; ablations running. Every claim is repeated over 3 seeds
+> and the top pairs are tested with **exact McNemar** on paired test predictions. Results land
+> in [`avaliacao-pratica-1/results/`](activities/avaliacao-pratica-1/results/) as JSON carrying
+> their own 10,000 test predictions, so the tables, the confusion matrix and the significance
+> tests regenerate on CPU with no retraining.
+
+---
+
+### Avaliação Prática 2 — Text Classification: LSTM vs Transformer
+
+Full write-up: [`activities/avaliacao-pratica-2.md`](activities/avaliacao-pratica-2.md) · Code: [`avaliacao-pratica-2/`](activities/avaliacao-pratica-2/) · Runners: [`colab.ipynb`](activities/avaliacao-pratica-2/colab.ipynb) · [`kaggle.ipynb`](activities/avaliacao-pratica-2/kaggle.ipynb)
+
+Two tasks over 2,436 Portuguese news headlines annotated with emotions — binary valence and
+7-class emotion — comparing an **LSTM**, a fine-tuned **BERTimbau**, and a classical
+**TF-IDF + linear SVM** baseline. Protocol: stratified 70/30 holdout, 3 seeds, exact McNemar
+on paired predictions.
+
+**BERT wins both tasks with significance** (0.829 binary, 0.574 multiclass; $p < 10^{-5}$
+against the LSTM). But the classical baseline — **36k parameters, one second of CPU** —
+*significantly beats the 912k-parameter LSTM on both tasks* and covers **46%** of the
+LSTM→BERT gap. A model with no attention and no pretraining cannot do that if architecture is
+what decides. The result suggests **prior linguistic knowledge**, not attention, carries the
+substantial share of the advantage — stated as the indirect inference it is, since the control
+that would prove it (a Transformer trained *without* pretraining) is not part of the design.
+
+Three corpus findings preceded any training, and each changed the numbers:
+
+- **292 duplicates (10.7%)** across the two files. De-duplication happens *before* the split —
+  otherwise a text and its copy straddle train and test, and the model is scored on what it
+  memorised.
+- **Four texts carry conflicting labels, and every conflict is negative-vs-negative.**
+  Annotators never disagree about *valence*, only about *which* negative emotion. The binary
+  task is therefore clean, while the multiclass task carries **irreducible label noise** — and
+  the confusion matrix bleeds exactly there, as predicted in writing before the models ran.
+- The **majority-class baseline** (57.6% / 24.8%) is quoted beside every accuracy. Without it,
+  a 62% binary classifier reads as a result rather than as arithmetic.
+
+---
+
 ## Image Pattern Reference
 
 All adaptive images in this repository use the following pattern, supporting both GitHub's native `prefers-color-scheme` and Obsidian CSS snippet hooks:
@@ -268,11 +334,37 @@ All adaptive images in this repository use the following pattern, supporting bot
 
 ---
 
+## Experimental Discipline
+
+The three deep-learning activities share a protocol, and it is deliberate rather than
+incidental. Each has a `common.py` that owns the splits, the metrics and the statistics, and
+each persists **the test predictions themselves** into its result JSONs — which is what makes
+the tables, confusion matrices and significance tests regenerable on a CPU, by anyone, with no
+GPU and no retraining. It is also what lets a PyTorch model and a Keras model stay comparable:
+the protocol lives in the data and the evaluation, not in the framework.
+
+Four rules are applied without exception:
+
+| Rule | Why |
+|---|---|
+| **The test set is read once per configuration.** | Model selection happens on validation. A number tuned on test is not a measurement. |
+| **No claim rests on a single run.** | Every trained model runs at 3 seeds; a gap smaller than the seed-to-seed spread is not a result. |
+| **Paired comparisons use exact McNemar.** | Models are scored on *identical* samples, so their errors are paired; only the discordant predictions carry information. Differences that fail the test are reported as **technical ties**, not wins. |
+| **Cost is a reported variable.** | Accuracy without training time and parameter count invites celebrating a 0.3 pp win that cost 50× the compute. |
+
+Where a lecture notebook's methodology is departed from, the departure is stated and its effect
+quantified — not silently corrected.
+
+---
+
 ## Roadmap
 
 - [x] Implement Atividade 1 as a reproducible script and report full results + analysis
 - [x] Add exam-prep layer: worked examples, intuition boxes, self-checks, study guide, glossary, flashcards
 - [x] Convert mind map from static PNG to an interactive SVG/HTML view
+- [x] Avaliação Prática 2 — LSTM vs Transformer, with a classical baseline that reframes the result
+- [ ] Avaliação Prática 1 — CIFAR-10; core strategies done, ablations running
+- [ ] Unify the two `common.py` protocol modules into one shared package (duplicated on purpose while both activities were in flight)
 - [ ] Open a dedicated SDN/Smart Grid research repo and link from the Research Context section
 - [ ] Add future activity write-ups to `/activities/` as the course progresses
 
@@ -292,6 +384,6 @@ All adaptive images in this repository use the following pattern, supporting bot
 
 ---
 
-*Last updated: June 2026.*  
+*Last updated: July 2026.*  
 *Course: Aprendizagem de Máquina · PPGIA/PUC-PR · MSc 2026*  
 *Instructor: Prof. Alceu de Souza Britto Jr. (alceu@ppgia.pucpr.br)*
