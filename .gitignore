@@ -16,3 +16,6 @@ activities/avaliacao-pratica-1/checkpoints/
 *.npz
 *.hdf5
 *.keras
+
+# Avaliação Prática 2 — instructor-provided corpus, not redistributed
+activities/avaliacao-pratica-2/data/
