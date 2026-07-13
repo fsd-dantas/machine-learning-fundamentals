@@ -190,18 +190,29 @@ def seed_keras_cache() -> str | None:
         if not base.is_dir():
             continue
 
-        for found in base.rglob("cifar-10-batches-py"):
-            if found.is_dir() and (found / "data_batch_1").exists():
+        # Identify the dataset by its CONTENTS, not by its folder name. Kaggle datasets
+        # ship the pickled batches under whatever directory the uploader chose, and
+        # matching on `cifar-10-batches-py` would miss most of them.
+        for marker in base.rglob("data_batch_1"):
+            found = marker.parent
+            if (found / "test_batch").exists():
                 cache.mkdir(parents=True, exist_ok=True)
                 shutil.copytree(found, target)
                 return str(found)
 
-        for archive in base.rglob("cifar-10-python.tar.gz"):
+        for archive in base.rglob("*.tar.gz"):
+            if "cifar" not in archive.name.lower():
+                continue
             cache.mkdir(parents=True, exist_ok=True)
             with tarfile.open(archive) as tar:
                 tar.extractall(cache)
             if target.is_dir():
                 return str(archive)
+            # some tarballs unpack under a different top-level name
+            for marker in cache.rglob("data_batch_1"):
+                if (marker.parent / "test_batch").exists():
+                    marker.parent.rename(target)
+                    return str(archive)
 
     return None
 
