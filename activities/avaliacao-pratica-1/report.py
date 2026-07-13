@@ -163,12 +163,18 @@ def table_main(rows: list[dict], runs: list[dict], lang: str) -> str:
 
 def table_ablation(rows: list[dict], strategy: str, prefix: str, variable: str,
                    lang: str) -> str:
-    """One ablation: a single variable moves, everything else is pinned."""
+    """One ablation: a single variable moves, everything else is pinned.
+
+    An ablation needs at least two arms to exist. With only the `core` stage run, the
+    prefix filter would otherwise match that stage's single configuration and render a
+    one-row table under an ablation heading — presenting a result that was never
+    measured. A partially-run experiment must look partially-run.
+    """
     t = L[lang]
     sel = [r for r in rows if r["strategy"] == strategy
            and r["label"].startswith(prefix)]
-    if not sel:
-        return t["missing"].format(p=prefix)
+    if len({r["label"] for r in sel}) < 2:
+        return t["missing"].format(p=prefix or variable)
 
     sel.sort(key=lambda r: r["accuracy_mean"], reverse=True)
     top = sel[0]["accuracy_mean"]
