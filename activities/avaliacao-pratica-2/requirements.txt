@@ -1,0 +1,12 @@
+# Avaliação Prática 2 — text classification stack.
+# Colab already ships TensorFlow, PyTorch and NLTK; only transformers is reliably absent.
+
+tensorflow>=2.15        # LSTM
+torch>=2.1              # BERT
+transformers>=4.40      # BERTimbau (neuralmind/bert-base-portuguese-cased)
+nltk>=3.8               # Portuguese stopwords (LSTM preprocessing only)
+scikit-learn>=1.3
+scipy>=1.11
+pandas>=2.0
+numpy>=1.24
+matplotlib>=3.7         # confusion matrices
