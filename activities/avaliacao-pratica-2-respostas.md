@@ -125,6 +125,7 @@ _(exige uma execução de LSTM e uma de BERT na semente primária)_
 | Orquestrador (todas as tarefas, modelos e sementes) | [`run_all.py`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-2/run_all.py) |
 | Gerador do relatório (tabelas, matrizes de confusão, testes) | [`report.py`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-2/report.py) |
 | Executor Colab (GPU) | [`colab.ipynb`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-2/colab.ipynb) |
+| Executor Kaggle (GPU) | [`kaggle.ipynb`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-2/kaggle.ipynb) |
 | Artefatos de resultado (JSON, com as predições de teste) | [`results/`](https://github.com/fsd-dantas/machine-learning-fundamentals/tree/main/activities/avaliacao-pratica-2/results) |
 
 **Repositório:** <https://github.com/fsd-dantas/machine-learning-fundamentals>
