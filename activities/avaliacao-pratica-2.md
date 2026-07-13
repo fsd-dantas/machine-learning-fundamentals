@@ -3,7 +3,7 @@
 > **Course:** Aprendizagem de Máquina · PPGIA / PUC-PR · MSc 2026
 > **Instructor:** Prof. Alceu de Souza Britto Jr. (alceu@ppgia.pucpr.br)
 > **Related module:** [Module 5 — Deep Techniques](../modules/05-deep.md)
-> **Code:** [`activities/avaliacao-pratica-2/`](avaliacao-pratica-2/) · **Runner:** [`colab.ipynb`](avaliacao-pratica-2/colab.ipynb)
+> **Code:** [`activities/avaliacao-pratica-2/`](avaliacao-pratica-2/) · **Runners:** [`colab.ipynb`](avaliacao-pratica-2/colab.ipynb) · [`kaggle.ipynb`](avaliacao-pratica-2/kaggle.ipynb)
 
 ---
 
@@ -204,6 +204,12 @@ python report.py                       # tables + confusion matrices         (~5
 
 The baselines run on CPU in seconds — useful for validating the data pipeline before
 spending a GPU minute on anything.
+
+**Two runners, deliberately.** [`colab.ipynb`](avaliacao-pratica-2/colab.ipynb) and
+[`kaggle.ipynb`](avaliacao-pratica-2/kaggle.ipynb) call the identical scripts; they differ
+only in how the corpus arrives (Colab upload widget vs. a Kaggle private dataset). Kaggle's
+free GPU quota is independent of Colab's, so this activity can train on Kaggle while
+[Avaliação Prática 1](avaliacao-pratica-1.md) occupies the Colab GPU.
 
 ---
 
