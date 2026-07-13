@@ -68,6 +68,33 @@ class CifarTensorDataset:
         return self.tf(self.x[i]), int(self.y[i])
 
 
+def assert_pretrained(loading_info: dict) -> None:
+    """Fail loudly if `from_pretrained` did not actually load the pretrained encoder.
+
+    This is not paranoia. transformers 5.x refactored the ViT implementation and renamed
+    every encoder parameter (`encoder.layer.N.attention.attention.query` ->
+    `vit.layers.N.attention.q_proj`). The old checkpoint's tensors then fail to map: the
+    whole encoder is reported UNEXPECTED, silently discarded, and randomly initialised.
+    `from_pretrained` raises nothing. Training proceeds. A number is produced and saved —
+    and it is the number of a ViT trained *from scratch* on 10,000 images, which would
+    have been written up as "the transformer is weak in the low-data regime": a
+    conclusion that is false, and caused entirely by a library upgrade.
+
+    The only key legitimately missing is the classification head, which is new by
+    construction — ImageNet-21k's classes are replaced by CIFAR-10's ten.
+    """
+    missing = [k for k in loading_info.get("missing_keys", [])
+               if not k.startswith("classifier.")]
+    if missing:
+        raise RuntimeError(
+            f"pretrained weights did NOT load: {len(missing)} encoder parameters were "
+            f"randomly initialised (e.g. {missing[:3]}).\n"
+            "This is the transformers 5.x ViT rename. Install the pinned version:\n"
+            "    pip install -q 'transformers>=4.40,<5'\n"
+            "Refusing to train a randomly-initialised ViT and report it as pretrained."
+        )
+
+
 def evaluate(model, loader, device, torch) -> np.ndarray:
     model.eval()
     preds = []
@@ -117,10 +144,13 @@ def main() -> None:
                            batch_size=args.batch_size, num_workers=2, pin_memory=True),
     }
 
-    model = ViTForImageClassification.from_pretrained(
+    model, loading_info = ViTForImageClassification.from_pretrained(
         args.model, num_labels=common.N_CLASSES,
         ignore_mismatched_sizes=True,   # the 21k-class head is discarded for a 10-class one
-    ).to(device)
+        output_loading_info=True,
+    )
+    assert_pretrained(loading_info)
+    model = model.to(device)
 
     head_params = list(model.classifier.parameters())
     head_ids = {id(p) for p in head_params}
