@@ -72,6 +72,9 @@ L = {
                     "**technical tie**, not a win."),
         "sens": ("| Mapping | LSTM | BERT | Note |\n|---|---|---|---|\n"),
         "missing_pair": "_(needs both an LSTM and a BERT run at the primary seed)_",
+        "pair": "Comparison", "pvalue_short": "p (McNemar)", "verdict": "Significant?",
+        "yes": "**yes**", "no": "no — technical tie", "class": "Class",
+        "confusion": "Confusion", "rate": "Rate",
     },
     "pt": {
         "model": "Modelo", "acc": "Acurácia", "f1": "Macro-F1", "wf1": "F1 ponderado",
@@ -88,6 +91,9 @@ L = {
                     "indistinguíveis — **empate técnico**, não vitória."),
         "sens": ("| Mapeamento | LSTM | BERT | Observação |\n|---|---|---|---|\n"),
         "missing_pair": "_(exige uma execução de LSTM e uma de BERT na semente primária)_",
+        "pair": "Comparação", "pvalue_short": "p (McNemar)", "verdict": "Significativa?",
+        "yes": "**sim**", "no": "não — empate técnico", "class": "Classe",
+        "confusion": "Confusão", "rate": "Taxa",
     },
 }
 
@@ -160,6 +166,75 @@ def significance(task: str, lang: str) -> str:
         "",
         verdict,
     ])
+
+
+PAIRS = (("bert", "tfidf_svm"), ("tfidf_svm", "lstm"), ("bert", "lstm"),
+         ("bilstm", "lstm"))
+
+
+def pairwise(task: str, lang: str) -> str:
+    """Every comparison that carries a claim, not just LSTM vs BERT.
+
+    The assignment asks for LSTM vs Transformer, but the table also has a classical
+    baseline in it, and 'TF-IDF beats the LSTM' is a claim — so it gets a test. Each
+    pair is scored by exact McNemar on the primary seed's paired predictions.
+    """
+    t = L[lang]
+    runs = {r["model"]: r for r in common.load_results(task) if r["seed"] == common.SEED}
+    corpus = common.load_corpus(task, verbose=False)
+    y_test = common.make_splits(corpus, common.SEED).y_test
+
+    lines = [f"| {t['pair']} | Δ | {t['pvalue_short']} | {t['verdict']} |",
+             "|---|---|---|---|"]
+    any_row = False
+    for a, b in PAIRS:
+        if a not in runs or b not in runs:
+            continue
+        any_row = True
+        test = common.mcnemar(y_test, np.array(runs[a]["test_predictions"]),
+                              np.array(runs[b]["test_predictions"]))
+        gap = (runs[a]["accuracy"] - runs[b]["accuracy"]) * 100
+        name_a = MODEL_NAMES[lang].get(a, a).split(" *")[0]
+        name_b = MODEL_NAMES[lang].get(b, b).split(" *")[0]
+        verdict = t["yes"] if test["significant_at_05"] else t["no"]
+        lines.append(f"| {name_a} vs. {name_b} | {gap:+.2f} pp | "
+                     f"{test['p_value']:.3g} | {verdict} |")
+    return "\n".join(lines) if any_row else t["none"]
+
+
+def per_class(task: str, lang: str) -> str:
+    """Per-class F1 of the best model — where a macro average hides the damage."""
+    t = L[lang]
+    runs = [r for r in common.load_results(task) if r["seed"] == common.SEED
+            and r["model"] not in ("majority",)]
+    if not runs:
+        return t["none"]
+    best = max(runs, key=lambda r: r["accuracy"])
+    lines = [f"| {t['class']} | F1 |", "|---|---|"]
+    for name, value in sorted(best["per_class_f1"].items(), key=lambda kv: -kv[1]):
+        lines.append(f"| {name} | {value:.3f} |")
+    return "\n".join(lines)
+
+
+def confusions(task: str, lang: str, top: int = 6) -> str:
+    """The off-diagonal — the only part of a confusion matrix that carries information."""
+    t = L[lang]
+    runs = [r for r in common.load_results(task) if r["seed"] == common.SEED
+            and r["model"] not in ("majority",)]
+    if not runs:
+        return t["none"]
+    best = max(runs, key=lambda r: r["accuracy"])
+    names = best["class_names"]
+    cm = np.array(best["confusion_matrix"], dtype=float)
+    norm = cm / np.maximum(cm.sum(axis=1, keepdims=True), 1)
+    np.fill_diagonal(norm, 0.0)
+
+    pairs = sorted(((norm[i, j], i, j) for i in range(len(names))
+                    for j in range(len(names)) if i != j), reverse=True)
+    lines = [f"| {t['confusion']} | {t['rate']} |", "|---|---|"]
+    for rate, i, j in pairs[:top]:
+        lines.append(f"| {names[i]} → {names[j]} | {rate*100:.1f}% |")
+    return "\n".join(lines)
 
 
 def sensitivity(rows: list[dict], lang: str) -> str:
@@ -281,6 +356,10 @@ def main() -> None:
             "significance-binary": significance("binary", lang),
             "significance-multiclass": significance("multiclass", lang),
             "sensitivity": sensitivity(rows, lang),
+            "pairwise-binary": pairwise("binary", lang),
+            "pairwise-multiclass": pairwise("multiclass", lang),
+            "per-class-multiclass": per_class("multiclass", lang),
+            "confusions-multiclass": confusions("multiclass", lang),
         }
         if args.no_write:
             for key, content in sections.items():

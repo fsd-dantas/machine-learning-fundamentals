@@ -134,14 +134,21 @@ one model destroys the other.
 <!-- BEGIN GENERATED: table-binary -->
 | Model | Accuracy | Δ floor | Macro-F1 | Weighted-F1 | 95% CI | Trainable params | Train |
 |---|---|---|---|---|---|---|---|
-| TF-IDF + linear SVM *(classical baseline)* <sub>(3 seeds)</sub> | **0.7957 ± 0.0084** | +21.9 pp | 0.7893 ± 0.0091 | 0.7949 | 0.7554–0.8302 | 35,955 | 0s |
+| BERT (BERTimbau, fine-tuned) <sub>(3 seeds)</sub> | **0.8285 ± 0.0235** | +25.2 pp | 0.8203 ± 0.0289 | 0.8261 | 0.7712–0.8698 | 108,924,674 | 33s |
+| TF-IDF + linear SVM *(classical baseline)* <sub>(3 seeds)</sub> | **0.7957 ± 0.0084** | +21.9 pp | 0.7893 ± 0.0091 | 0.7949 | 0.7554–0.8302 | 35,955 | 1s |
+| BiLSTM | **0.7798** | +20.3 pp | 0.7743 | 0.7796 | 0.7483–0.8083 | 1,313,986 | 19s |
+| LSTM <sub>(3 seeds)</sub> | **0.7711 ± 0.0114** | +19.5 pp | 0.7641 ± 0.0138 | 0.7702 | 0.7298–0.8122 | 911,554 | 10s |
 | Majority class *(floor)* <sub>(3 seeds)</sub> | **0.5759 ± 0.0000** | -0.0 pp | 0.3655 ± 0.0000 | 0.4209 | 0.5398–0.6113 | 0 | 0s |
 <!-- END GENERATED: table-binary -->
 
 **LSTM vs BERT, paired:**
 
 <!-- BEGIN GENERATED: significance-binary -->
-_(needs both an LSTM and a BERT run at the primary seed)_
+| Discordant | LSTM right / BERT wrong | LSTM wrong / BERT right | p (exact McNemar) |
+|---|---|---|---|
+| 133 | 38 | 95 | 8.25e-07 |
+
+The 7.80 pp gap between **BERT** and the other is **significant** (α = 0.05, exact McNemar on paired test predictions).
 <!-- END GENERATED: significance-binary -->
 
 <p align="center">
@@ -156,14 +163,21 @@ _(needs both an LSTM and a BERT run at the primary seed)_
 <!-- BEGIN GENERATED: table-multiclass -->
 | Model | Accuracy | Δ floor | Macro-F1 | Weighted-F1 | 95% CI | Trainable params | Train |
 |---|---|---|---|---|---|---|---|
+| BERT (BERTimbau, fine-tuned) <sub>(3 seeds)</sub> | **0.5741 ± 0.0360** | +32.6 pp | 0.5378 ± 0.0488 | 0.5650 | 0.5055–0.6475 | 108,928,519 | 39s |
 | TF-IDF + linear SVM *(classical baseline)* <sub>(3 seeds)</sub> | **0.5303 ± 0.0208** | +28.2 pp | 0.4946 ± 0.0115 | 0.5283 | 0.4754–0.5883 | 35,617 | 1s |
+| BiLSTM | **0.4720** | +22.4 pp | 0.4060 | 0.4592 | 0.4360–0.5082 | 1,314,311 | 23s |
+| LSTM <sub>(3 seeds)</sub> | **0.4615 ± 0.0190** | +21.4 pp | 0.4119 ± 0.0121 | 0.4620 | 0.4049–0.5137 | 911,879 | 20s |
 | Majority class *(floor)* <sub>(3 seeds)</sub> | **0.2476 ± 0.0000** | -0.0 pp | 0.0567 ± 0.0000 | 0.0983 | 0.2177–0.2802 | 0 | 0s |
 <!-- END GENERATED: table-multiclass -->
 
 **LSTM vs BERT, paired:**
 
 <!-- BEGIN GENERATED: significance-multiclass -->
-_(needs both an LSTM and a BERT run at the primary seed)_
+| Discordant | LSTM right / BERT wrong | LSTM wrong / BERT right | p (exact McNemar) |
+|---|---|---|---|
+| 234 | 80 | 154 | 1.505e-06 |
+
+The 10.12 pp gap between **BERT** and the other is **significant** (α = 0.05, exact McNemar on paired test predictions).
 <!-- END GENERATED: significance-multiclass -->
 
 <p align="center">
@@ -178,8 +192,8 @@ _(needs both an LSTM and a BERT run at the primary seed)_
 <!-- BEGIN GENERATED: sensitivity -->
 | Mapping | LSTM | BERT | Note |
 |---|---|---|---|
-| binary (positive/negative) | — | — | instructor's map (`neutro`, `surpresa` → positive) |
-| binary, valence-clean | — | — | `neutro`/`surpresa` dropped |
+| binary (positive/negative) | 0.7711 ± 0.0114 | 0.8285 ± 0.0235 | instructor's map (`neutro`, `surpresa` → positive) |
+| binary, valence-clean | 0.8358 | 0.8972 | `neutro`/`surpresa` dropped |
 
 <!-- END GENERATED: sensitivity -->
 
@@ -214,3 +228,48 @@ free GPU quota is independent of Colab's, so this activity can train on Kaggle w
 ---
 
 *[← README](../README.md) · [Module 5 — Deep Techniques](../modules/05-deep.md) · [Answers (pt-BR)](avaliacao-pratica-2-respostas.md)*
+
+
+<!-- BEGIN GENERATED: pairwise-binary -->
+| Comparison | Δ | p (McNemar) | Significant? |
+|---|---|---|---|
+| BERT (BERTimbau, fine-tuned) vs. TF-IDF + linear SVM | +4.24 pp | 0.00239 | **yes** |
+| TF-IDF + linear SVM vs. LSTM | +3.56 pp | 0.00734 | **yes** |
+| BERT (BERTimbau, fine-tuned) vs. LSTM | +7.80 pp | 8.25e-07 | **yes** |
+| BiLSTM vs. LSTM | +1.23 pp | 0.336 | no — technical tie |
+<!-- END GENERATED: pairwise-binary -->
+
+
+<!-- BEGIN GENERATED: pairwise-multiclass -->
+| Comparison | Δ | p (McNemar) | Significant? |
+|---|---|---|---|
+| BERT (BERTimbau, fine-tuned) vs. TF-IDF + linear SVM | +5.61 pp | 0.00426 | **yes** |
+| TF-IDF + linear SVM vs. LSTM | +4.51 pp | 0.00184 | **yes** |
+| BERT (BERTimbau, fine-tuned) vs. LSTM | +10.12 pp | 1.51e-06 | **yes** |
+| BiLSTM vs. LSTM | +0.55 pp | 0.769 | no — technical tie |
+<!-- END GENERATED: pairwise-multiclass -->
+
+
+<!-- BEGIN GENERATED: per-class-multiclass -->
+| Class | F1 |
+|---|---|
+| alegria | 0.686 |
+| tristeza | 0.606 |
+| surpresa | 0.589 |
+| raiva | 0.576 |
+| medo | 0.517 |
+| desgosto | 0.478 |
+| neutro | 0.309 |
+<!-- END GENERATED: per-class-multiclass -->
+
+
+<!-- BEGIN GENERATED: confusions-multiclass -->
+| Confusion | Rate |
+|---|---|
+| neutro → alegria | 29.4% |
+| neutro → desgosto | 26.5% |
+| surpresa → alegria | 26.2% |
+| medo → tristeza | 21.5% |
+| desgosto → tristeza | 20.8% |
+| tristeza → desgosto | 18.8% |
+<!-- END GENERATED: confusions-multiclass -->
