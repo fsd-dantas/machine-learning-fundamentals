@@ -164,6 +164,58 @@ class Splits:
                 f"test {self.x_test.shape[0]:,} (official split)")
 
 
+CIFAR_FILES = ("data_batch_1", "data_batch_2", "data_batch_3", "data_batch_4",
+               "data_batch_5", "test_batch")
+
+
+def find_cifar_dir() -> Path | None:
+    """A directory holding a **complete** CIFAR-10 python distribution, or None.
+
+    Completeness is checked file by file, and that is the point: a truncated download that
+    was then untarred leaves a partial `cifar-10-batches-py/` behind. An earlier version of
+    this function saw the directory exist, declared victory, and handed Keras a cache it
+    then rejected — so the 91-minute download ran anyway, under a log line claiming the
+    data was already local. A cache check that can produce a false positive is worse than
+    no cache check.
+    """
+    candidates = [Path("/kaggle/input"), Path("/content"), HERE / "data",
+                  Path.home() / ".keras" / "datasets"]
+    for base in candidates:
+        if not base.is_dir():
+            continue
+        for marker in base.rglob("data_batch_1"):
+            folder = marker.parent
+            if all((folder / name).exists() for name in CIFAR_FILES):
+                return folder
+    return None
+
+
+def load_cifar_from_dir(folder: Path):
+    """Unpickle the canonical CIFAR-10 batches — no Keras, no cache conventions.
+
+    The python distribution is six pickled dicts: five training batches of 10,000 and one
+    test batch, each with flat `data` (N, 3072) in channels-first order and a `labels` list.
+    Reading them directly removes every dependency on where a framework decides to cache
+    things, which is where the last two failures came from.
+    """
+    import pickle
+
+    def read(name: str):
+        with (folder / name).open("rb") as handle:
+            batch = pickle.load(handle, encoding="bytes")
+        data = batch[b"data"].reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1)
+        return data.astype(np.uint8), np.asarray(batch[b"labels"], dtype=np.int64)
+
+    xs, ys = zip(*(read(f"data_batch_{i}") for i in range(1, 6)))
+    x_train, y_train = np.concatenate(xs), np.concatenate(ys)
+    x_test, y_test = read("test_batch")
+
+    if x_train.shape != (50000, 32, 32, 3) or x_test.shape != (10000, 32, 32, 3):
+        raise RuntimeError(f"CIFAR-10 at {folder} is malformed: "
+                           f"{x_train.shape} / {x_test.shape}")
+    return (x_train, y_train.reshape(-1, 1)), (x_test, y_test.reshape(-1, 1))
+
+
 def seed_keras_cache() -> str | None:
     """Point Keras at a locally-attached CIFAR-10 instead of downloading it.
 
@@ -265,11 +317,10 @@ def load_splits(*, rebuild: bool = False) -> Splits:
         return Splits(**{k: z[k] for k in
                          ("x_train", "y_train", "x_val", "y_val", "x_test", "y_test")})
 
-    source = seed_keras_cache()
-    if source:
-        print(f"CIFAR-10: {source}")
-        from tensorflow.keras.datasets import cifar10
-        (x_full, y_full), (x_test, y_test) = cifar10.load_data()
+    folder = find_cifar_dir()
+    if folder is not None:
+        print(f"CIFAR-10: reading {folder}")
+        (x_full, y_full), (x_test, y_test) = load_cifar_from_dir(folder)
     else:
         (x_full, y_full), (x_test, y_test) = load_cifar10_fallback()
     y_full = y_full.ravel().astype(np.int64)
