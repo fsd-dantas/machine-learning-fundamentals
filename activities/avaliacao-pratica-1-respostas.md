@@ -2,7 +2,7 @@
 
 > **Disciplina:** Aprendizagem de Máquina · PPGIA / PUC-PR · Mestrado 2026
 > **Aluno:** Fernando Dantas
-> **Reprodutibilidade:** todos os valores foram gerados pelos scripts listados na seção *Scripts* (semente primária 42); o relatório é regenerado a partir dos artefatos de resultado por [`report.py`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/report.py).
+> **Reprodutibilidade:** todos os valores foram gerados pelos scripts listados na seção *Scripts* (*seed* primária 42); o relatório é regenerado a partir dos artefatos de resultado por [`report.py`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/report.py).
 
 ---
 
@@ -10,7 +10,7 @@
 
 Foram avaliadas cinco estratégias de classificação sobre a base **CIFAR-10** (60.000 imagens coloridas de 32×32 pixels, 10 classes balanceadas): (1) CNN treinada do zero; (2) rede pré-treinada como extratora de características, com classificador raso; (3) ajuste fino de CNN pré-treinada na ImageNet; (4) ajuste fino com aumento de dados; e (5) ajuste fino de um *Vision Transformer* (ViT).
 
-**Orçamento igual entre estratégias.** Todas as estratégias foram treinadas sobre a **mesma subamostra estratificada de 10.000 imagens** (1.000 por classe), validadas sobre as **mesmas 2.000 imagens** e avaliadas **uma única vez** sobre o **conjunto de teste oficial completo do CIFAR-10** (10.000 imagens). A subamostragem não é um atalho, mas a condição de legalidade da comparação: as cinco estratégias diferem em custo computacional por um fator de aproximadamente 50 — uma CNN treinada do zero em 32×32 converge em minutos, enquanto o ajuste fino de um ViT-B/16 em 224×224 não —, e o orçamento disponível (GPU T4, camada gratuita) não comporta a base completa em cinco estratégias, três sementes e quatro ablações. Diante dessa restrição, a escolha se dá entre *todas as estratégias com 10.000 imagens* e *algumas estratégias com mais dados que outras*; apenas a primeira constitui um experimento controlado.
+**Orçamento igual entre estratégias.** Todas as estratégias foram treinadas sobre a **mesma subamostra estratificada de 10.000 imagens** (1.000 por classe), validadas sobre as **mesmas 2.000 imagens** e avaliadas **uma única vez** sobre o **conjunto de teste oficial completo do CIFAR-10** (10.000 imagens). A subamostragem não é um atalho, mas a condição de legalidade da comparação: as cinco estratégias diferem em custo computacional por um fator de aproximadamente 50 — uma CNN treinada do zero em 32×32 converge em minutos, enquanto o ajuste fino de um ViT-B/16 em 224×224 não —, e o orçamento disponível (GPU T4, camada gratuita) não comporta a base completa em cinco estratégias, três sementes aleatórias (*seeds*) e quatro ablações. Diante dessa restrição, a escolha se dá entre *todas as estratégias com 10.000 imagens* e *algumas estratégias com mais dados que outras*; apenas a primeira constitui um experimento controlado.
 
 **Consequência declarada.** Um regime de 10.000 imagens é um regime de poucos dados, e é precisamente nesse regime que a transferência de aprendizado exibe sua maior vantagem. Uma CNN treinada do zero recuperaria parte substancial da diferença com as 50.000 imagens da base completa. As conclusões aqui reportadas referem-se, portanto, à comparação **sob este orçamento de dados**, e não a uma superioridade intrínseca e incondicional das estratégias baseadas em transferência.
 
@@ -18,13 +18,13 @@ Foram avaliadas cinco estratégias de classificação sobre a base **CIFAR-10** 
 
 **Isolamento do conjunto de teste.** A arquitetura, o número de épocas e a parada antecipada foram selecionados exclusivamente sobre o conjunto de validação. O conjunto de teste produziu exatamente um número por configuração: não houve seleção de época, de limiar ou de configuração com base no teste.
 
-**Dispersão.** As configurações da comparação principal foram executadas em **três sementes** (42, 7 e 2024) e as ablações das questões em aberto, em **duas** (42 e 7); ambas são reportadas como média ± desvio-padrão. A semente altera a inicialização dos pesos e a amostragem do aumento de dados, jamais os dados: a subamostra é fixada por um gerador independente. Duas sementes bastam para verificar se um efeito excede o ruído entre execuções — que é precisamente o que as questões em aberto perguntam ao indagar se determinada substituição impacta *significativamente* o resultado —; a terceira semente apenas refinaria a estimativa de variância, a um custo computacional 50% maior. Uma diferença entre configurações menor que a dispersão entre sementes não é reportada como resultado.
+**Dispersão.** As configurações da comparação principal foram executadas em **três *seeds*** (42, 7 e 2024) e as ablações das questões em aberto, em **duas** (42 e 7); ambas são reportadas como média ± desvio-padrão. A *seed* altera a inicialização dos pesos e a amostragem do aumento de dados, jamais os dados: a subamostra é fixada por um gerador independente. Duas *seeds* bastam para verificar se um efeito excede o ruído entre execuções — que é precisamente o que as questões em aberto perguntam ao indagar se determinada substituição impacta *significativamente* o resultado —; a terceira *seed* apenas refinaria a estimativa de variância, a um custo computacional 50% maior. Uma diferença entre configurações menor que a dispersão entre *seeds* não é reportada como resultado.
 
 **Inferência estatística.** Para o par de melhores modelos aplicou-se o **teste exato de McNemar** sobre as predições pareadas do conjunto de teste. Este é o teste adequado ao delineamento — e não o teste de Wilcoxon sobre dobras, empregado na Atividade 1 —, pois ambos os modelos são avaliados sobre **as mesmas** 10.000 imagens: os erros são, por construção, pareados, e apenas as predições discordantes carregam informação. Reporta-se ainda o intervalo de confiança de Wilson (95%) para a acurácia; sobre 10.000 amostras, sua semiamplitude é de aproximadamente ±0,6 ponto percentual em torno de 90% de acurácia, o que estabelece o **limite de resolução de qualquer afirmação deste relatório**.
 
-**Escopo da comparação.** Não houve busca sistemática de hiperparâmetros: as configurações seguem as práticas correntes de cada estratégia (taxas de aprendizado padrão, parada antecipada sobre a acurácia de validação). As conclusões referem-se à comparação dessas configurações, não à superioridade intrínseca dos métodos. As ablações das questões em aberto isolam uma única variável por vez, mantendo dados, cronograma e sementes fixos.
+**Escopo da comparação.** Não houve busca sistemática de hiperparâmetros: as configurações seguem as práticas correntes de cada estratégia (taxas de aprendizado padrão, parada antecipada sobre a acurácia de validação). As conclusões referem-se à comparação dessas configurações, não à superioridade intrínseca dos métodos. As ablações das questões em aberto isolam uma única variável por vez, mantendo dados, cronograma e *seeds* fixos.
 
-**Ambiente.** Google Colab, GPU NVIDIA T4, precisão mista (`mixed_float16`); TensorFlow/Keras nas estratégias 1–4 e PyTorch/HuggingFace na estratégia 5. Os *splits* são materializados em disco e lidos por ambos os arcabouços, o que garante que as estratégias vejam dados byte a byte idênticos independentemente do arcabouço utilizado.
+**Ambiente.** Google Colab, GPU NVIDIA T4, precisão mista (`mixed_float16`); TensorFlow/Keras nas estratégias 1–4 e PyTorch/HuggingFace na estratégia 5. Os *splits* são materializados em disco e lidos por ambos os frameworks, o que garante que as estratégias vejam dados byte a byte idênticos independentemente do framework utilizado.
 
 ---
 
@@ -45,6 +45,23 @@ _(pendente — executar `python run_all.py --stage core --stage seeds`)_
 <!-- BEGIN GENERATED: significance -->
 _(pendente)_
 <!-- END GENERATED: significance -->
+
+### Todas as comparações entre estratégias (McNemar exato, *seed* primária)
+
+<!-- BEGIN GENERATED: pairwise -->
+_(pendente)_
+<!-- END GENERATED: pairwise -->
+
+*Cada linha confronta um incremento de transferência com o anterior. Uma diferença que não sobrevive ao teste de McNemar é uma diferença **paga e não recebida**: o custo computacional foi incorrido, o ganho não se materializou. Essa informação é invisível em um ranking de acurácia.*
+
+### Acurácia por minuto de GPU
+
+<!-- BEGIN GENERATED: cost -->
+_(pendente)_
+<!-- END GENERATED: cost -->
+
+*A pergunta do enunciado — qual estratégia é a melhor — não admite resposta sem um eixo de custo: uma estratégia que vence por 0,1 ponto percentual consumindo vinte vezes mais computação não venceu nada que um praticante compraria.*
+
 
 ### Matriz de confusão do melhor modelo
 
