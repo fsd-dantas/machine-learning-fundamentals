@@ -386,7 +386,33 @@ Hidden: **ReLU**. Binary output: **sigmoid**. Multiclass output: **softmax**.
 
 ## Connected Activities
 
-No course activity currently targets Module 5 exclusively. The MLP appears in [Atividade 1](../activities/atividade-1.md) as a shallow-regime baseline. Deep architectures will be exercised in future activities.
+Two practicals exercise this module end to end. Both are worth reading for what they say
+about **where deep learning's advantage actually comes from** — which, in both cases, turns
+out not to be the architecture.
+
+**[Avaliação Prática 1 — CIFAR-10](../activities/avaliacao-pratica-1.md)** (§ CNN, transfer
+learning, ViT)
+Five strategies on an equal budget: a CNN trained from scratch, a frozen ImageNet backbone
+with a shallow classifier, a fine-tuned CNN, the same with augmentation, and a fine-tuned
+Vision Transformer. Four controlled ablations answer the open questions — backbone swap,
+`Flatten()` vs `GlobalMaxPooling2D()`, optimiser, and augmentation policy.
+*Concepts exercised:* [CNN](#5-convolutional-neural-networks-cnn) · transfer learning ·
+[Transformer](#8-transformer-and-generative-models) · batch normalisation · dropout.
+
+**[Avaliação Prática 2 — LSTM vs Transformer](../activities/avaliacao-pratica-2.md)**
+(§ RNN, LSTM, attention)
+Binary and 7-class emotion classification over Portuguese news headlines, comparing an LSTM
+against a fine-tuned BERT — with a classical TF-IDF + linear SVM baseline that reframes the
+result: **it significantly beats the 912k-parameter LSTM on both tasks** and covers 46% of
+the LSTM→BERT gap. A model with no attention and no pretraining cannot do that if
+architecture is what decides. The LSTM's deficit is *data*, not recurrence: it is asked to
+learn what words mean from 1,449 headlines.
+*Concepts exercised:* [RNN / LSTM](#6-recurrent-neural-networks-rnn) ·
+[Transformer](#8-transformer-and-generative-models) · attention · pretraining and fine-tuning ·
+word embeddings.
+
+The MLP also appears in [Atividade 1](../activities/atividade-1.md) as a shallow-regime
+baseline, where it ties with SVM at the top.
 
 ---
 

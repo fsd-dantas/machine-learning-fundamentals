@@ -28,6 +28,18 @@ Foram avaliadas cinco estratégias de classificação sobre a base **CIFAR-10** 
 
 ---
 
+## Limitações do Delineamento
+
+Três fatores confundem a comparação entre as cinco estratégias. Todos são declarados aqui, antes dos resultados, porque nenhum deles é corrigível dentro do orçamento disponível — e um relatório que os omitisse atribuiria a causas erradas os efeitos que observa.
+
+**1. O ViT não enfrenta um problema novo.** O ViT-B/16 foi pré-treinado na **ImageNet-21k**, cujo conjunto de classes contém categorias que coincidem, em substância, com as do CIFAR-10 — avião, automóvel, pássaro, gato, cervo, cão, sapo, cavalo, navio e caminhão são todas categorias amplamente representadas na ImageNet. O modelo, portanto, **não generaliza para um domínio inédito: ele reconhece categorias que já viu durante o pré-treinamento**, em resolução muito superior e com ordens de magnitude mais exemplos. Sua acurácia deve ser lida como um limite superior de transferência sob condições excepcionalmente favoráveis, e **não** como evidência de superioridade intrínseca da arquitetura *transformer* sobre a convolucional. As redes convolucionais pré-treinadas (estratégias 2 a 4) compartilham essa vantagem, porém em grau menor: foram pré-treinadas na ImageNet-1k, cerca de quatorze vezes menor.
+
+**2. A resolução de entrada não é constante entre as estratégias.** A CNN treinada do zero opera em 32×32 — a resolução nativa das imagens —, enquanto as demais operam em 128×128 (ou 224×224, no caso do ViT), pois as redes pré-treinadas exigem entradas compatíveis com suas estatísticas de origem. Essa diferença é **inerente à natureza das estratégias comparadas**, e não um descuido: ampliar as imagens para treinar uma rede do zero apenas interpolaria pixels, sem acrescentar informação, ao custo de mais computação. Ainda assim, ela impede atribuir a diferença de desempenho exclusivamente ao pré-treinamento.
+
+**3. As ablações foram executadas com orçamento de épocas reduzido.** As questões em aberto 4(b) e 4(c) exigiam dezesseis treinamentos adicionais da estratégia 4, inviáveis no orçamento de GPU disponível sob o cronograma de entrega. Reduziu-se o número de épocas (de 15 + 12 para 8 + 6), **de modo idêntico em todos os braços de cada ablação**. A validade interna da comparação é preservada — o que se pergunta é qual braço supera qual, e todos operam sob o mesmo orçamento —, mas as **acurácias absolutas das ablações não são comparáveis às da tabela principal**, apenas entre si.
+
+---
+
 ## Resultados por Estratégia
 
 <!-- BEGIN GENERATED: main-table -->
