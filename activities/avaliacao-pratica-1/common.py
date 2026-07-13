@@ -217,6 +217,41 @@ def seed_keras_cache() -> str | None:
     return None
 
 
+def load_cifar10_fallback():
+    """Fetch CIFAR-10 from somewhere that is not cs.toronto.edu.
+
+    Keras' canonical source throttled Kaggle to ~30 KB/s — 170 MB in **91 minutes**, longer
+    than the entire training sweep, and paid again on every session restart. `wget` measured
+    the same rate, so the bottleneck is the origin server, not the client.
+
+    HuggingFace serves the identical dataset from a CDN, in seconds. The arrays it returns
+    are the canonical CIFAR-10 train/test split — the same 50,000/10,000 partition, the same
+    images — so the protocol is unaffected: only the transport changes.
+
+    Falls back to Keras (slow, but works) if `datasets` is unavailable.
+    """
+    try:
+        from datasets import load_dataset
+    except ImportError:
+        print("CIFAR-10: `datasets` not installed — falling back to the slow origin.\n"
+              "          pip install datasets   (turns 91 minutes into seconds)")
+        from tensorflow.keras.datasets import cifar10
+        return cifar10.load_data()
+
+    print("CIFAR-10: fetching from HuggingFace (cs.toronto.edu throttles this network)…")
+    dataset = load_dataset("uoft-cs/cifar10")
+
+    def to_arrays(split):
+        images = np.stack([np.asarray(img, dtype=np.uint8) for img in split["img"]])
+        labels = np.asarray(split["label"], dtype=np.int64).reshape(-1, 1)
+        return images, labels
+
+    train = to_arrays(dataset["train"])
+    test = to_arrays(dataset["test"])
+    print(f"CIFAR-10: train {train[0].shape} · test {test[0].shape}")
+    return train, test
+
+
 def load_splits(*, rebuild: bool = False) -> Splits:
     """Return the fixed splits, building and caching them on first call.
 
@@ -231,12 +266,12 @@ def load_splits(*, rebuild: bool = False) -> Splits:
                          ("x_train", "y_train", "x_val", "y_val", "x_test", "y_test")})
 
     source = seed_keras_cache()
-    print(f"CIFAR-10: {source}" if source
-          else "CIFAR-10: downloading (170 MB — attach it as an input to skip this)")
-
-    from tensorflow.keras.datasets import cifar10
-
-    (x_full, y_full), (x_test, y_test) = cifar10.load_data()
+    if source:
+        print(f"CIFAR-10: {source}")
+        from tensorflow.keras.datasets import cifar10
+        (x_full, y_full), (x_test, y_test) = cifar10.load_data()
+    else:
+        (x_full, y_full), (x_test, y_test) = load_cifar10_fallback()
     y_full = y_full.ravel().astype(np.int64)
     y_test = y_test.ravel().astype(np.int64)
 
