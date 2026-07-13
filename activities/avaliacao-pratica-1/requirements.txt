@@ -6,7 +6,13 @@
 tensorflow>=2.15
 torch>=2.1
 torchvision>=0.16
-transformers>=4.40      # ViT (strategy 5)
+# transformers 5.x refactored the ViT implementation and renamed every encoder
+# parameter (encoder.layer.N.attention.attention.query -> vit.layers.N.attention.q_proj).
+# Loading `google/vit-base-patch16-224-in21k` under 5.x silently discards the whole
+# pretrained encoder as UNEXPECTED and randomly initialises the model instead — the
+# script still runs, still reports a number, and the number is meaningless.
+# s5_vit.py asserts against this regardless of version; the pin keeps it from happening.
+transformers>=4.40,<5   # ViT (strategy 5)
 scikit-learn>=1.3
 scipy>=1.11
 numpy>=1.24
