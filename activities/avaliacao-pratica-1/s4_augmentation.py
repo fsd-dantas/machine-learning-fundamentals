@@ -90,19 +90,22 @@ def main() -> None:
     parser.add_argument("--policy", default="flip_crop", choices=POLICIES)
     parser.add_argument("--optimizer", default="adam", choices=OPTIMIZERS)
     parser.add_argument("--seed", type=int, default=common.SEED)
-    parser.add_argument("--epochs-frozen", type=int, default=20)
-    parser.add_argument("--epochs-finetune", type=int, default=20)
+    parser.add_argument("--epochs-frozen", type=int, default=15)
+    parser.add_argument("--epochs-finetune", type=int, default=12)
     parser.add_argument("--batch-size", type=int, default=64)
+    parser.add_argument("--image-size", type=int, default=common.WORKING_RESOLUTION)
     parser.add_argument("--unfreeze-layers", type=int, default=30)
+    parser.add_argument("--seeds", type=int, nargs="+", default=list(common.SEEDS),
+                        help="seeds used by the ablation sweeps")
     parser.add_argument("--ablation-policy", action="store_true",
-                        help="open question 4(c): 4 policies x 3 seeds")
+                        help="open question 4(c): augmentation policies")
     parser.add_argument("--ablation-optimizer", action="store_true",
-                        help="open question 4(b): 4 optimisers x 3 seeds")
+                        help="open question 4(b): optimisers")
     args = parser.parse_args()
 
     device = common.configure_gpu()
     splits = common.load_splits()
-    print(f"device: {device} · {splits.summary()}")
+    print(f"device: {device} · {splits.summary()} · {args.image_size}px")
 
     # Augmentation slows convergence (each epoch shows the net a harder problem), so
     # strategy 4 gets more epochs than strategy 3. Early stopping on val accuracy
@@ -111,17 +114,17 @@ def main() -> None:
     base = dict(epochs_frozen=args.epochs_frozen, epochs_finetune=args.epochs_finetune,
                 batch_size=args.batch_size, frozen_only=False,
                 unfreeze_layers=args.unfreeze_layers, device=device,
-                strategy="s4_augment")
+                image_size=args.image_size, strategy="s4_augment")
 
     if args.ablation_policy:
         for policy in POLICIES:
-            for seed in common.SEEDS:
+            for seed in args.seeds:
                 run_one(args.backbone, args.head, seed, splits,
                         augment=build_policy(policy, seed), optimizer=args.optimizer,
                         label=f"policy_{policy}", **base)
     elif args.ablation_optimizer:
         for optimizer in OPTIMIZERS:
-            for seed in common.SEEDS:
+            for seed in args.seeds:
                 run_one(args.backbone, args.head, seed, splits,
                         augment=build_policy(args.policy, seed), optimizer=optimizer,
                         label=f"optimizer_{optimizer}", **base)

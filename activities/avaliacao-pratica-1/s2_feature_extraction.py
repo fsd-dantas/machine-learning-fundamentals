@@ -36,19 +36,19 @@ from sklearn.svm import SVC
 import common
 
 
-def extract_features(backbone: common.Backbone, splits: common.Splits,
-                     *, batch_size: int = 64) -> dict[str, np.ndarray]:
+def extract_features(backbone: common.Backbone, splits: common.Splits, *,
+                     image_size: int, batch_size: int = 64) -> dict[str, np.ndarray]:
     """Run the frozen backbone once over every split; cache the result to disk."""
-    cache = common.DATA_DIR / f"features_{backbone.key}.npz"
+    cache = common.DATA_DIR / f"features_{backbone.key}_{image_size}.npz"
     if cache.exists():
         print(f"[{backbone.display}] using cached features: {cache.name}")
         z = np.load(cache)
         return {k: z[k] for k in z.files}
 
-    model = backbone.build(pooling="avg")
+    res = image_size
+    model = backbone.build(pooling="avg", input_shape=(res, res, 3))
     model.trainable = False
     preprocess = backbone.preprocess()
-    res = backbone.resolution
 
     out: dict[str, np.ndarray] = {}
     for name, x, y in (("train", splits.x_train, splits.y_train),
@@ -83,12 +83,12 @@ def build_classifier(kind: str, seed: int):
     return Pipeline([("scaler", StandardScaler()), ("clf", est)])
 
 
-def run_one(backbone_key: str, classifier: str, seed: int,
-            splits: common.Splits) -> None:
+def run_one(backbone_key: str, classifier: str, seed: int, splits: common.Splits,
+            *, image_size: int) -> None:
     backbone = common.BACKBONES[backbone_key]
     common.set_seed(seed)
 
-    feats = extract_features(backbone, splits)
+    feats = extract_features(backbone, splits, image_size=image_size)
     model = build_classifier(classifier, seed)
 
     with common.Timer() as timer:
@@ -109,7 +109,7 @@ def run_one(backbone_key: str, classifier: str, seed: int,
                 "backbone_trained": False, "val_accuracy": val_acc},
         y_true=splits.y_test,
         y_pred=y_pred,
-        input_resolution=backbone.resolution,
+        input_resolution=image_size,
         params_total=int(backbone.params_millions * 1e6),
         params_trainable=0,  # the backbone is frozen; only the shallow head is fitted
         train_seconds=timer.seconds,
@@ -123,13 +123,14 @@ def main() -> None:
                         choices=list(common.BACKBONES))
     parser.add_argument("--classifier", default="svm", choices=["svm", "mlp"])
     parser.add_argument("--seed", type=int, default=common.SEED)
+    parser.add_argument("--image-size", type=int, default=common.WORKING_RESOLUTION)
     parser.add_argument("--ablation", action="store_true",
                         help="open question 2(a): every backbone x every classifier")
     args = parser.parse_args()
 
     device = common.configure_gpu()
     splits = common.load_splits()
-    print(f"device: {device} · {splits.summary()}")
+    print(f"device: {device} · {splits.summary()} · {args.image_size}px")
 
     if args.ablation:
         # Deterministic shallow heads on cached features: the backbone comparison is
@@ -137,9 +138,10 @@ def main() -> None:
         # here. The seed sweep is spent where it matters — on the trained networks.
         for backbone, clf in itertools.product(
                 ["mobilenetv2", "resnet50", "inceptionv3"], ["svm", "mlp"]):
-            run_one(backbone, clf, args.seed, splits)
+            run_one(backbone, clf, args.seed, splits, image_size=args.image_size)
     else:
-        run_one(args.backbone, args.classifier, args.seed, splits)
+        run_one(args.backbone, args.classifier, args.seed, splits,
+                image_size=args.image_size)
 
 
 if __name__ == "__main__":

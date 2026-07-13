@@ -81,14 +81,29 @@ for _d in (DATA_DIR, RESULTS_DIR, CHECKPOINT_DIR):
 # Backbone registry
 # --------------------------------------------------------------------------- #
 
+WORKING_RESOLUTION = 128
+"""Input size for every pretrained CNN (strategies 2-4).
+
+Not the ImageNet-native 224. CIFAR-10 images are 32x32: upsampling them to 224
+adds no information whatsoever — it fabricates pixels by interpolation — while
+costing ~3x the compute of 128. 128 is still a 4x upsample of the source, it is an
+officially supported MobileNetV2 input size, and it keeps the whole sweep inside a
+free-tier GPU session. It is applied identically to strategies 2, 3 and 4, so it is
+a controlled constant of the comparison, not a variable.
+
+The ViT (strategy 5) stays at 224: its patch grid and position embeddings are fixed
+by the pretrained checkpoint.
+"""
+
+
 @dataclass(frozen=True)
 class Backbone:
     """An ImageNet-pretrained convolutional backbone from `keras.applications`.
 
-    `resolution` is the native ImageNet input size; `params_millions` and
-    `gflops` are what make the accuracy-vs-cost trade-off in the report legible —
-    MobileNetV2 is ~50x cheaper per image than VGG16, which is the whole point of
-    open question 2(a).
+    `resolution` is the native ImageNet input size, kept for reference; the
+    experiments run at `WORKING_RESOLUTION`. `params_millions` and `gflops` are what
+    make the accuracy-vs-cost trade-off in the report legible — MobileNetV2 is ~50x
+    cheaper per image than VGG16, which is the whole point of open question 2(a).
     """
 
     key: str

@@ -64,13 +64,23 @@ regime, and low-data regimes are exactly where transfer learning is strongest.**
 from-scratch CNN would close much of the gap at 50,000 images. The ranking reported here
 is a ranking *at this budget*, and the report says so.
 
-### 2. The test set is touched once
+### 2. Input resolution: 128×128, not 224×224
+
+CIFAR-10 images are 32×32. Upsampling them to an ImageNet-native 224×224 does not add a
+single bit of information — it fabricates pixels by interpolation — while costing roughly
+**3× the compute**. Strategies 2, 3 and 4 therefore run at **128×128**, still a 4× upsample
+of the source and an officially supported MobileNetV2 input size. The choice is applied
+identically across those three strategies, so it is a controlled constant of the
+comparison, not a variable. Strategy 5 stays at 224×224: a ViT's patch grid and position
+embeddings are fixed by its pretrained checkpoint.
+
+### 3. The test set is touched once
 
 Architecture, epochs, and early stopping are all selected on the validation split. The
 test set produces exactly one number per configuration. There is no "best epoch on test",
 no threshold tuned on test, and no configuration chosen because it looked good on test.
 
-### 3. No claim rests on a single run
+### 4. No claim rests on a single run
 
 Every trained network is run at three seeds (42, 7, 2024) and reported as mean ± standard
 deviation. The seed changes weight initialisation and augmentation sampling — never the
@@ -123,9 +133,9 @@ with the classifier and the data held fixed. A ~14× parameter gap and ~19× com
 
 **Q4(a) — Does replacing `Flatten()` with `GlobalMaxPooling2D()` significantly change the
 result?**
-Not a cosmetic choice. On MobileNetV2 at 224px the final feature map is 7×7×1280, so
-`Flatten → Dense(512)` is **32.1M** head parameters against `GlobalMaxPool → Dense(512)`'s
-**0.66M** — a 49× difference in head capacity, fitted on 10,000 images. Global average
+Not a cosmetic choice. On MobileNetV2 at 128px the final feature map is 4×4×1280, so
+`Flatten → Dense(512)` is **10.5M** head parameters against `GlobalMaxPool → Dense(512)`'s
+**0.66M** — a 16× difference in head capacity, fitted on 10,000 images. Global average
 pooling is included as a third arm.
 
 **Q4(b) — Can changing the optimiser (`Adam()`) improve the result?**
@@ -205,12 +215,17 @@ _(pending — run `python s4_augmentation.py --ablation-policy`)_
 cd activities/avaliacao-pratica-1
 pip install -r requirements.txt
 
-python run_all.py --stage core        # 5 strategies, primary seed   (~70 min, T4)
-python run_all.py --stage seeds       # 3 seeds for the trained nets (~2 h)
-python run_all.py --stage ablations   # the four open questions      (~2.5 h)
-python run_all.py --stage baseline    # the lecture notebook's setup (~20 min)
+python run_all.py --stage core        # 5 strategies, primary seed   (~35 min, T4)
+python run_all.py --stage ablations   # the four open questions      (~70 min)
+python run_all.py --stage seeds       # remaining seeds, main table  (~50 min)
+python run_all.py --stage baseline    # the lecture notebook's setup (~10 min)
 python report.py                      # tables + confusion matrix    (~10 s, CPU)
 ```
+
+The stages are ordered by value per GPU-minute: the report is already deliverable after
+`core`, and each stage after it strengthens rather than completes the submission. Run
+`report.py` after any stage — configurations with a single seed report no standard
+deviation rather than a fabricated zero.
 
 On Colab, open [`colab.ipynb`](avaliacao-pratica-1/colab.ipynb), select a T4 runtime, and run the
 cells: it clones this repository and calls the same scripts. The notebook is the execution
