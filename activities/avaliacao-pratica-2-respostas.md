@@ -57,11 +57,11 @@ Solicita-se à LSTM que aprenda o significado das palavras a partir de 1.449 exe
 <!-- BEGIN GENERATED: table-binary -->
 | Modelo | Acurácia | Δ piso | Macro-F1 | F1 ponderado | IC 95% | Parâmetros treináveis | Treino |
 |---|---|---|---|---|---|---|---|
-| BERT (BERTimbau, ajuste fino) <sub>(3 sementes)</sub> | **0.8285 ± 0.0235** | +25.2 pp | 0.8203 ± 0.0289 | 0.8261 | 0.7712–0.8698 | 108,924,674 | 33s |
-| TF-IDF + SVM linear *(baseline clássico)* <sub>(3 sementes)</sub> | **0.7957 ± 0.0084** | +21.9 pp | 0.7893 ± 0.0091 | 0.7949 | 0.7554–0.8302 | 35,955 | 1s |
-| BiLSTM | **0.7798** | +20.3 pp | 0.7743 | 0.7796 | 0.7483–0.8083 | 1,313,986 | 19s |
-| LSTM <sub>(3 sementes)</sub> | **0.7711 ± 0.0114** | +19.5 pp | 0.7641 ± 0.0138 | 0.7702 | 0.7298–0.8122 | 911,554 | 10s |
-| Classe majoritária *(piso)* <sub>(3 sementes)</sub> | **0.5759 ± 0.0000** | -0.0 pp | 0.3655 ± 0.0000 | 0.4209 | 0.5398–0.6113 | 0 | 0s |
+| BERT (BERTimbau, ajuste fino) <sub>(3 sementes)</sub> | **0,8285 ± 0,0235** | +25,2 pp | 0,8203 ± 0,0289 | 0,8261 | 0,7712–0,8698 | 108.924.674 | 33s |
+| TF-IDF + SVM linear *(baseline clássico)* <sub>(3 sementes)</sub> | **0,7957 ± 0,0084** | +21,9 pp | 0,7893 ± 0,0091 | 0,7949 | 0,7554–0,8302 | 35.955 | 1s |
+| BiLSTM | **0,7798** | +20,3 pp | 0,7743 | 0,7796 | 0,7483–0,8083 | 1.313.986 | 19s |
+| LSTM <sub>(3 sementes)</sub> | **0,7711 ± 0,0114** | +19,5 pp | 0,7641 ± 0,0138 | 0,7702 | 0,7298–0,8122 | 911.554 | 10s |
+| Classe majoritária *(piso)* <sub>(3 sementes)</sub> | **0,5759 ± 0,0000** | -0,0 pp | 0,3655 ± 0,0000 | 0,4209 | 0,5398–0,6113 | 0 | 0s |
 <!-- END GENERATED: table-binary -->
 
 ### Significância estatística — LSTM *versus* BERT (predições pareadas)
@@ -69,9 +69,9 @@ Solicita-se à LSTM que aprenda o significado das palavras a partir de 1.449 exe
 <!-- BEGIN GENERATED: significance-binary -->
 | Discordâncias | LSTM certo / BERT errado | LSTM errado / BERT certo | p (McNemar exato) |
 |---|---|---|---|
-| 133 | 38 | 95 | 8.25e-07 |
+| 133 | 38 | 95 | 8,25e-07 |
 
-A diferença de 7.80 pp em favor do **BERT** é **significativa** (α = 0,05; McNemar exato sobre predições pareadas).
+A diferença de 7,80 pp em favor do **BERT** é **significativa** (α = 0,05; McNemar exato sobre predições pareadas).
 <!-- END GENERATED: significance-binary -->
 
 ### Todas as comparações (McNemar exato, semente primária)
@@ -79,10 +79,10 @@ A diferença de 7.80 pp em favor do **BERT** é **significativa** (α = 0,05; Mc
 <!-- BEGIN GENERATED: pairwise-binary -->
 | Comparação | Δ | p (McNemar) | Significativa? |
 |---|---|---|---|
-| BERT (BERTimbau, ajuste fino) vs. TF-IDF + SVM linear | +4.24 pp | 0.00239 | **sim** |
-| TF-IDF + SVM linear vs. LSTM | +3.56 pp | 0.00734 | **sim** |
-| BERT (BERTimbau, ajuste fino) vs. LSTM | +7.80 pp | 8.25e-07 | **sim** |
-| BiLSTM vs. LSTM | +1.23 pp | 0.336 | não — empate técnico |
+| BERT (BERTimbau, ajuste fino) vs. TF-IDF + SVM linear | +4,24 pp | 0,00239 | **sim** |
+| TF-IDF + SVM linear vs. LSTM | +3,56 pp | 0,00734 | **sim** |
+| BERT (BERTimbau, ajuste fino) vs. LSTM | +7,80 pp | 8,25e-07 | **sim** |
+| BiLSTM vs. LSTM | +1,23 pp | 0,336 | não — empate técnico |
 <!-- END GENERATED: pairwise-binary -->
 
 **O baseline clássico supera a LSTM, e a diferença é estatisticamente significativa.** Este é o achado central da tarefa. Um vetor TF-IDF de n-gramas de palavras e caracteres, classificado por uma SVM linear — **36 mil parâmetros, um segundo de CPU** — atinge 79,6%, contra 77,1% da LSTM, que possui **912 mil parâmetros** e treina em GPU (Δ = +3,56 pp; p = 0,007). A LSTM não é derrotada por ser recorrente: é derrotada porque lhe exigimos aprender *o que as palavras significam* a partir de 1.449 manchetes, e 1.449 exemplos são insuficientes para induzir semântica lexical do zero. A SVM não precisa aprender semântica alguma — opera sobre contagens de n-gramas, e os n-gramas de caracteres capturam a morfologia do português (*mata*, *matou*, *matando* compartilham radical) que um modelo de palavras trataria como três tokens sem relação.
@@ -106,11 +106,11 @@ A diferença de 7.80 pp em favor do **BERT** é **significativa** (α = 0,05; Mc
 <!-- BEGIN GENERATED: table-multiclass -->
 | Modelo | Acurácia | Δ piso | Macro-F1 | F1 ponderado | IC 95% | Parâmetros treináveis | Treino |
 |---|---|---|---|---|---|---|---|
-| BERT (BERTimbau, ajuste fino) <sub>(3 sementes)</sub> | **0.5741 ± 0.0360** | +32.6 pp | 0.5378 ± 0.0488 | 0.5650 | 0.5055–0.6475 | 108,928,519 | 39s |
-| TF-IDF + SVM linear *(baseline clássico)* <sub>(3 sementes)</sub> | **0.5303 ± 0.0208** | +28.2 pp | 0.4946 ± 0.0115 | 0.5283 | 0.4754–0.5883 | 35,617 | 1s |
-| BiLSTM | **0.4720** | +22.4 pp | 0.4060 | 0.4592 | 0.4360–0.5082 | 1,314,311 | 23s |
-| LSTM <sub>(3 sementes)</sub> | **0.4615 ± 0.0190** | +21.4 pp | 0.4119 ± 0.0121 | 0.4620 | 0.4049–0.5137 | 911,879 | 20s |
-| Classe majoritária *(piso)* <sub>(3 sementes)</sub> | **0.2476 ± 0.0000** | -0.0 pp | 0.0567 ± 0.0000 | 0.0983 | 0.2177–0.2802 | 0 | 0s |
+| BERT (BERTimbau, ajuste fino) <sub>(3 sementes)</sub> | **0,5741 ± 0,0360** | +32,6 pp | 0,5378 ± 0,0488 | 0,5650 | 0,5055–0,6475 | 108.928.519 | 39s |
+| TF-IDF + SVM linear *(baseline clássico)* <sub>(3 sementes)</sub> | **0,5303 ± 0,0208** | +28,2 pp | 0,4946 ± 0,0115 | 0,5283 | 0,4754–0,5883 | 35.617 | 1s |
+| BiLSTM | **0,4720** | +22,4 pp | 0,4060 | 0,4592 | 0,4360–0,5082 | 1.314.311 | 23s |
+| LSTM <sub>(3 sementes)</sub> | **0,4615 ± 0,0190** | +21,4 pp | 0,4119 ± 0,0121 | 0,4620 | 0,4049–0,5137 | 911.879 | 20s |
+| Classe majoritária *(piso)* <sub>(3 sementes)</sub> | **0,2476 ± 0,0000** | -0,0 pp | 0,0567 ± 0,0000 | 0,0983 | 0,2177–0,2802 | 0 | 0s |
 <!-- END GENERATED: table-multiclass -->
 
 ### Significância estatística — LSTM *versus* BERT (predições pareadas)
@@ -118,9 +118,9 @@ A diferença de 7.80 pp em favor do **BERT** é **significativa** (α = 0,05; Mc
 <!-- BEGIN GENERATED: significance-multiclass -->
 | Discordâncias | LSTM certo / BERT errado | LSTM errado / BERT certo | p (McNemar exato) |
 |---|---|---|---|
-| 234 | 80 | 154 | 1.505e-06 |
+| 234 | 80 | 154 | 1,505e-06 |
 
-A diferença de 10.12 pp em favor do **BERT** é **significativa** (α = 0,05; McNemar exato sobre predições pareadas).
+A diferença de 10,12 pp em favor do **BERT** é **significativa** (α = 0,05; McNemar exato sobre predições pareadas).
 <!-- END GENERATED: significance-multiclass -->
 
 ### Todas as comparações (McNemar exato, semente primária)
@@ -128,10 +128,10 @@ A diferença de 10.12 pp em favor do **BERT** é **significativa** (α = 0,05; M
 <!-- BEGIN GENERATED: pairwise-multiclass -->
 | Comparação | Δ | p (McNemar) | Significativa? |
 |---|---|---|---|
-| BERT (BERTimbau, ajuste fino) vs. TF-IDF + SVM linear | +5.61 pp | 0.00426 | **sim** |
-| TF-IDF + SVM linear vs. LSTM | +4.51 pp | 0.00184 | **sim** |
-| BERT (BERTimbau, ajuste fino) vs. LSTM | +10.12 pp | 1.51e-06 | **sim** |
-| BiLSTM vs. LSTM | +0.55 pp | 0.769 | não — empate técnico |
+| BERT (BERTimbau, ajuste fino) vs. TF-IDF + SVM linear | +5,61 pp | 0,00426 | **sim** |
+| TF-IDF + SVM linear vs. LSTM | +4,51 pp | 0,00184 | **sim** |
+| BERT (BERTimbau, ajuste fino) vs. LSTM | +10,12 pp | 1,51e-06 | **sim** |
+| BiLSTM vs. LSTM | +0,55 pp | 0,769 | não — empate técnico |
 <!-- END GENERATED: pairwise-multiclass -->
 
 A ordenação é **idêntica à da tarefa binária**, com margens ampliadas: BERT (57,4%) > TF-IDF + SVM (53,0%) > BiLSTM (47,2%) ≈ LSTM (46,2%). O baseline clássico volta a superar a LSTM de forma significativa (+4,51 pp; p = 0,002), e a bidirecionalidade volta a não fazer diferença (p = 0,769). Que as duas tarefas — de dificuldades muito distintas — produzam a mesma ordenação e os mesmos vereditos de significância reforça que não se trata de artefato de uma partição particular.
@@ -149,13 +149,13 @@ A ordenação é **idêntica à da tarefa binária**, com margens ampliadas: BER
 <!-- BEGIN GENERATED: per-class-multiclass -->
 | Classe | F1 |
 |---|---|
-| alegria | 0.686 |
-| tristeza | 0.606 |
-| surpresa | 0.589 |
-| raiva | 0.576 |
-| medo | 0.517 |
-| desgosto | 0.478 |
-| neutro | 0.309 |
+| alegria | 0,686 |
+| tristeza | 0,606 |
+| surpresa | 0,589 |
+| raiva | 0,576 |
+| medo | 0,517 |
+| desgosto | 0,478 |
+| neutro | 0,309 |
 <!-- END GENERATED: per-class-multiclass -->
 
 ### Principais confusões
@@ -163,12 +163,12 @@ A ordenação é **idêntica à da tarefa binária**, com margens ampliadas: BER
 <!-- BEGIN GENERATED: confusions-multiclass -->
 | Confusão | Taxa |
 |---|---|
-| neutro → alegria | 29.4% |
-| neutro → desgosto | 26.5% |
-| surpresa → alegria | 26.2% |
-| medo → tristeza | 21.5% |
-| desgosto → tristeza | 20.8% |
-| tristeza → desgosto | 18.8% |
+| neutro → alegria | 29,4% |
+| neutro → desgosto | 26,5% |
+| surpresa → alegria | 26,2% |
+| medo → tristeza | 21,5% |
+| desgosto → tristeza | 20,8% |
+| tristeza → desgosto | 18,8% |
 <!-- END GENERATED: confusions-multiclass -->
 
 **A previsão registrada na seção de preparação da base confirmou-se.** Havíamos apontado, *antes* de qualquer treinamento, que os quatro conflitos de anotação eram todos internos à valência negativa (raiva/desgosto; desgosto/medo; tristeza/medo) e que, por isso, a sangria da matriz de confusão se concentraria entre as emoções negativas. É exatamente o que ocorre: **medo → tristeza (21,5%)**, **desgosto → tristeza (20,8%)**, **tristeza → desgosto (18,8%)** e **raiva → tristeza (15,5%)** figuram entre as maiores confusões, e `desgosto` (F1 = 0,478) e `medo` (F1 = 0,517) estão entre as classes de pior desempenho. O modelo erra onde os próprios anotadores humanos divergiram — parte desse erro é, portanto, **irredutível**: nenhum classificador pode superar a consistência do rótulo que lhe foi dado.
@@ -184,8 +184,8 @@ A ordenação é **idêntica à da tarefa binária**, com margens ampliadas: BER
 <!-- BEGIN GENERATED: sensitivity -->
 | Mapeamento | LSTM | BERT | Observação |
 |---|---|---|---|
-| binária (positivo/negativo) | 0.7711 ± 0.0114 | 0.8285 ± 0.0235 | mapa do professor (`neutro`, `surpresa` → positivo) |
-| binária, valência limpa | 0.8358 | 0.8972 | `neutro`/`surpresa` descartados |
+| binária (positivo/negativo) | 0,7711 ± 0,0114 | 0,8285 ± 0,0235 | mapa do professor (`neutro`, `surpresa` → positivo) |
+| binária, valência limpa | 0,8358 | 0,8972 | `neutro`/`surpresa` descartados |
 
 <!-- END GENERATED: sensitivity -->
 

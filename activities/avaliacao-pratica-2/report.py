@@ -313,6 +313,27 @@ def confusion_png(run: dict, lang: str = "pt") -> list[Path]:
     return paths
 
 
+def localise_decimals(text: str) -> str:
+    """English number formatting -> pt-BR, for the submitted write-up.
+
+    Both separators swap, and the order matters. `108,924,674` is a *thousands* comma in
+    English and would read as a decimal in Portuguese — leaving it is worse than leaving
+    the decimal point, because it silently changes the magnitude a reader perceives. So:
+
+        108,924,674  ->  108.924.674     (thousands: comma -> dot)
+        0.8285       ->  0,8285          (decimal:   dot   -> comma)
+        8.25e-07     ->  8,25e-07
+
+    Thousands groups are parked on a sentinel first, so the decimal pass cannot chew on
+    the dots it just created. The lookarounds require digits on both sides, so `vs.`,
+    `report.py` and URLs are left alone.
+    """
+    sentinel = "\x00"
+    text = re.sub(r"(?<=\d),(?=\d{3}(?!\d))", sentinel, text)  # thousands
+    text = re.sub(r"(?<=\d)\.(?=\d)", ",", text)               # decimals
+    return text.replace(sentinel, ".")
+
+
 def patch(markdown: str, key: str, content: str) -> str:
     begin, end = BEGIN.format(key), END.format(key)
     block = f"{begin}\n{content}\n{end}"
@@ -370,7 +391,8 @@ def main() -> None:
             continue
         markdown = target.read_text(encoding="utf-8")
         for key, content in sections.items():
-            markdown = patch(markdown, key, content)
+            markdown = patch(markdown, key,
+                             localise_decimals(content) if lang == "pt" else content)
         target.write_text(markdown, encoding="utf-8")
         print(f"patched {target.name}")
 
