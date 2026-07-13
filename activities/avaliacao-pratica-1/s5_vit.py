@@ -85,7 +85,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--seed", type=int, default=common.SEED)
-    parser.add_argument("--epochs", type=int, default=6)
+    # A pretrained ViT converges on CIFAR-10 in very few epochs — most of the work was
+    # done on ImageNet-21k. Early stopping usually fires before this budget is spent.
+    parser.add_argument("--epochs", type=int, default=4)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--lr-encoder", type=float, default=2e-5)
     parser.add_argument("--lr-head", type=float, default=1e-3)

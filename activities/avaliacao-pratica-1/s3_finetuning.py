@@ -16,12 +16,12 @@ classifier — not fine-tuning. Phase 2 is the difference, and the report quanti
 
 Open question 4(a) — *does replacing `Flatten()` with `GlobalMaxPooling2D()` change
 the result significantly?* — is answered by the `--head` ablation. The two are not
-cosmetic variants: on MobileNetV2 at 224px the final feature map is 7x7x1280, so
+cosmetic variants: on MobileNetV2 at 128px the final feature map is 4x4x1280, so
 
-    Flatten -> Dense(512):  62,720 x 512 = 32.1M parameters
-    GlobalMaxPool -> Dense(512): 1,280 x 512 =  0.66M parameters
+    Flatten -> Dense(512):       20,480 x 512 = 10.5M parameters
+    GlobalMaxPool -> Dense(512):  1,280 x 512 =  0.66M parameters
 
-a 49x difference in head capacity, fitted on 10,000 images. Pooling also discards
+a 16x difference in head capacity, fitted on 10,000 images. Pooling also discards
 spatial position, which for object classification is largely a nuisance variable.
 
 BatchNorm caveat: when the top block is unfrozen, its BatchNormalization layers are
@@ -45,16 +45,16 @@ import common
 HEADS = ("flatten", "gmp", "gap")
 
 
-def build_model(backbone: common.Backbone, head: str, seed: int, *,
+def build_model(backbone: common.Backbone, head: str, seed: int, *, image_size: int,
                 dropout: float = 0.3):
     from tensorflow import keras
     from tensorflow.keras import layers
 
     init = keras.initializers.GlorotUniform(seed=seed)
-    base = backbone.build(pooling=None)
+    base = backbone.build(pooling=None, input_shape=(image_size, image_size, 3))
     base.trainable = False
 
-    inputs = keras.Input(shape=(backbone.resolution, backbone.resolution, 3))
+    inputs = keras.Input(shape=(image_size, image_size, 3))
     x = base(inputs, training=False)  # keeps BatchNorm in inference mode
     x = {
         "flatten": layers.Flatten(),
@@ -87,6 +87,7 @@ def trainable_params(model) -> int:
 def run_one(backbone_key: str, head: str, seed: int, splits: common.Splits, *,
             epochs_frozen: int, epochs_finetune: int, batch_size: int,
             frozen_only: bool, unfreeze_layers: int, device: str,
+            image_size: int = common.WORKING_RESOLUTION,
             optimizer: str = "adam", augment=None, label: str | None = None,
             strategy: str = "s3_finetune") -> None:
     """One full two-phase run. Shared with strategy 4, which passes `augment`."""
@@ -94,7 +95,7 @@ def run_one(backbone_key: str, head: str, seed: int, splits: common.Splits, *,
 
     common.set_seed(seed)
     backbone = common.BACKBONES[backbone_key]
-    res = backbone.resolution
+    res = image_size
     preprocess = backbone.preprocess()
 
     train_ds = common.make_tf_dataset(
@@ -105,7 +106,7 @@ def run_one(backbone_key: str, head: str, seed: int, splits: common.Splits, *,
     test_ds = common.make_tf_dataset(splits.x_test, splits.y_test, image_size=res,
                                      preprocess=preprocess, batch_size=batch_size)
 
-    model, base = build_model(backbone, head, seed)
+    model, base = build_model(backbone, head, seed, image_size=res)
     params_head = trainable_params(model)
 
     def make_optimizer(lr: float):
@@ -168,29 +169,33 @@ def main() -> None:
                         choices=list(common.BACKBONES))
     parser.add_argument("--head", default="gap", choices=HEADS)
     parser.add_argument("--seed", type=int, default=common.SEED)
-    parser.add_argument("--epochs-frozen", type=int, default=15)
-    parser.add_argument("--epochs-finetune", type=int, default=15)
+    parser.add_argument("--epochs-frozen", type=int, default=12)
+    parser.add_argument("--epochs-finetune", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=64)
+    parser.add_argument("--image-size", type=int, default=common.WORKING_RESOLUTION)
     parser.add_argument("--unfreeze-layers", type=int, default=30)
     parser.add_argument("--frozen-only", action="store_true",
                         help="skip phase 2 — reproduces the lecture notebook's setup")
     parser.add_argument("--ablation-head", action="store_true",
                         help="open question 4(a): flatten vs gmp vs gap over 3 seeds")
+    parser.add_argument("--seeds", type=int, nargs="+", default=list(common.SEEDS),
+                        help="seeds used by the ablation sweep")
     args = parser.parse_args()
 
     device = common.configure_gpu()
     splits = common.load_splits()
-    print(f"device: {device} · {splits.summary()}")
+    print(f"device: {device} · {splits.summary()} · {args.image_size}px")
 
     kwargs = dict(epochs_frozen=args.epochs_frozen, epochs_finetune=args.epochs_finetune,
                   batch_size=args.batch_size, frozen_only=args.frozen_only,
-                  unfreeze_layers=args.unfreeze_layers, device=device)
+                  unfreeze_layers=args.unfreeze_layers, device=device,
+                  image_size=args.image_size)
 
     if args.ablation_head:
-        # 3 heads x 3 seeds: a head difference is only reportable if it survives
-        # the seed-to-seed spread it has to be measured against.
+        # A head difference is only reportable if it survives the seed-to-seed spread
+        # it has to be measured against — hence a sweep, not a single run.
         for head in HEADS:
-            for seed in common.SEEDS:
+            for seed in args.seeds:
                 run_one(args.backbone, head, seed, splits, **kwargs)
     else:
         run_one(args.backbone, args.head, args.seed, splits, **kwargs)
