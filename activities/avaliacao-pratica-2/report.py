@@ -48,7 +48,7 @@ MODEL_NAMES = {
         "bert": "BERT (BERTimbau, fine-tuned)",
     },
     "pt": {
-        "majority": "Classe majoritária *(piso)*",
+        "majority": "Classe majoritária *(baseline trivial)*",
         "tfidf_svm": "TF-IDF + SVM linear *(baseline clássico)*",
         "lstm": "LSTM",
         "bilstm": "BiLSTM",
@@ -78,8 +78,8 @@ L = {
     },
     "pt": {
         "model": "Modelo", "acc": "Acurácia", "f1": "Macro-F1", "wf1": "F1 ponderado",
-        "ci": "IC 95%", "floor": "Δ piso", "params": "Parâmetros treináveis",
-        "train": "Treino", "seeds": "sementes", "none": "_(sem execuções ainda)_",
+        "ci": "IC 95%", "floor": "Δ baseline", "params": "Parâmetros treináveis",
+        "train": "Treino", "seeds": "seeds", "none": "_(sem execuções ainda)_",
         "cm_x": "Predita", "cm_y": "Verdadeira",
         "cm_title": "Matriz de confusão — {model} · {task}\nacurácia {acc:.4f} · normalizada por linha",
         "sig_head": ["Discordâncias", "LSTM certo / BERT errado",
@@ -305,7 +305,8 @@ def confusion_png(run: dict, lang: str = "pt") -> list[Path]:
             spine.set_color(fg)
 
         IMG_DIR.mkdir(parents=True, exist_ok=True)
-        path = IMG_DIR / f"avaliacao-pratica-2-confusion-{run['task']}-{theme}.png"
+        path = (IMG_DIR /
+                f"avaliacao-pratica-2-confusion-{run['task']}-{run['model']}-{theme}.png")
         fig.tight_layout()
         fig.savefig(path, dpi=160, facecolor=bg)
         plt.close(fig)
@@ -353,10 +354,21 @@ def main() -> None:
     rows = common.aggregate(runs)
     print(f"{len(runs)} runs across {len({r['task'] for r in runs})} tasks")
 
-    # The pictured model is the best *mean* over seeds, shown at the primary seed —
-    # not the single luckiest run.
+    # One matrix per (task, model) for the two models the assignment compares — four in
+    # all. Showing only the winner's would hide *how* the LSTM fails, which is where the
+    # comparison is actually informative: two models at similar accuracy can be wrong in
+    # entirely different places, and the report should let the reader see that.
+    # Always the primary-seed run, never the luckiest one.
     best_run: dict[str, dict] = {}
     for task in ("binary", "multiclass"):
+        for model in ("lstm", "bert"):
+            for run in runs:
+                if (run["task"] == task and run["model"] == model
+                        and run["seed"] == common.SEED):
+                    for path in confusion_png(run):
+                        print(f"wrote {path.name}")
+                    break
+
         candidates = [r for r in rows if r["task"] == task
                       and r["model"] not in ("majority",)]
         if not candidates:
@@ -366,8 +378,6 @@ def main() -> None:
             if (run["task"] == task and run["model"] == leader["model"]
                     and run["seed"] == common.SEED):
                 best_run[task] = run
-                for path in confusion_png(run):
-                    print(f"wrote {path.name}")
                 break
 
     for lang, target in TARGETS.items():
