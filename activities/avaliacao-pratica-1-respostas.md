@@ -93,6 +93,8 @@ _(pendente)_
 
 ## Questões em Aberto
 
+> **Nota sobre o estado desta seção.** As quatro questões em aberto exigem 28 treinamentos adicionais. Aquelas cujas tabelas aparecem preenchidas abaixo foram executadas e são reportadas com dispersão entre *seeds*; aquelas assinaladas como sem resultados **não foram executadas**, por esgotamento da cota de GPU gratuita dentro do prazo de entrega. Nenhum valor é estimado, inferido ou reportado sem o artefato correspondente em [`results/`](https://github.com/fsd-dantas/machine-learning-fundamentals/tree/main/activities/avaliacao-pratica-1/results): uma tabela ausente significa exatamente que o experimento não foi realizado, e não que seu resultado foi desfavorável.
+
 ### 2(a) — Trocar a rede CNN por uma mais simples, como a MobileNet, impacta significativamente o resultado?
 
 <!-- BEGIN GENERATED: ablation-backbone -->
