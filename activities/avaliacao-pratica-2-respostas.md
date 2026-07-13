@@ -34,7 +34,7 @@ Distribuição após o tratamento: **binária** — negativo 1.404, positivo 1.0
 
 **Pré-processamento distinto por modelo, deliberadamente.** A LSTM recebe o texto com remoção de *stopwords* (fiel ao script da disciplina, e defensável: com 1.449 textos de treinamento e *embeddings* inicializados aleatoriamente, não há sinal suficiente para que a rede aprenda que “de” é desinformativo). O BERT recebe o **texto bruto**: foi pré-treinado sobre português corrente, e remover “não” de “não gostei” inverte o sentimento. O pré-processamento que beneficia um modelo destrói o outro — o que é, em si, um resultado.
 
-**Ambiente.** Google Colab, GPU NVIDIA T4. LSTM em TensorFlow/Keras (fiel ao script da disciplina) e BERT em PyTorch/HuggingFace (o BERTimbau distribui pesos PyTorch, e o suporte a TensorFlow da biblioteca está descontinuado). A comparabilidade é preservada porque a avaliação ocorre sobre as predições persistidas, e não sobre os modelos: ambos os arcabouços atravessam o mesmo protocolo de partição, métricas e teste estatístico.
+**Ambiente.** Kaggle Notebooks, GPU NVIDIA T4. LSTM em TensorFlow/Keras (fiel ao script da disciplina) e BERT em PyTorch/HuggingFace (o BERTimbau distribui pesos PyTorch, e o suporte a TensorFlow da biblioteca está descontinuado). A comparabilidade é preservada porque a avaliação ocorre sobre as predições persistidas, e não sobre os modelos: ambos os arcabouços atravessam o mesmo protocolo de partição, métricas e teste estatístico.
 
 ---
 
@@ -44,7 +44,7 @@ A comparação solicitada é **estruturalmente desigual**, e explicitá-lo é pa
 
 | | LSTM | BERT (BERTimbau) |
 |---|---|---|
-| Parâmetros | ~1,4 milhão | ~109 milhões |
+| Parâmetros treináveis | 911.554 | 108.924.674 (**119×**) |
 | *Embeddings* | aprendidos do zero, sobre 1.449 textos | pré-treinados sobre o brWaC (2,7 bilhões de palavras) |
 | O que precisa aprender | o que as palavras significam **e** a tarefa | apenas a tarefa |
 
@@ -57,17 +57,43 @@ Solicita-se à LSTM que aprenda o significado das palavras a partir de 1.449 exe
 <!-- BEGIN GENERATED: table-binary -->
 | Modelo | Acurácia | Δ piso | Macro-F1 | F1 ponderado | IC 95% | Parâmetros treináveis | Treino |
 |---|---|---|---|---|---|---|---|
-| TF-IDF + SVM linear *(baseline clássico)* <sub>(3 sementes)</sub> | **0.7957 ± 0.0084** | +21.9 pp | 0.7893 ± 0.0091 | 0.7949 | 0.7554–0.8302 | 35,955 | 0s |
+| BERT (BERTimbau, ajuste fino) <sub>(3 sementes)</sub> | **0.8285 ± 0.0235** | +25.2 pp | 0.8203 ± 0.0289 | 0.8261 | 0.7712–0.8698 | 108,924,674 | 33s |
+| TF-IDF + SVM linear *(baseline clássico)* <sub>(3 sementes)</sub> | **0.7957 ± 0.0084** | +21.9 pp | 0.7893 ± 0.0091 | 0.7949 | 0.7554–0.8302 | 35,955 | 1s |
+| BiLSTM | **0.7798** | +20.3 pp | 0.7743 | 0.7796 | 0.7483–0.8083 | 1,313,986 | 19s |
+| LSTM <sub>(3 sementes)</sub> | **0.7711 ± 0.0114** | +19.5 pp | 0.7641 ± 0.0138 | 0.7702 | 0.7298–0.8122 | 911,554 | 10s |
 | Classe majoritária *(piso)* <sub>(3 sementes)</sub> | **0.5759 ± 0.0000** | -0.0 pp | 0.3655 ± 0.0000 | 0.4209 | 0.5398–0.6113 | 0 | 0s |
 <!-- END GENERATED: table-binary -->
 
 ### Significância estatística — LSTM *versus* BERT (predições pareadas)
 
 <!-- BEGIN GENERATED: significance-binary -->
-_(exige uma execução de LSTM e uma de BERT na semente primária)_
+| Discordâncias | LSTM certo / BERT errado | LSTM errado / BERT certo | p (McNemar exato) |
+|---|---|---|---|
+| 133 | 38 | 95 | 8.25e-07 |
+
+A diferença de 7.80 pp em favor do **BERT** é **significativa** (α = 0,05; McNemar exato sobre predições pareadas).
 <!-- END GENERATED: significance-binary -->
 
-### Matriz de confusão — melhor modelo
+### Todas as comparações (McNemar exato, semente primária)
+
+<!-- BEGIN GENERATED: pairwise-binary -->
+| Comparação | Δ | p (McNemar) | Significativa? |
+|---|---|---|---|
+| BERT (BERTimbau, ajuste fino) vs. TF-IDF + SVM linear | +4.24 pp | 0.00239 | **sim** |
+| TF-IDF + SVM linear vs. LSTM | +3.56 pp | 0.00734 | **sim** |
+| BERT (BERTimbau, ajuste fino) vs. LSTM | +7.80 pp | 8.25e-07 | **sim** |
+| BiLSTM vs. LSTM | +1.23 pp | 0.336 | não — empate técnico |
+<!-- END GENERATED: pairwise-binary -->
+
+**O baseline clássico supera a LSTM, e a diferença é estatisticamente significativa.** Este é o achado central da tarefa. Um vetor TF-IDF de n-gramas de palavras e caracteres, classificado por uma SVM linear — **36 mil parâmetros, um segundo de CPU** — atinge 79,6%, contra 77,1% da LSTM, que possui **912 mil parâmetros** e treina em GPU (Δ = +3,56 pp; p = 0,007). A LSTM não é derrotada por ser recorrente: é derrotada porque lhe exigimos aprender *o que as palavras significam* a partir de 1.449 manchetes, e 1.449 exemplos são insuficientes para induzir semântica lexical do zero. A SVM não precisa aprender semântica alguma — opera sobre contagens de n-gramas, e os n-gramas de caracteres capturam a morfologia do português (*mata*, *matou*, *matando* compartilham radical) que um modelo de palavras trataria como três tokens sem relação.
+
+**A bidirecionalidade não resgata o braço recorrente.** A BiLSTM avança 1,23 pp sobre a LSTM, e o teste de McNemar não distingue as duas (p = 0,336): **empate técnico**. O resultado corrobora o diagnóstico anterior — a limitação não reside na arquitetura recorrente, mas no volume de dados. Duplicar a capacidade de leitura da sequência não cria os exemplos que faltam.
+
+**O BERT vence, e vence também o baseline clássico** (82,9%; +4,24 pp sobre o TF-IDF; p = 0,002). A atribuição honesta, contudo, não é ao mecanismo de **atenção**, e sim ao **pré-treinamento**: o BERT chega ao problema já sabendo português — 2,7 bilhões de palavras do brWaC — e precisa apenas aprender a tarefa. Tomada isoladamente, a comparação LSTM *versus* Transformer sugeriria superioridade arquitetural; a presença do baseline clássico desfaz a ilusão, ao evidenciar que a maior parte da distância entre LSTM e BERT é percorrida por um modelo **desprovido de qualquer mecanismo de atenção**.
+
+**Custo.** O BERT possui 108,9 milhões de parâmetros treináveis, contra 36 mil da SVM — razão de aproximadamente **3.000×** — em troca de 4,24 pontos percentuais. Em contexto de implantação, isso configura uma escolha de engenharia, não uma conclusão automática.
+
+### Matriz de confusão — melhor modelo (BERT)
 
 <p align="center">
   <img src="../assets/img/avaliacao-pratica-2-confusion-binary-light.png" alt="Matriz de confusão — tarefa binária" width="520">
@@ -80,23 +106,76 @@ _(exige uma execução de LSTM e uma de BERT na semente primária)_
 <!-- BEGIN GENERATED: table-multiclass -->
 | Modelo | Acurácia | Δ piso | Macro-F1 | F1 ponderado | IC 95% | Parâmetros treináveis | Treino |
 |---|---|---|---|---|---|---|---|
+| BERT (BERTimbau, ajuste fino) <sub>(3 sementes)</sub> | **0.5741 ± 0.0360** | +32.6 pp | 0.5378 ± 0.0488 | 0.5650 | 0.5055–0.6475 | 108,928,519 | 39s |
 | TF-IDF + SVM linear *(baseline clássico)* <sub>(3 sementes)</sub> | **0.5303 ± 0.0208** | +28.2 pp | 0.4946 ± 0.0115 | 0.5283 | 0.4754–0.5883 | 35,617 | 1s |
+| BiLSTM | **0.4720** | +22.4 pp | 0.4060 | 0.4592 | 0.4360–0.5082 | 1,314,311 | 23s |
+| LSTM <sub>(3 sementes)</sub> | **0.4615 ± 0.0190** | +21.4 pp | 0.4119 ± 0.0121 | 0.4620 | 0.4049–0.5137 | 911,879 | 20s |
 | Classe majoritária *(piso)* <sub>(3 sementes)</sub> | **0.2476 ± 0.0000** | -0.0 pp | 0.0567 ± 0.0000 | 0.0983 | 0.2177–0.2802 | 0 | 0s |
 <!-- END GENERATED: table-multiclass -->
 
 ### Significância estatística — LSTM *versus* BERT (predições pareadas)
 
 <!-- BEGIN GENERATED: significance-multiclass -->
-_(exige uma execução de LSTM e uma de BERT na semente primária)_
+| Discordâncias | LSTM certo / BERT errado | LSTM errado / BERT certo | p (McNemar exato) |
+|---|---|---|---|
+| 234 | 80 | 154 | 1.505e-06 |
+
+A diferença de 10.12 pp em favor do **BERT** é **significativa** (α = 0,05; McNemar exato sobre predições pareadas).
 <!-- END GENERATED: significance-multiclass -->
 
-### Matriz de confusão — melhor modelo
+### Todas as comparações (McNemar exato, semente primária)
+
+<!-- BEGIN GENERATED: pairwise-multiclass -->
+| Comparação | Δ | p (McNemar) | Significativa? |
+|---|---|---|---|
+| BERT (BERTimbau, ajuste fino) vs. TF-IDF + SVM linear | +5.61 pp | 0.00426 | **sim** |
+| TF-IDF + SVM linear vs. LSTM | +4.51 pp | 0.00184 | **sim** |
+| BERT (BERTimbau, ajuste fino) vs. LSTM | +10.12 pp | 1.51e-06 | **sim** |
+| BiLSTM vs. LSTM | +0.55 pp | 0.769 | não — empate técnico |
+<!-- END GENERATED: pairwise-multiclass -->
+
+A ordenação é **idêntica à da tarefa binária**, com margens ampliadas: BERT (57,4%) > TF-IDF + SVM (53,0%) > BiLSTM (47,2%) ≈ LSTM (46,2%). O baseline clássico volta a superar a LSTM de forma significativa (+4,51 pp; p = 0,002), e a bidirecionalidade volta a não fazer diferença (p = 0,769). Que as duas tarefas — de dificuldades muito distintas — produzam a mesma ordenação e os mesmos vereditos de significância reforça que não se trata de artefato de uma partição particular.
+
+### Matriz de confusão — melhor modelo (BERT)
 
 <p align="center">
   <img src="../assets/img/avaliacao-pratica-2-confusion-multiclass-light.png" alt="Matriz de confusão — tarefa multiclasse" width="720">
 </p>
 
-*Matriz normalizada por linha. Espera-se sangria concentrada entre as emoções negativas (medo, desgosto, raiva, tristeza) — a mesma região em que os próprios anotadores divergiram, conforme a seção de preparação da base.*
+*Matriz normalizada por linha.*
+
+### F1 por classe (BERT)
+
+<!-- BEGIN GENERATED: per-class-multiclass -->
+| Classe | F1 |
+|---|---|
+| alegria | 0.686 |
+| tristeza | 0.606 |
+| surpresa | 0.589 |
+| raiva | 0.576 |
+| medo | 0.517 |
+| desgosto | 0.478 |
+| neutro | 0.309 |
+<!-- END GENERATED: per-class-multiclass -->
+
+### Principais confusões
+
+<!-- BEGIN GENERATED: confusions-multiclass -->
+| Confusão | Taxa |
+|---|---|
+| neutro → alegria | 29.4% |
+| neutro → desgosto | 26.5% |
+| surpresa → alegria | 26.2% |
+| medo → tristeza | 21.5% |
+| desgosto → tristeza | 20.8% |
+| tristeza → desgosto | 18.8% |
+<!-- END GENERATED: confusions-multiclass -->
+
+**A previsão registrada na seção de preparação da base confirmou-se.** Havíamos apontado, *antes* de qualquer treinamento, que os quatro conflitos de anotação eram todos internos à valência negativa (raiva/desgosto; desgosto/medo; tristeza/medo) e que, por isso, a sangria da matriz de confusão se concentraria entre as emoções negativas. É exatamente o que ocorre: **medo → tristeza (21,5%)**, **desgosto → tristeza (20,8%)**, **tristeza → desgosto (18,8%)** e **raiva → tristeza (15,5%)** figuram entre as maiores confusões, e `desgosto` (F1 = 0,478) e `medo` (F1 = 0,517) estão entre as classes de pior desempenho. O modelo erra onde os próprios anotadores humanos divergiram — parte desse erro é, portanto, **irredutível**: nenhum classificador pode superar a consistência do rótulo que lhe foi dado.
+
+**A classe `neutro` é a mais problemática (F1 = 0,309)**, e o modo de sua falha é revelador: ela se dispersa **quase igualmente** entre `alegria` (29,4%) e `desgosto` (26,5%) — isto é, entre uma classe positiva e uma negativa. Neutro não é uma emoção fraca; é a **ausência** de emoção, e não ocupa posição intermediária em um eixo de valência. Esse resultado valida, *a posteriori*, a objeção levantada na seção de preparação da base ao mapeamento `neutro → positivo` adotado pelo enunciado: um texto que o modelo confunde tanto com alegria quanto com desgosto não é, em sentido algum defensável, um texto positivo.
+
+**`surpresa` (F1 = 0,589) confunde-se sobretudo com `alegria` (26,2%)**, coerente com sua valência ambígua — no corpus jornalístico, surpresas tendem a ser noticiadas em tom favorável, o que torna o mapeamento `surpresa → positivo` menos indefensável que o de `neutro`, ainda que arbitrário.
 
 ---
 
@@ -105,12 +184,30 @@ _(exige uma execução de LSTM e uma de BERT na semente primária)_
 <!-- BEGIN GENERATED: sensitivity -->
 | Mapeamento | LSTM | BERT | Observação |
 |---|---|---|---|
-| binária (positivo/negativo) | — | — | mapa do professor (`neutro`, `surpresa` → positivo) |
-| binária, valência limpa | — | — | `neutro`/`surpresa` descartados |
+| binária (positivo/negativo) | 0.7711 ± 0.0114 | 0.8285 ± 0.0235 | mapa do professor (`neutro`, `surpresa` → positivo) |
+| binária, valência limpa | 0.8358 | 0.8972 | `neutro`/`surpresa` descartados |
 
 <!-- END GENERATED: sensitivity -->
 
 *A segunda linha descarta `neutro` e `surpresa`, mantendo apenas emoções de valência inequívoca. Se a ordenação entre LSTM e BERT se preserva, a conclusão é robusta ao mapeamento adotado.*
+
+**A conclusão principal é robusta; uma conclusão secundária, não.** Removidos `neutro` e `surpresa`, o piso majoritário sobe de 57,6% para 69,9% (a base torna-se mais desbalanceada) e todos os modelos sobem junto: BERT 89,7%, LSTM 83,6%, TF-IDF + SVM 82,6%. O **veredito solicitado pelo enunciado se mantém integralmente**: o BERT supera a LSTM, e com significância (p = 0,0003). A comparação LSTM *versus* Transformer, portanto, **não depende** da decisão de rotular `neutro` e `surpresa` como positivos.
+
+Já a ordenação entre **LSTM e baseline clássico se inverte** nessa variante (83,6% contra 82,6%) — mas o McNemar **não distingue as duas** (p = 0,451): trata-se de empate técnico, não de reversão. A leitura honesta é que a superioridade do TF-IDF sobre a LSTM, robusta e significativa nas duas tarefas do enunciado, **enfraquece para um empate** quando as classes de valência ambígua são removidas. Registra-se o fato em vez de omiti-lo: a afirmação “o baseline clássico bate a LSTM” vale para as tarefas conforme especificadas, não como lei universal.
+
+---
+
+## Conclusão
+
+**1. O Transformer vence as duas tarefas, com significância estatística.** BERT obtém 82,9% (binária) e 57,4% (multiclasse), contra 77,1% e 46,2% da LSTM — diferenças de 7,80 e 10,12 pontos percentuais, ambas significativas pelo teste exato de McNemar sobre predições pareadas (p < 10⁻⁵). É a resposta direta ao que o enunciado pergunta.
+
+**2. Mas a vitória é do pré-treinamento, não da atenção.** O baseline clássico — TF-IDF com SVM linear, sem atenção, sem recorrência, sem pré-treinamento, **36 mil parâmetros e um segundo de CPU** — supera a LSTM de forma significativa nas duas tarefas, e percorre a maior parte da distância que separa a LSTM do BERT. Se a arquitetura fosse o fator determinante, isso seria impossível. O que separa os modelos é **quanto conhecimento prévio sobre a língua cada um traz consigo**: a LSTM traz zero e precisa induzir semântica de 1.449 manchetes; a SVM não precisa de semântica; o BERT já a possui, extraída de 2,7 bilhões de palavras.
+
+**3. A bidirecionalidade não muda nada** (p = 0,336 e p = 0,769) — mais capacidade arquitetural não compensa a ausência de dados.
+
+**4. Parte do erro na multiclasse é irredutível.** As maiores confusões do BERT concentram-se entre as emoções negativas — exatamente onde os anotadores humanos divergiram entre si, conforme identificado *antes* do treinamento. Nenhum classificador pode ser mais consistente que seus rótulos.
+
+**5. Implicação de engenharia.** Diante de um corpus desta escala, a sequência racional de decisões não é “treinar uma rede recorrente”, e sim: estabelecer o piso majoritário, medir um baseline clássico, e só então avaliar se o pré-treinamento justifica seu custo. Aqui ele justifica — mas ao preço de 3.000× mais parâmetros por 4,24 pontos percentuais sobre um modelo que treina em um segundo.
 
 ---
 

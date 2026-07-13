@@ -643,10 +643,10 @@
   ],
   "params_trainable": 30220,
   "epochs_run": 0,
-  "train_seconds": 0.2847557999775745,
+  "train_seconds": 0.5503230939998502,
   "framework": "sklearn",
   "environment": {
     "device": "",
-    "python": "3.13.12"
+    "python": "3.12.13"
   }
 }
