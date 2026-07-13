@@ -191,19 +191,43 @@ not comparable to the main table**, only to each other.
 ### Strategy comparison
 
 <!-- BEGIN GENERATED: main-table -->
-_(pending — run `python run_all.py --stage core --stage seeds`)_
+| Strategy | Configuration | Accuracy (test) | 95% CI | Macro-F1 | Resolution | Trainable params | Training |
+|---|---|---|---|---|---|---|---|
+| 5 — ViT fine-tuning | `vit_base_patch16_224_in21k` | **0.9825** | 0.9797–0.9849 | 0.9825 | 224px | 85,806,346 | 6.7 min |
+| 4 — Fine-tuning + augmentation | `mobilenetv2_gap_flip_crop` | **0.8650** | 0.8582–0.8716 | 0.8650 | 128px | 2,171,722 | 8.6 min |
+| 2 — Feature extraction | `mobilenetv2_svm` | **0.8522** | 0.8451–0.8590 | 0.8524 | 128px | 0 | 0.6 min |
+| 3 — Fine-tuning | `mobilenetv2_gap` | **0.8512** | 0.8441–0.8580 | 0.8512 | 128px | 2,171,722 | 5.7 min |
+| 1 — CNN from scratch | `cnn_scratch` | **0.7636** | 0.7552–0.7718 | 0.7617 | 32px | 305,258 | 1.7 min |
 <!-- END GENERATED: main-table -->
 
 ### Statistical significance of the top-2 gap
 
 <!-- BEGIN GENERATED: significance -->
-_(pending)_
+- **1º** `s5_vit / vit_base_patch16_224_in21k` — 0.9825
+- **2º** `s4_augment / mobilenetv2_gap_flip_crop` — 0.8650
+
+| Discordant | 1st right / 2nd wrong | 1st wrong / 2nd right | p (exact McNemar) |
+|---|---|---|---|
+| 1311 | 1243 | 68 | 3.234e-280 |
+
+The 11.75 pp gap is **significant** (α = 0.05). The top-ranked model is therefore the best model in this comparison.
 <!-- END GENERATED: significance -->
 
 ### Every strategy against every other (paired McNemar, primary seed)
 
 <!-- BEGIN GENERATED: pairwise -->
-_(pending)_
+| Comparison | Δ | p (McNemar) | Significant? |
+|---|---|---|---|
+| Strategy 2 vs. 1 | +8.86 pp | 5.7e-83 | **yes** |
+| Strategy 3 vs. 1 | +8.76 pp | 4.7e-79 | **yes** |
+| Strategy 3 vs. 2 | -0.10 pp | 0.722 | no — technical tie |
+| Strategy 4 vs. 1 | +10.14 pp | 2.86e-109 | **yes** |
+| Strategy 4 vs. 2 | +1.28 pp | 5.96e-06 | **yes** |
+| Strategy 4 vs. 3 | +1.38 pp | 3.04e-07 | **yes** |
+| Strategy 5 vs. 1 | +21.89 pp | 0 | **yes** |
+| Strategy 5 vs. 2 | +13.03 pp | 4.74e-322 | **yes** |
+| Strategy 5 vs. 3 | +13.13 pp | 2.96e-323 | **yes** |
+| Strategy 5 vs. 4 | +11.75 pp | 3.23e-280 | **yes** |
 <!-- END GENERATED: pairwise -->
 
 *Each row pits one increment of transfer against the previous one. A gap that fails
@@ -213,7 +237,13 @@ accuracy did not arrive. An accuracy ranking cannot show this.*
 ### Accuracy per GPU-minute
 
 <!-- BEGIN GENERATED: cost -->
-_(pending)_
+| Strategy | Accuracy | Training | pp over from-scratch CNN | pp per minute |
+|---|---|---|---|---|
+| 5 — ViT fine-tuning | 0.9825 | 6.7 min | +21.89 pp | +3.25 |
+| 4 — Fine-tuning + augmentation | 0.8650 | 8.6 min | +10.14 pp | +1.18 |
+| 2 — Feature extraction | 0.8522 | 0.6 min | +8.86 pp | +13.67 |
+| 3 — Fine-tuning | 0.8512 | 5.7 min | +8.76 pp | +1.53 |
+| 1 — CNN from scratch | 0.7636 | 1.7 min | +0.00 pp | +0.00 |
 <!-- END GENERATED: cost -->
 
 
@@ -229,31 +259,37 @@ _(pending)_
 </p>
 
 <!-- BEGIN GENERATED: hardest-classes -->
-_(pending)_
+| Confusion | Rate | Reading |
+|---|---|---|
+| dog → cat | 3.6% | |
+| cat → dog | 2.3% | |
+| truck → automobile | 1.5% | |
+| automobile → truck | 1.0% | |
+| bird → cat | 0.7% | |
 <!-- END GENERATED: hardest-classes -->
 
 ### Q2(a) — Backbone swap
 
 <!-- BEGIN GENERATED: ablation-backbone -->
-_(pending — run `python s2_feature_extraction.py --ablation`)_
+_(no results for `Backbone + classifier*` — run the corresponding ablation)_
 <!-- END GENERATED: ablation-backbone -->
 
 ### Q4(a) — `Flatten()` vs `GlobalMaxPooling2D()`
 
 <!-- BEGIN GENERATED: ablation-head -->
-_(pending — run `python s3_finetuning.py --ablation-head`)_
+_(no results for `Head (pooling)*` — run the corresponding ablation)_
 <!-- END GENERATED: ablation-head -->
 
 ### Q4(b) — Optimiser
 
 <!-- BEGIN GENERATED: ablation-optimizer -->
-_(pending — run `python s4_augmentation.py --ablation-optimizer`)_
+_(no results for `optimizer_*` — run the corresponding ablation)_
 <!-- END GENERATED: ablation-optimizer -->
 
 ### Q4(c) — Augmentation policy
 
 <!-- BEGIN GENERATED: ablation-policy -->
-_(pending — run `python s4_augmentation.py --ablation-policy`)_
+_(no results for `policy_*` — run the corresponding ablation)_
 <!-- END GENERATED: ablation-policy -->
 
 ---
