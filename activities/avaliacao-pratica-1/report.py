@@ -86,19 +86,21 @@ L = {
                         "noise. We declare a **technical tie**."),
         "cm_title": "Confusion matrix — {label}\naccuracy {acc:.4f} · row-normalised",
         "cm_x": "Predicted class", "cm_y": "True class",
+        "pair": "Comparison", "pvalue_short": "p (McNemar)",
+        "verdict_col": "Significant?", "yes": "**yes**", "no": "no — technical tie",
     },
     "pt": {
         "strategy": "Estratégia", "config": "Configuração", "accuracy": "Acurácia (teste)",
         "ci": "IC 95%", "f1": "Macro-F1", "resolution": "Resolução",
         "params": "Parâmetros treináveis", "train": "Treino",
-        "acc_seeds": "Acurácia (média ± dp, {n} sementes)", "delta": "Δ vs. melhor",
+        "acc_seeds": "Acurácia (média ± dp, {n} seeds)", "delta": "Δ vs. melhor",
         "missing": "_(sem resultados para `{p}*` — execute a ablação correspondente)_",
         "min": "min", "backbone": "Backbone + classificador", "head": "Cabeça (pooling)",
         "optimizer": "Otimizador", "policy": "Política de aumento de dados",
         "confusion": "Confusão", "rate": "Taxa", "reading": "Leitura",
         "discordant": "Discordâncias", "a_right": "1º certo / 2º errado",
         "b_right": "1º errado / 2º certo", "pvalue": "p (McNemar exato)",
-        "need_two": "_(são necessários ao menos dois runs na semente primária)_",
+        "need_two": "_(são necessários ao menos dois runs na *seed* primária)_",
         "significant": "**significativa**", "not_significant": "**não significativa**",
         "verdict_sig": ("A diferença de {gap:.2f} pp é {verdict} (α = 0,05). O primeiro "
                         "colocado é, portanto, o melhor modelo desta comparação."),
@@ -108,6 +110,8 @@ L = {
                         "menor que o ruído. Declaramos **empate técnico**."),
         "cm_title": "Matriz de confusão — {label}\nacurácia {acc:.4f} · normalizada por linha",
         "cm_x": "Classe predita", "cm_y": "Classe verdadeira",
+        "pair": "Comparação", "pvalue_short": "p (McNemar)",
+        "verdict_col": "Significativa?", "yes": "**sim**", "no": "não — empate técnico",
     },
 }
 
@@ -234,6 +238,90 @@ def top2_mcnemar(runs: list[dict], rows: list[dict], y_test: np.ndarray,
     ])
 
 
+def pairwise_strategies(runs: list[dict], rows: list[dict], y_test: np.ndarray,
+                        lang: str) -> str:
+    """Every strategy against every other, paired, at the primary seed.
+
+    The top-2 test alone answers "who won". These pairs answer the questions the
+    assignment is really about — each one is an increment of transfer, and each has a
+    price:
+
+        s2 vs s1   does a frozen ImageNet backbone beat learning from scratch?
+        s3 vs s2   does unfreezing the top block buy anything over frozen features?
+        s4 vs s3   does augmentation buy anything over plain fine-tuning?
+        s5 vs s4   does a transformer beat the convolutional stack?
+
+    A gap that fails McNemar is a gap that was paid for and not received. That is the
+    most useful thing this report can tell a reader, and it is invisible in an accuracy
+    ranking.
+    """
+    t = L[lang]
+    leaders = best_per_strategy(rows)
+    by_strategy = {row["strategy"]: primary_run(runs, row) for row in leaders}
+    order = ["s1_scratch", "s2_features", "s3_finetune", "s4_augment", "s5_vit"]
+    present = [s for s in order if by_strategy.get(s) is not None]
+    if len(present) < 2:
+        return t["need_two"]
+
+    lines = [f"| {t['pair']} | Δ | {t['pvalue_short']} | {t['verdict_col']} |",
+             "|---|---|---|---|"]
+    for i, later in enumerate(present):
+        for earlier in present[:i]:
+            a, b = by_strategy[later], by_strategy[earlier]
+            test = common.mcnemar(y_test, np.array(a["test_predictions"]),
+                                  np.array(b["test_predictions"]))
+            gap = (a["accuracy"] - b["accuracy"]) * 100
+            name_a = STRATEGY_NAMES[lang][later].split(" — ")[0]
+            name_b = STRATEGY_NAMES[lang][earlier].split(" — ")[0]
+            verdict = t["yes"] if test["significant_at_05"] else t["no"]
+            lines.append(f"| Estratégia {name_a} vs. {name_b} | {gap:+.2f} pp | "
+                         f"{test['p_value']:.3g} | {verdict} |"
+                         if lang == "pt" else
+                         f"| Strategy {name_a} vs. {name_b} | {gap:+.2f} pp | "
+                         f"{test['p_value']:.3g} | {verdict} |")
+    return "\n".join(lines)
+
+
+def cost_table(rows: list[dict], lang: str) -> str:
+    """Accuracy per GPU-minute. The ranking nobody asks for and everybody needs.
+
+    Reported because the assignment's question ("which strategy is best?") has no answer
+    without a cost axis: a strategy that wins by 0.1 pp at 20x the compute has not won
+    anything a practitioner would buy.
+    """
+    t = L[lang]
+    leaders = best_per_strategy(rows)
+    if not leaders:
+        return t["need_two"]
+
+    head = ("| Estratégia | Acurácia | Treino | pp acima da CNN do zero | pp por minuto |"
+            if lang == "pt" else
+            "| Strategy | Accuracy | Training | pp over from-scratch CNN | pp per minute |")
+    lines = [head, "|---|---|---|---|---|"]
+
+    scratch = next((r for r in leaders if r["strategy"] == "s1_scratch"), None)
+    floor = scratch["accuracy_mean"] if scratch else 0.0
+
+    for row in leaders:
+        minutes = max(row["train_minutes_mean"], 0.01)
+        lift = (row["accuracy_mean"] - floor) * 100
+        name = STRATEGY_NAMES[lang].get(row["strategy"], row["strategy"])
+        lines.append(f"| {name} | {row['accuracy_mean']:.4f} | "
+                     f"{minutes:.1f} min | {lift:+.2f} pp | {lift / minutes:+.2f} |")
+    return "\n".join(lines)
+
+
+def localise_decimals(text: str) -> str:
+    """English number formatting -> pt-BR. Both separators swap, and order matters:
+    `2,171,722` is an English thousands comma that a Portuguese reader parses as a
+    decimal. Thousands groups are parked on a sentinel so the decimal pass cannot chew
+    the dots it just created."""
+    sentinel = "\x00"
+    text = re.sub(r"(?<=\d),(?=\d{3}(?!\d))", sentinel, text)
+    text = re.sub(r"(?<=\d)\.(?=\d)", ",", text)
+    return text.replace(sentinel, ".")
+
+
 def hardest_classes(run: dict, lang: str) -> str:
     """Where the best model actually fails. The off-diagonal is the informative part
     of a confusion matrix; the diagonal only restates the score."""
@@ -323,6 +411,8 @@ def build_sections(runs: list[dict], rows: list[dict], y_test: np.ndarray,
                                              t["optimizer"], lang),
         "ablation-policy": table_ablation(rows, "s4_augment", "policy_", t["policy"], lang),
         "significance": top2_mcnemar(runs, rows, y_test, lang),
+        "pairwise": pairwise_strategies(runs, rows, y_test, lang),
+        "cost": cost_table(rows, lang),
         "hardest-classes": hardest_classes(best_run, lang),
     }
 
@@ -361,7 +451,8 @@ def main() -> None:
             continue
         markdown = target.read_text(encoding="utf-8")
         for key, content in sections.items():
-            markdown = patch(markdown, key, content)
+            markdown = patch(markdown, key,
+                             localise_decimals(content) if lang == "pt" else content)
         target.write_text(markdown, encoding="utf-8")
         print(f"patched {target.name}")
 

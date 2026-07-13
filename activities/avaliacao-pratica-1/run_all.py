@@ -14,9 +14,14 @@ is missing is dispersion and ablations — not results.
     baseline   the lecture notebook's exact setup    ~10 min   -> nice-to-have
     report     tables, confusion matrix, McNemar     ~10 s     -> CPU, run it after each stage
 
-Results accumulate in `results/` as JSON, so a stage that already ran is never repeated
-and a dropped Colab session costs only the run in flight. `report.py` degrades honestly:
+Results accumulate in `results/` as JSON, so a dropped Colab session costs only the run
+in flight — everything already finished is on disk. `report.py` degrades honestly:
 configurations with one seed report no standard deviation rather than a fake zero.
+
+**Re-running a stage retrains it.** There is no skip-if-exists check: a completed run is
+overwritten by an identical one, and the GPU minutes are spent again. This is deliberate
+(a silent skip would hide a stale result from a since-changed script), but it means the
+recovery move after a crash is to run the *remaining* scripts, not the whole stage.
 
 Stage order matters exactly once: a TensorFlow script must run before `s5`, because it is
 what materialises the cached `.npz` splits the PyTorch ViT reads back.

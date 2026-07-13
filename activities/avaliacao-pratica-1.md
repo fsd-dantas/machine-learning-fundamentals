@@ -168,6 +168,23 @@ _(pending — run `python run_all.py --stage core --stage seeds`)_
 _(pending)_
 <!-- END GENERATED: significance -->
 
+### Every strategy against every other (paired McNemar, primary seed)
+
+<!-- BEGIN GENERATED: pairwise -->
+_(pending)_
+<!-- END GENERATED: pairwise -->
+
+*Each row pits one increment of transfer against the previous one. A gap that fails
+McNemar is a gap that was **paid for and not received**: the compute was spent, the
+accuracy did not arrive. An accuracy ranking cannot show this.*
+
+### Accuracy per GPU-minute
+
+<!-- BEGIN GENERATED: cost -->
+_(pending)_
+<!-- END GENERATED: cost -->
+
+
 ### Best model — confusion matrix
 
 <p align="center">
