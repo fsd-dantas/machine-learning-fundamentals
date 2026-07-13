@@ -25,17 +25,25 @@ emotions, and two model families compared on each:
 | BERT (BERTimbau) | the task; the encoder is nudged | 2.7B words of Portuguese | [`m2_bert.py`](avaliacao-pratica-2/m2_bert.py) |
 
 The comparison the assignment asks for — LSTM vs Transformer — is **structurally
-lopsided, and that is the finding**, not a caveat:
+lopsided**, and saying so is part of the result:
 
-> The LSTM has ~1.4M parameters and must learn *what words mean* from 1,449 headlines.
-> BERT has ~109M parameters and arrives already knowing, having been pretrained on
-> brWaC. If BERT wins, the honest attribution is **pretraining**, not **attention**.
+> The LSTM has 912k trainable parameters and must learn *what words mean* from 1,449
+> headlines. BERT has 109M and arrives already knowing, pretrained on brWaC. The two
+> differ **simultaneously** in architecture, in capacity, and in prior knowledge of the
+> language — so comparing them head-to-head cannot isolate which of the three is doing
+> the work.
 
 Which is why the classical baseline is in the table. TF-IDF + linear SVM has no
-pretraining and no attention, and on 1,449 short texts it is a serious competitor. If it
-beats the LSTM, then the LSTM's deficit was never architectural — it was data. This is
-the same lesson [Atividade 1](atividade-1.md) produced when a logistic-regression
-baseline outranked every tree ensemble.
+pretraining and no attention, and on 1,449 short texts it is a serious competitor. How
+much of the LSTM→BERT gap it covers is *indirect* evidence about where that gap comes
+from. This is the same lesson [Atividade 1](atividade-1.md) produced when a
+logistic-regression baseline outranked every tree ensemble: the right inductive bias
+beats the fancier algorithm.
+
+**Design limitation, stated up front.** No Transformer was trained *without* pretraining
+on this corpus — the control that would experimentally separate architecture from
+pretraining. Every claim below about *why* BERT wins is therefore an inference from the
+baseline, consistent with the evidence but not causally established.
 
 ---
 
@@ -151,12 +159,11 @@ one model destroys the other.
 The 7.80 pp gap between **BERT** and the other is **significant** (α = 0.05, exact McNemar on paired test predictions).
 <!-- END GENERATED: significance-binary -->
 
-<p align="center">
-  <picture class="github-mode-only">
-    <source media="(prefers-color-scheme: dark)" srcset="../assets/img/avaliacao-pratica-2-confusion-binary-dark.png">
-    <img src="../assets/img/avaliacao-pratica-2-confusion-binary-light.png" alt="Binary confusion matrix">
-  </picture>
-</p>
+| LSTM | BERT |
+|:---:|:---:|
+| <img src="../assets/img/avaliacao-pratica-2-confusion-binary-lstm-light.png" alt="Binary confusion matrix — LSTM" width="380"> | <img src="../assets/img/avaliacao-pratica-2-confusion-binary-bert-light.png" alt="Binary confusion matrix — BERT" width="380"> |
+
+*Row-normalised, primary seed. Both models are shown, not just the winner: two models at different accuracies can be wrong in the same places, and that is what the side-by-side reveals.*
 
 ### Task 2 — Multiclass (7 emotions)
 
@@ -180,12 +187,11 @@ The 7.80 pp gap between **BERT** and the other is **significant** (α = 0.05, ex
 The 10.12 pp gap between **BERT** and the other is **significant** (α = 0.05, exact McNemar on paired test predictions).
 <!-- END GENERATED: significance-multiclass -->
 
-<p align="center">
-  <picture class="github-mode-only">
-    <source media="(prefers-color-scheme: dark)" srcset="../assets/img/avaliacao-pratica-2-confusion-multiclass-dark.png">
-    <img src="../assets/img/avaliacao-pratica-2-confusion-multiclass-light.png" alt="Multiclass confusion matrix">
-  </picture>
-</p>
+| LSTM | BERT |
+|:---:|:---:|
+| <img src="../assets/img/avaliacao-pratica-2-confusion-multiclass-lstm-light.png" alt="Multiclass confusion matrix — LSTM" width="380"> | <img src="../assets/img/avaliacao-pratica-2-confusion-multiclass-bert-light.png" alt="Multiclass confusion matrix — BERT" width="380"> |
+
+*Row-normalised, primary seed. Both models are shown, not just the winner: two models at different accuracies can be wrong in the same places, and that is what the side-by-side reveals.*
 
 ### Sensitivity — does the binary result depend on `neutro`/`surpresa` being "positive"?
 
