@@ -2,6 +2,7 @@
 
 > **Disciplina:** Aprendizagem de Máquina · PPGIA / PUC-PR · Mestrado 2026
 > **Aluno:** Fernando Dantas
+> **Versão:** preliminar. As investigações complementares 4(b) e 4(c) encontravam-se **em execução no momento da exportação deste documento**; seus resultados serão incorporados à versão final.
 > **Reprodutibilidade:** todos os valores foram gerados pelos scripts listados na seção *Scripts* (*seed* primária 42); o relatório é regenerado a partir dos artefatos de resultado por [`report.py`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/report.py).
 
 ---
@@ -40,7 +41,7 @@ Três fatores confundem a comparação entre as cinco estratégias. Todos são d
 
 **2. A resolução de entrada não é constante entre as estratégias.** A CNN treinada do zero opera em 32×32 — a resolução nativa das imagens —, enquanto as demais operam em 128×128 (ou 224×224, no caso do ViT), pois as redes pré-treinadas exigem entradas compatíveis com suas estatísticas de origem. Essa diferença é **inerente à natureza das estratégias comparadas**, e não um descuido: ampliar as imagens para treinar uma rede do zero apenas interpolaria pixels, sem acrescentar informação, ao custo de mais computação. Ainda assim, ela impede atribuir a diferença de desempenho exclusivamente ao pré-treinamento.
 
-**3. Restrição computacional.** O experimento foi conduzido em infraestrutura de GPU de acesso gratuito, com cota limitada. Duas consequências decorrem disso, ambas reportadas sem atenuação. Primeira: a comparação principal repousa majoritariamente sobre execução única, de modo que **a estabilidade das estratégias frente à inicialização dos pesos não foi medida, e não é reivindicada** — mitigada, porém, pelo uso de teste pareado e pela estimativa de ruído de treinamento apresentada no protocolo. Segunda: **as ablações das questões 4(b) e 4(c) não foram conduzidas**, por exigirem dezesseis treinamentos adicionais da Estratégia 4. O protocolo, os scripts e o procedimento de execução dessas ablações estão integralmente disponíveis no repositório, e sua realização é reprodutível por terceiros sem qualquer adaptação.
+**3. Restrição computacional.** O experimento foi conduzido em infraestrutura de GPU de acesso gratuito, com cota limitada. Duas consequências decorrem disso, ambas reportadas sem atenuação. Primeira: a comparação principal repousa majoritariamente sobre execução única, de modo que **a estabilidade das estratégias frente à inicialização dos pesos não foi medida, e não é reivindicada** — mitigada, porém, pelo uso de teste pareado e pela estimativa de ruído de treinamento apresentada no protocolo. Segunda: as ablações das investigações 4(b) e 4(c) exigem dezesseis treinamentos adicionais da Estratégia 4 e, por essa razão, **encontravam-se em execução no momento da exportação desta versão do relatório, sem resultados consolidados até aqui**. O protocolo, os scripts e o procedimento de execução estão integralmente disponíveis no repositório; os resultados serão incorporados à versão final.
 
 ---
 
@@ -150,14 +151,14 @@ A estrutura do erro é, portanto, **compatível com a hipótese** de que o que r
 
 ## Investigações Complementares
 
-O enunciado formula quatro questões de investigação. Duas foram conduzidas e respondidas; duas não foram conduzidas, pela restrição computacional documentada na seção anterior.
+O enunciado formula quatro questões de investigação. Duas foram conduzidas e respondidas. As duas restantes encontravam-se **em execução no momento da exportação desta versão do relatório**, sem resultados consolidados até aqui; seus delineamentos são apresentados adiante e seus resultados serão incorporados à versão final.
 
 | Questão | Evidência | Conclusão |
 |---|---|---|
 | **2(a)** Trocar a CNN por uma mais simples (MobileNet) impacta significativamente o resultado? | 6 configurações (3 backbones × 2 classificadores), 1 *seed* | **Sim.** A adoção da MobileNetV2 custa **2,39 pp** de acurácia frente à ResNet50 (p = 4×10⁻¹⁰). A InceptionV3, contudo, a mais custosa das três, é a de pior desempenho: **capacidade não prediz qualidade de transferência**. |
 | **4(a)** Substituir `Flatten()` por `GlobalMaxPooling2D()` impacta significativamente o resultado? | 3 configurações, 2 *seeds* por braço | **Sim, e favoravelmente:** +1,19 pp (p = 9×10⁻⁵). O melhor braço, porém, é o `GlobalAveragePooling2D()`, em empate técnico com o máximo — o mérito é do **agrupamento global** como classe de operação. |
-| **4(b)** Substituir o otimizador (`Adam()`) pode melhorar o resultado? | Ablação não conduzida | Sem conclusão. Ver *Limitações do Delineamento*, item 3. |
-| **4(c)** Outras estratégias de aumento de dados podem melhorar o resultado? | Ablação não conduzida | Sem conclusão. Ver *Limitações do Delineamento*, item 3. |
+| **4(b)** Substituir o otimizador (`Adam()`) pode melhorar o resultado? | Ablação em execução (8 treinamentos) | Sem resultados consolidados nesta versão. |
+| **4(c)** Outras estratégias de aumento de dados podem melhorar o resultado? | Ablação em execução (8 treinamentos) | Sem resultados consolidados nesta versão. |
 
 Nenhum valor é estimado, inferido ou reportado sem o artefato correspondente em [`results/`](https://github.com/fsd-dantas/machine-learning-fundamentals/tree/main/activities/avaliacao-pratica-1/results). **A ausência de uma tabela indica que o experimento não foi conduzido — e não que seu resultado tenha sido desfavorável.**
 
@@ -218,23 +219,23 @@ Cabe registrar que **o notebook da disciplina utiliza `Flatten()`** — e que a 
 
 ### 4(b) — Substituir o algoritmo otimizador (`Adam()`) pode melhorar o resultado?
 
-*Investigação não conduzida.*
+*Investigação em execução no momento da exportação desta versão.*
 
 <!-- BEGIN GENERATED: ablation-optimizer -->
 _(sem resultados para `optimizer_*` — execute a ablação correspondente)_
 <!-- END GENERATED: ablation-optimizer -->
 
-**Ablação não conduzida.** A comparação prevista — Adam, AdamW, SGD com momento de Nesterov e RMSprop, sob a política de aumento de dados fixada e duas *seeds* por braço — exige oito treinamentos da Estratégia 4, inviáveis na cota de GPU disponível (ver *Limitações do Delineamento*, item 3). O delineamento é preservado no repositório e executável por [`s4_augmentation.py --ablation-optimizer`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/s4_augmentation.py); ao SGD atribui-se taxa de aprendizado dez vezes maior, pois comparar otimizadores sob taxa calibrada para o Adam não constitui experimento controlado.
+**Ablação em execução; sem resultados consolidados nesta versão.** A comparação delineada confronta Adam, AdamW, SGD com momento de Nesterov e RMSprop, sob política de aumento de dados fixada e duas *seeds* por braço — oito treinamentos da Estratégia 4, em curso no momento da exportação deste documento. O delineamento é [`s4_augmentation.py --ablation-optimizer`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/s4_augmentation.py); ao SGD atribui-se taxa de aprendizado dez vezes maior, pois comparar otimizadores sob taxa calibrada para o Adam não constitui experimento controlado.
 
 ### 4(c) — Avaliar outras estratégias de aumento de dados pode melhorar o resultado?
 
-*Investigação não conduzida.*
+*Investigação em execução no momento da exportação desta versão.*
 
 <!-- BEGIN GENERATED: ablation-policy -->
 _(sem resultados para `policy_*` — execute a ablação correspondente)_
 <!-- END GENERATED: ablation-policy -->
 
-**Ablação não conduzida**, pelas razões expostas no item anterior. O delineamento previa quatro políticas — incluindo a do notebook da disciplina (`rotation 10°, zoom 0.15, shift 0.1`) — e é executável por [`s4_augmentation.py --ablation-policy`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/s4_augmentation.py).
+**Ablação em execução; sem resultados consolidados nesta versão**, nas mesmas condições do item anterior. O delineamento confronta quatro políticas — incluindo a do notebook da disciplina (`rotation 10°, zoom 0.15, shift 0.1`) — e é [`s4_augmentation.py --ablation-policy`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/s4_augmentation.py).
 
 Cabe registrar, ainda assim, a observação que motivou a inclusão dessa ablação: **a política do notebook da disciplina omite o espelhamento horizontal** — sobre o CIFAR-10, a transformação mais eficaz e mais evidentemente preservadora de rótulo disponível, dado que um caminhão espelhado permanece um caminhão. O espelhamento **vertical**, por sua vez, é deliberadamente excluído de todas as políticas previstas: um cavalo de cabeça para baixo não constitui imagem natural, e o conjunto de teste não contém nenhuma.
 
