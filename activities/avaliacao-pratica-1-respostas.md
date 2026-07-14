@@ -148,9 +148,18 @@ A estrutura do erro é, portanto, **compatível com a hipótese** de que o que r
 
 ---
 
-## Questões em Aberto
+## Questões em Aberto do Enunciado
 
-> **Nota sobre o estado desta seção.** As quatro questões em aberto exigem 28 treinamentos adicionais. Aquelas cujas tabelas aparecem preenchidas abaixo foram executadas e são reportadas com dispersão entre *seeds*; aquelas assinaladas como sem resultados **não foram executadas**, por esgotamento da cota de GPU gratuita dentro do prazo de entrega. Nenhum valor é estimado, inferido ou reportado sem o artefato correspondente em [`results/`](https://github.com/fsd-dantas/machine-learning-fundamentals/tree/main/activities/avaliacao-pratica-1/results): uma tabela ausente significa exatamente que o experimento não foi realizado, e não que seu resultado foi desfavorável.
+*“Questões em aberto” designa aqui as perguntas formuladas pelo professor no enunciado, e não questões sem resposta. O estado de cada uma é declarado abaixo.*
+
+| Questão | Estado | Resposta sintética |
+|---|---|---|
+| **2(a)** Trocar a CNN por uma mais simples (MobileNet) impacta significativamente? | ✅ **Respondida** — 6 configurações, 1 *seed* | **Sim: custa 2,39 pp** frente à ResNet50 (p = 4×10⁻¹⁰). Porém a InceptionV3, a mais cara das três, é a **pior** — capacidade não prediz qualidade de transferência. |
+| **4(a)** Substituir `Flatten()` por `GlobalMaxPooling2D()` impacta significativamente? | ✅ **Respondida** — 3 configurações, 2 *seeds* | **Sim, e melhora: +1,19 pp** (p = 9×10⁻⁵). O melhor braço, contudo, é o `GlobalAveragePooling2D()`, em empate técnico com o máximo. |
+| **4(b)** Substituir o otimizador (`Adam()`) pode melhorar? | ⏳ **Não executada** | — |
+| **4(c)** Outras estratégias de aumento de dados podem melhorar? | ⏳ **Não executada** | — |
+
+> **Sobre as questões não executadas.** As ablações 4(b) e 4(c) exigem dezesseis treinamentos adicionais da Estratégia 4, que não couberam na cota de GPU gratuita disponível dentro do prazo de entrega. Nenhum valor é estimado, inferido ou reportado sem o artefato correspondente em [`results/`](https://github.com/fsd-dantas/machine-learning-fundamentals/tree/main/activities/avaliacao-pratica-1/results): **uma tabela ausente significa que o experimento não foi realizado — e não que seu resultado tenha sido desfavorável.**
 
 ### 2(a) — Trocar a rede CNN por uma mais simples, como a MobileNet, impacta significativamente o resultado?
 
