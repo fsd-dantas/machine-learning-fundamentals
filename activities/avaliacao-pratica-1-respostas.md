@@ -101,7 +101,7 @@ O custo, contudo, não empata: a Estratégia 2 consome **0,6 minuto** de GPU —
 
 A interpretação tem consequência prática. Com 10.000 imagens de treinamento, **não há sinal suficiente para reajustar proveitosamente 2,17 milhões de parâmetros convolucionais**: as características que a MobileNetV2 já extraiu da ImageNet servem ao CIFAR-10 como estão, e o descongelamento oferece à rede sobretudo capacidade de memorizar o conjunto de treinamento. Os registros de treinamento corroboram: na fase 2, a acurácia de treinamento atinge 99,8% enquanto a de validação permanece estacionária em torno de 85% — a definição operacional de sobreajuste.
 
-Cabe destacar que o notebook da disciplina **congela o backbone e nunca o descongela** — procedimento que, conforme a seção de desvios metodológicos, é extração de características com cabeça densa, e não ajuste fino. Este experimento indica que, **neste regime de dados, o notebook não perde nada por isso**. O desvio metodológico que implementamos (a fase 2) foi executado, medido, e não se pagou.
+Cabe destacar que o notebook da disciplina **congela o backbone e nunca o descongela** — procedimento que, conforme a seção de desvios metodológicos, é extração de características com cabeça densa, e não ajuste fino. Este experimento indica que, **neste regime de dados, tal procedimento não acarreta perda de desempenho**. O desvio metodológico aqui implementado — a fase 2 de descongelamento — foi executado, mensurado, e não produziu ganho estatisticamente detectável.
 
 ### Acurácia por minuto de GPU
 
@@ -115,13 +115,13 @@ Cabe destacar que o notebook da disciplina **congela o backbone e nunca o descon
 | 1 — CNN do zero | 0,7636 | 1,7 min | +0,00 pp | +0,00 |
 <!-- END GENERATED: cost -->
 
-*A pergunta do enunciado — qual estratégia é a melhor — não admite resposta sem um eixo de custo: uma estratégia que vence por 0,1 ponto percentual consumindo vinte vezes mais computação não venceu nada que um praticante compraria.*
+*A pergunta do enunciado — qual estratégia é a melhor — não admite resposta sem um eixo de custo. Uma vantagem de 0,1 ponto percentual obtida ao preço de vinte vezes mais computação não constitui superioridade sob qualquer critério de engenharia aplicável.*
 
-**A extração de características é, disparadamente, a estratégia mais eficiente:** entrega **14,45 pontos percentuais por minuto** de GPU acima da CNN treinada do zero, contra 3,25 do ViT, 2,86 do ajuste fino e 1,18 do ajuste fino com aumento de dados. Uma ordem de grandeza separa a primeira colocada da segunda nesse critério.
+**A extração de características é, por larga margem, a estratégia mais eficiente:** entrega **14,45 pontos percentuais por minuto** de GPU acima da CNN treinada do zero, contra 3,25 do ViT, 2,86 do ajuste fino e 1,18 do ajuste fino com aumento de dados. Uma ordem de grandeza separa a primeira colocada da segunda nesse critério.
 
 Isso **não contradiz** a tabela de acurácia — o ViT permanece o modelo mais acurado, e por larga margem. O que o eixo de custo estabelece é que as duas perguntas têm **respostas diferentes**: se o critério é acurácia máxima, a resposta é o ViT; se é acurácia por unidade de recurso, a resposta é a extração de características. Um relatório que reportasse apenas a primeira coluna omitiria do leitor o fato de que **81% do ganho de transferência sobre a CNN do zero (8,86 dos 10,94 pp atingidos pela melhor estratégia convolucional) é capturado em 36 segundos de GPU**, sem treinar um único parâmetro convolucional.
 
-**O aumento de dados, por sua vez, paga-se.** A Estratégia 4 supera a Estratégia 3 em **+0,92 pp** com significância (p = 4,0 × 10⁻⁴) — é o único incremento sobre o ajuste fino que sobrevive ao teste. Resultado coerente com o regime de poucos dados: se 10.000 imagens são insuficientes para reajustar o backbone, ampliá-las artificialmente ataca precisamente a restrição vigente.
+**O aumento de dados, por sua vez, justifica seu custo.** A Estratégia 4 supera a Estratégia 3 em **+0,92 pp** com significância (p = 4,0 × 10⁻⁴) — é o único incremento sobre o ajuste fino que sobrevive ao teste. Resultado coerente com o regime de poucos dados: se 10.000 imagens são insuficientes para reajustar o backbone, ampliá-las artificialmente ataca precisamente a restrição vigente.
 
 ### Matriz de confusão do melhor modelo
 
@@ -213,7 +213,7 @@ O mecanismo é o número de parâmetros. Sobre a MobileNetV2 em 128 px, o mapa d
 | `GlobalMaxPooling2D() → Dense(512)` | 2.171.722 | 0,8558 ± 0,0020 |
 | `GlobalAveragePooling2D() → Dense(512)` | 2.171.722 | **0,8576 ± 0,0025** |
 
-O `Flatten()` exige **5,5 vezes mais parâmetros** para entregar acurácia **inferior** — e com **dispersão 2,5 vezes maior** entre *seeds* (± 0,0063 contra ± 0,0025), sinal de instabilidade. Ele preserva a posição espacial de cada ativação, mas, em classificação de objetos, a posição é majoritariamente **variável de perturbação**: um gato no canto superior esquerdo e um gato no centro são o mesmo gato, e forçar a rede a aprender essa invariância a partir de 10.000 exemplos desperdiça capacidade que o agrupamento global concede de graça.
+O `Flatten()` exige **5,5 vezes mais parâmetros** para entregar acurácia **inferior** — e com **dispersão 2,5 vezes maior** entre *seeds* (± 0,0063 contra ± 0,0025), sinal de instabilidade. O `Flatten()` preserva a posição espacial de cada ativação; contudo, na classificação de objetos, a posição constitui majoritariamente **variável de perturbação** — a identidade da classe independe da localização do objeto no enquadramento. Exigir que a rede induza tal invariância a partir de 10.000 exemplos consome capacidade que o agrupamento global fornece por construção arquitetural.
 
 Cabe registrar que **o notebook da disciplina utiliza `Flatten()`** — e que a alternativa comentada no próprio código (`#model.add(GlobalMaxPooling2D())`) é, conforme esta ablação demonstra, a melhor escolha.
 
@@ -237,7 +237,7 @@ _(sem resultados para `policy_*` — execute a ablação correspondente)_
 
 **Ablação em execução; sem resultados consolidados nesta versão**, nas mesmas condições do item anterior. O delineamento confronta quatro políticas — incluindo a do notebook da disciplina (`rotation 10°, zoom 0.15, shift 0.1`) — e é [`s4_augmentation.py --ablation-policy`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/s4_augmentation.py).
 
-Cabe registrar, ainda assim, a observação que motivou a inclusão dessa ablação: **a política do notebook da disciplina omite o espelhamento horizontal** — sobre o CIFAR-10, a transformação mais eficaz e mais evidentemente preservadora de rótulo disponível, dado que um caminhão espelhado permanece um caminhão. O espelhamento **vertical**, por sua vez, é deliberadamente excluído de todas as políticas previstas: um cavalo de cabeça para baixo não constitui imagem natural, e o conjunto de teste não contém nenhuma.
+Cabe registrar a observação que motivou a inclusão dessa ablação: **a política do notebook da disciplina omite o espelhamento horizontal**, transformação reportada na literatura como das mais eficazes sobre o CIFAR-10 e cuja preservação do rótulo é assegurada pela simetria bilateral aproximada das classes envolvidas. O espelhamento **vertical** é, em contrapartida, deliberadamente excluído de todas as políticas do delineamento: a inversão vertical não preserva a verossimilhança das cenas naturais representadas na base, e o conjunto de teste não contém instâncias sob tal transformação.
 
 ---
 
