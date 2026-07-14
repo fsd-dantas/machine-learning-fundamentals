@@ -193,7 +193,7 @@ not comparable to the main table**, only to each other.
 <!-- BEGIN GENERATED: main-table -->
 | Strategy | Configuration | Accuracy (test) | 95% CI | Macro-F1 | Resolution | Trainable params | Training |
 |---|---|---|---|---|---|---|---|
-| 5 — ViT fine-tuning | `vit_base_patch16_224_in21k` | **0.9825** | 0.9797–0.9849 | 0.9825 | 224px | 85,806,346 | 6.7 min |
+| 5 — ViT fine-tuning | `vit_base_patch16_224_in21k` | **0.9818 ± 0.0006** | 0.9785–0.9849 | 0.9818 ± 0.0007 | 224px | 85,806,346 | 6.8 min |
 | 4 — Fine-tuning + augmentation | `mobilenetv2_gap_flip_crop` | **0.8650** | 0.8582–0.8716 | 0.8650 | 128px | 2,171,722 | 8.6 min |
 | 3 — Fine-tuning | `mobilenetv2_gap` | **0.8576 ± 0.0025** | 0.8488–0.8660 | 0.8575 ± 0.0024 | 128px | 2,171,722 | 3.3 min |
 | 2 — Feature extraction | `mobilenetv2_svm` | **0.8522** | 0.8451–0.8590 | 0.8524 | 128px | 0 | 0.6 min |
@@ -239,7 +239,7 @@ accuracy did not arrive. An accuracy ranking cannot show this.*
 <!-- BEGIN GENERATED: cost -->
 | Strategy | Accuracy | Training | pp over from-scratch CNN | pp per minute |
 |---|---|---|---|---|
-| 5 — ViT fine-tuning | 0.9825 | 6.7 min | +21.89 pp | +3.25 |
+| 5 — ViT fine-tuning | 0.9818 | 6.8 min | +21.82 pp | +3.20 |
 | 4 — Fine-tuning + augmentation | 0.8650 | 8.6 min | +10.14 pp | +1.18 |
 | 3 — Fine-tuning | 0.8576 | 3.3 min | +9.40 pp | +2.86 |
 | 2 — Feature extraction | 0.8522 | 0.6 min | +8.86 pp | +14.45 |

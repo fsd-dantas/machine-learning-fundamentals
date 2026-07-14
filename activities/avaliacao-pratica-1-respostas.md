@@ -18,9 +18,11 @@ Foram avaliadas cinco estratégias de classificação sobre a base **CIFAR-10** 
 
 **Isolamento do conjunto de teste.** A arquitetura, o número de épocas e a parada antecipada foram selecionados exclusivamente sobre o conjunto de validação. O conjunto de teste produziu exatamente um número por configuração: não houve seleção de época, de limiar ou de configuração com base no teste.
 
-**Cobertura experimental.** A comparação principal entre estratégias é reportada em **execução única** (*seed* 42), à exceção da Estratégia 3, para a qual há **duas execuções** (*seeds* 42 e 7). A ablação da questão 4(a) dispõe de duas *seeds* por braço; a da questão 2(a), de uma. Essa cobertura desigual decorre da restrição computacional documentada na seção *Limitações do Delineamento*, e é reportada tal como é: **o desvio-padrão é omitido onde não foi medido**, jamais substituído por zero.
+**Cobertura experimental.** A cobertura entre estratégias é desigual, e é declarada tal como é. A Estratégia 5 (ViT) dispõe de **três execuções** (*seeds* 42, 7 e 2024) e a Estratégia 3, de **duas** (42 e 7, herdadas da ablação de cabeça); as Estratégias 1, 2 e 4 repousam sobre **execução única** (*seed* 42). As ablações dispõem de duas *seeds* por braço, à exceção da ablação de backbone (uma). O relatório **omite o desvio-padrão onde ele não foi medido**, em vez de imprimir um zero fabricado. A origem dessa assimetria é a restrição computacional documentada em *Limitações do Delineamento*.
 
 A validade das comparações não repousa, contudo, sobre a repetição. Ela repousa sobre o **teste exato de McNemar aplicado a predições pareadas**: como todos os modelos são avaliados sobre as **mesmas** 10.000 imagens, seus erros são pareados por construção, e a evidência é extraída das concordâncias e discordâncias entre eles — não da variância entre execuções. A *seed* altera a inicialização dos pesos e a amostragem do aumento de dados, jamais os dados: a subamostra é fixada por um gerador independente.
+
+**Estabilidade do modelo vencedor.** As três execuções do ViT produziram 0,9825, 0,9815 e 0,9813 — **desvio-padrão de 0,0006**, ou 0,06 ponto percentual. Trata-se do modelo mais estável do experimento: sua dispersão é **oito vezes inferior** ao ruído de treinamento medido nas redes convolucionais (0,46 pp, adiante) e **sessenta vezes inferior** à do SGD (investigação 4b). O ajuste fino de um *transformer* pré-treinado, neste regime, é notavelmente insensível à inicialização — o que é coerente com a hipótese de que o pré-treinamento, e não a otimização, responde pela maior parte de seu desempenho.
 
 **Variabilidade entre execuções idênticas.** A Estratégia 3, na *seed* 42, foi treinada duas vezes sob configuração rigorosamente idêntica, obtendo **0,8512** e **0,8558**. A diferença de **0,46 ponto percentual** decorre do não-determinismo dos núcleos cuDNN em GPU e fornece uma **estimativa empírica do ruído de treinamento** neste experimento. Trata-se de valor da mesma ordem de grandeza das diferenças que separam as Estratégias 2, 3 e 4, o que estabelece um piso de resolução para qualquer comparação entre elas — e justifica que os vereditos sejam emitidos por teste estatístico pareado, e não por leitura direta das acurácias.
 
@@ -40,7 +42,7 @@ Quatro fatores limitam a interpretação dos resultados. Todos são declarados a
 
 **2. A resolução de entrada não é constante entre as estratégias.** A CNN treinada do zero opera em 32×32 — a resolução nativa das imagens —, enquanto as demais operam em 128×128 (ou 224×224, no caso do ViT), pois as redes pré-treinadas exigem entradas compatíveis com suas estatísticas de origem. Essa diferença é **inerente à natureza das estratégias comparadas**, e não um descuido: ampliar as imagens para treinar uma rede do zero apenas interpolaria pixels, sem acrescentar informação, ao custo de mais computação. Ainda assim, ela impede atribuir a diferença de desempenho exclusivamente ao pré-treinamento.
 
-**3. Restrição computacional e cobertura desigual.** O experimento foi conduzido em infraestrutura de GPU de acesso gratuito, com cota limitada. Em consequência, a comparação principal repousa majoritariamente sobre execução única, ao passo que as ablações dispõem de duas *seeds* por braço. **A estabilidade das estratégias frente à inicialização dos pesos não foi medida, e não é reivindicada**; a inferência é sustentada pelo teste pareado de McNemar, cuja evidência provém das 10.000 predições do conjunto de teste, e pela estimativa de ruído de treinamento apresentada no protocolo.
+**3. Restrição computacional e cobertura desigual.** O experimento foi conduzido em infraestrutura de GPU de acesso gratuito, com cota limitada. Em consequência, a cobertura entre estratégias é desigual (três execuções para a Estratégia 5, duas para a Estratégia 3, uma para as demais). **A estabilidade das Estratégias 1, 2 e 4 frente à inicialização dos pesos não foi medida, e não é reivindicada**; a inferência é sustentada pelo teste pareado de McNemar, cuja evidência provém das 10.000 predições do conjunto de teste, e pela estimativa de ruído de treinamento apresentada no protocolo.
 
 **4. Seleção de modelo interna a cada fase.** A parada antecipada seleciona o melhor modelo **dentro** de cada uma das duas fases de treinamento (cabeça congelada; descongelamento do bloco superior), e não **globalmente entre elas**. O delineamento pressupõe, portanto, que a fase 2 aprimore o resultado da fase 1 — pressuposto válido em vinte e seis das vinte e sete execuções de ajuste fino conduzidas, e violado em uma (SGD, *seed* 7), conforme documentado na investigação 4(b). A correção é direta e está registrada como trabalho futuro; sua ausência afeta apenas execuções cuja fase 2 degrada o modelo, e o faz na direção conservadora.
 
@@ -51,7 +53,7 @@ Quatro fatores limitam a interpretação dos resultados. Todos são declarados a
 <!-- BEGIN GENERATED: main-table -->
 | Estratégia | Configuração | Acurácia (teste) | IC 95% | Macro-F1 | Resolução | Parâmetros treináveis | Treino |
 |---|---|---|---|---|---|---|---|
-| 5 — Ajuste fino de ViT | `vit_base_patch16_224_in21k` | **0,9825** | 0,9797–0,9849 | 0,9825 | 224px | 85.806.346 | 6,7 min |
+| 5 — Ajuste fino de ViT | `vit_base_patch16_224_in21k` | **0,9818 ± 0,0006** | 0,9785–0,9849 | 0,9818 ± 0,0007 | 224px | 85.806.346 | 6,8 min |
 | 4 — Ajuste fino + aumento de dados | `mobilenetv2_gap_flip_crop` | **0,8650** | 0,8582–0,8716 | 0,8650 | 128px | 2.171.722 | 8,6 min |
 | 3 — Ajuste fino | `mobilenetv2_gap` | **0,8576 ± 0,0025** | 0,8488–0,8660 | 0,8575 ± 0,0024 | 128px | 2.171.722 | 3,3 min |
 | 2 — Extração de características | `mobilenetv2_svm` | **0,8522** | 0,8451–0,8590 | 0,8524 | 128px | 0 | 0,6 min |
@@ -109,7 +111,7 @@ Cabe destacar que o notebook da disciplina **congela o backbone e nunca o descon
 <!-- BEGIN GENERATED: cost -->
 | Estratégia | Acurácia | Treino | pp acima da CNN do zero | pp por minuto |
 |---|---|---|---|---|
-| 5 — Ajuste fino de ViT | 0,9825 | 6,7 min | +21,89 pp | +3,25 |
+| 5 — Ajuste fino de ViT | 0,9818 | 6,8 min | +21,82 pp | +3,20 |
 | 4 — Ajuste fino + aumento de dados | 0,8650 | 8,6 min | +10,14 pp | +1,18 |
 | 3 — Ajuste fino | 0,8576 | 3,3 min | +9,40 pp | +2,86 |
 | 2 — Extração de características | 0,8522 | 0,6 min | +8,86 pp | +14,45 |
