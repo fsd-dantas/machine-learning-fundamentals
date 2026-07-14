@@ -125,19 +125,49 @@ def fmt(mean: float, std: float | None) -> str:
     return f"{mean:.4f}" if std is None else f"{mean:.4f} ± {std:.4f}"
 
 
-def best_per_strategy(rows: list[dict]) -> list[dict]:
-    """The strongest configuration of each strategy — the headline comparison.
+CANONICAL = {
+    "s1_scratch": "cnn_scratch",
+    "s2_features": "mobilenetv2_svm",
+    "s3_finetune": "mobilenetv2_gap",
+    "s4_augment": "mobilenetv2_gap_flip_crop",
+    "s5_vit": "vit_base_patch16_224_in21k",
+}
+"""The one configuration that *represents* each strategy in the headline comparison.
 
-    Ranked by mean test accuracy. This is a *reporting* choice, not a tuning one: the
-    configurations were selected on validation data, and each was scored on the test
-    set exactly once.
+Not the best-scoring one. Taking the maximum over every run of a strategy quietly folds
+the ablation arms into the main table: once the backbone ablation ran, `resnet50_svm`
+became the top `s2_features` run, and Strategy 2 silently changed from MobileNetV2 to
+ResNet50 — so the table then compared *ResNet50, frozen* against *MobileNetV2,
+fine-tuned*, moving two variables at once and dissolving the controlled comparison that
+strategies 2-4 exist to make (a shared MobileNetV2 backbone, one thing changing per step).
+
+The ablation arms belong in their ablation tables, where the variable they move is the
+one under study. Here, every strategy is pinned to the configuration the protocol
+declared for it.
+"""
+
+
+def best_per_strategy(rows: list[dict]) -> list[dict]:
+    """Each strategy at its canonical configuration, ranked by accuracy.
+
+    Falls back to the strategy's best run only if the canonical label is absent — which
+    means the core stage has not run, and the table is provisional anyway.
     """
-    best: dict[str, dict] = {}
+    chosen: dict[str, dict] = {}
     for row in rows:
-        current = best.get(row["strategy"])
-        if current is None or row["accuracy_mean"] > current["accuracy_mean"]:
-            best[row["strategy"]] = row
-    return sorted(best.values(), key=lambda r: r["accuracy_mean"], reverse=True)
+        strategy = row["strategy"]
+        if row["label"] == CANONICAL.get(strategy):
+            chosen[strategy] = row
+        elif strategy not in chosen:
+            chosen.setdefault(f"__fallback__{strategy}", row)
+
+    for key in [k for k in chosen if k.startswith("__fallback__")]:
+        strategy = key.removeprefix("__fallback__")
+        if strategy not in chosen:
+            chosen[strategy] = chosen[key]
+        del chosen[key]
+
+    return sorted(chosen.values(), key=lambda r: r["accuracy_mean"], reverse=True)
 
 
 def table_main(rows: list[dict], runs: list[dict], lang: str) -> str:
