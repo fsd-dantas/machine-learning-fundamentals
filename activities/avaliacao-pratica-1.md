@@ -294,13 +294,23 @@ accuracy did not arrive. An accuracy ranking cannot show this.*
 ### Q4(b) — Optimiser
 
 <!-- BEGIN GENERATED: ablation-optimizer -->
-_(no results for `optimizer_*` — run the corresponding ablation)_
+| Optimiser | Accuracy (mean ± sd, 2 seeds) | Δ vs. best | Macro-F1 | Training |
+|---|---|---|---|---|
+| `adamw` | 0.8660 ± 0.0013 | +0.00 pp | 0.8659 | 12.7 min |
+| `adam` | 0.8652 ± 0.0034 | -0.09 pp | 0.8648 | 13.4 min |
+| `rmsprop` | 0.8638 ± 0.0027 | -0.22 pp | 0.8637 | 12.7 min |
+| `sgd` | 0.8349 ± 0.0380 | -3.12 pp | 0.8351 | 11.1 min |
 <!-- END GENERATED: ablation-optimizer -->
 
 ### Q4(c) — Augmentation policy
 
 <!-- BEGIN GENERATED: ablation-policy -->
-_(no results for `policy_*` — run the corresponding ablation)_
+| Augmentation policy | Accuracy (mean ± sd, 2 seeds) | Δ vs. best | Macro-F1 | Training |
+|---|---|---|---|---|
+| `strong` | 0.8678 ± 0.0010 | +0.00 pp | 0.8672 | 20.7 min |
+| `lecture` | 0.8676 ± 0.0014 | -0.02 pp | 0.8672 | 21.0 min |
+| `flip_crop` | 0.8653 ± 0.0004 | -0.25 pp | 0.8649 | 11.5 min |
+| `flip` | 0.8590 ± 0.0028 | -0.88 pp | 0.8585 | 6.3 min |
 <!-- END GENERATED: ablation-policy -->
 
 ---
