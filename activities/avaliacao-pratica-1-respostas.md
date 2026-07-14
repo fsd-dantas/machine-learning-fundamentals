@@ -18,15 +18,15 @@ Foram avaliadas cinco estratégias de classificação sobre a base **CIFAR-10** 
 
 **Isolamento do conjunto de teste.** A arquitetura, o número de épocas e a parada antecipada foram selecionados exclusivamente sobre o conjunto de validação. O conjunto de teste produziu exatamente um número por configuração: não houve seleção de época, de limiar ou de configuração com base no teste.
 
-**Dispersão.** A cota de GPU gratuita esgotou-se durante a execução, e as *seeds* adicionais da comparação principal foram sacrificadas em favor das ablações, que são o objeto das questões em aberto. O resultado é uma cobertura **desigual**, declarada aqui em vez de uniformizada: as Estratégias 1, 2, 4 e 5 são reportadas a partir de **uma única execução** (*seed* 42); a Estratégia 3 dispõe de **duas** (42 e 7), herdadas da ablação de cabeça (questão 4a), e por isso é a única linha da tabela principal que exibe desvio-padrão. As ablações 2(a) e 4(a) seguem cada qual sua própria cobertura, indicada em suas tabelas.
+**Cobertura experimental.** A comparação principal entre estratégias é reportada em **execução única** (*seed* 42), à exceção da Estratégia 3, para a qual há **duas execuções** (*seeds* 42 e 7). A ablação da questão 4(a) dispõe de duas *seeds* por braço; a da questão 2(a), de uma. Essa cobertura desigual decorre da restrição computacional documentada na seção *Limitações do Delineamento*, e é reportada tal como é: **o desvio-padrão é omitido onde não foi medido**, jamais substituído por zero.
 
-O relatório **omite o desvio-padrão onde ele não foi medido**, em vez de imprimir um zero fabricado. As comparações entre estratégias são, por isso, sustentadas pelo **teste exato de McNemar sobre predições pareadas** — que não requer repetição, pois extrai sua evidência das concordâncias e discordâncias das 10.000 predições do próprio conjunto de teste —, e não pela dispersão entre execuções. A *seed* altera a inicialização dos pesos e a amostragem do aumento de dados, jamais os dados: a subamostra é fixada por um gerador independente.
+A validade das comparações não repousa, contudo, sobre a repetição. Ela repousa sobre o **teste exato de McNemar aplicado a predições pareadas**: como todos os modelos são avaliados sobre as **mesmas** 10.000 imagens, seus erros são pareados por construção, e a evidência é extraída das concordâncias e discordâncias entre eles — não da variância entre execuções. A *seed* altera a inicialização dos pesos e a amostragem do aumento de dados, jamais os dados: a subamostra é fixada por um gerador independente.
 
-**Réplica acidental, e o que ela revela.** A Estratégia 3 na *seed* 42 foi treinada **duas vezes** com configuração idêntica — uma na etapa principal, outra como braço da ablação de cabeça —, e obteve **0,8512** e **0,8558**: uma variação de **0,46 ponto percentual entre treinamentos rigorosamente idênticos**, atribuível ao não-determinismo dos núcleos cuDNN em GPU. Esse valor é da **mesma ordem de grandeza das diferenças que separam as Estratégias 2, 3 e 4**, e constitui evidência direta de que comparações baseadas em uma única execução, sem teste estatístico pareado, não são confiáveis neste experimento. O relatório reporta o artefato mais recente e preserva o anterior no histórico do repositório.
+**Variabilidade entre execuções idênticas.** A Estratégia 3, na *seed* 42, foi treinada duas vezes sob configuração rigorosamente idêntica, obtendo **0,8512** e **0,8558**. A diferença de **0,46 ponto percentual** decorre do não-determinismo dos núcleos cuDNN em GPU e fornece uma **estimativa empírica do ruído de treinamento** neste experimento. Trata-se de valor da mesma ordem de grandeza das diferenças que separam as Estratégias 2, 3 e 4, o que estabelece um piso de resolução para qualquer comparação entre elas — e justifica que os vereditos sejam emitidos por teste estatístico pareado, e não por leitura direta das acurácias.
 
 **Inferência estatística.** Para o par de melhores modelos aplicou-se o **teste exato de McNemar** sobre as predições pareadas do conjunto de teste. Este é o teste adequado ao delineamento — e não o teste de Wilcoxon sobre dobras, empregado na Atividade 1 —, pois ambos os modelos são avaliados sobre **as mesmas** 10.000 imagens: os erros são, por construção, pareados, e apenas as predições discordantes carregam informação. Reporta-se ainda o intervalo de confiança de Wilson (95%) para a acurácia; sobre 10.000 amostras, sua semiamplitude é de aproximadamente ±0,6 ponto percentual em torno de 90% de acurácia, o que estabelece o **limite de resolução de qualquer afirmação deste relatório**.
 
-**Escopo da comparação.** Não houve busca sistemática de hiperparâmetros: as configurações seguem as práticas correntes de cada estratégia (taxas de aprendizado padrão, parada antecipada sobre a acurácia de validação). As conclusões referem-se à comparação dessas configurações, não à superioridade intrínseca dos métodos. As ablações das questões em aberto isolam uma única variável por vez, mantendo dados, cronograma e *seeds* fixos.
+**Escopo da comparação.** Não houve busca sistemática de hiperparâmetros: as configurações seguem as práticas correntes de cada estratégia (taxas de aprendizado padrão, parada antecipada sobre a acurácia de validação). As conclusões referem-se à comparação dessas configurações, não à superioridade intrínseca dos métodos. As ablações das investigações complementares isolam uma única variável por vez, mantendo dados, cronograma e *seeds* fixos.
 
 **Ambiente.** Kaggle Notebooks, duas GPUs NVIDIA T4 em execução paralela, precisão mista (`mixed_float16`); TensorFlow/Keras nas estratégias 1–4 e PyTorch/HuggingFace na estratégia 5. Os *splits* são materializados em disco e lidos por ambos os frameworks, o que garante que as estratégias vejam dados byte a byte idênticos independentemente do framework utilizado.
 
@@ -40,7 +40,7 @@ Três fatores confundem a comparação entre as cinco estratégias. Todos são d
 
 **2. A resolução de entrada não é constante entre as estratégias.** A CNN treinada do zero opera em 32×32 — a resolução nativa das imagens —, enquanto as demais operam em 128×128 (ou 224×224, no caso do ViT), pois as redes pré-treinadas exigem entradas compatíveis com suas estatísticas de origem. Essa diferença é **inerente à natureza das estratégias comparadas**, e não um descuido: ampliar as imagens para treinar uma rede do zero apenas interpolaria pixels, sem acrescentar informação, ao custo de mais computação. Ainda assim, ela impede atribuir a diferença de desempenho exclusivamente ao pré-treinamento.
 
-**3. A tabela principal repousa sobre uma única execução por estratégia.** O esgotamento da cota de GPU gratuita durante a execução impôs uma escolha entre repetir a comparação principal em múltiplas *seeds* ou executar as ablações que respondem às questões em aberto. Optou-se pelas ablações. A consequência é que as linhas da tabela principal não trazem desvio-padrão — omitido, e não fabricado. O impacto sobre a validade é atenuado pelo fato de as comparações serem decididas por **McNemar sobre predições pareadas**, cuja evidência provém das 10.000 predições do conjunto de teste e não da repetição entre execuções; ainda assim, a estabilidade das estratégias frente à inicialização dos pesos **não foi medida**, e não é reivindicada.
+**3. Restrição computacional.** O experimento foi conduzido em infraestrutura de GPU de acesso gratuito, com cota limitada. Duas consequências decorrem disso, ambas reportadas sem atenuação. Primeira: a comparação principal repousa majoritariamente sobre execução única, de modo que **a estabilidade das estratégias frente à inicialização dos pesos não foi medida, e não é reivindicada** — mitigada, porém, pelo uso de teste pareado e pela estimativa de ruído de treinamento apresentada no protocolo. Segunda: **as ablações das questões 4(b) e 4(c) não foram conduzidas**, por exigirem dezesseis treinamentos adicionais da Estratégia 4. O protocolo, os scripts e o procedimento de execução dessas ablações estão integralmente disponíveis no repositório, e sua realização é reprodutível por terceiros sem qualquer adaptação.
 
 ---
 
@@ -148,20 +148,22 @@ A estrutura do erro é, portanto, **compatível com a hipótese** de que o que r
 
 ---
 
-## Questões em Aberto do Enunciado
+## Investigações Complementares
 
-*“Questões em aberto” designa aqui as perguntas formuladas pelo professor no enunciado, e não questões sem resposta. O estado de cada uma é declarado abaixo.*
+O enunciado formula quatro questões de investigação. Duas foram conduzidas e respondidas; duas não foram conduzidas, pela restrição computacional documentada na seção anterior.
 
-| Questão | Estado | Resposta sintética |
+| Questão | Evidência | Conclusão |
 |---|---|---|
-| **2(a)** Trocar a CNN por uma mais simples (MobileNet) impacta significativamente? | ✅ **Respondida** — 6 configurações, 1 *seed* | **Sim: custa 2,39 pp** frente à ResNet50 (p = 4×10⁻¹⁰). Porém a InceptionV3, a mais cara das três, é a **pior** — capacidade não prediz qualidade de transferência. |
-| **4(a)** Substituir `Flatten()` por `GlobalMaxPooling2D()` impacta significativamente? | ✅ **Respondida** — 3 configurações, 2 *seeds* | **Sim, e melhora: +1,19 pp** (p = 9×10⁻⁵). O melhor braço, contudo, é o `GlobalAveragePooling2D()`, em empate técnico com o máximo. |
-| **4(b)** Substituir o otimizador (`Adam()`) pode melhorar? | ⏳ **Não executada** | — |
-| **4(c)** Outras estratégias de aumento de dados podem melhorar? | ⏳ **Não executada** | — |
+| **2(a)** Trocar a CNN por uma mais simples (MobileNet) impacta significativamente o resultado? | 6 configurações (3 backbones × 2 classificadores), 1 *seed* | **Sim.** A adoção da MobileNetV2 custa **2,39 pp** de acurácia frente à ResNet50 (p = 4×10⁻¹⁰). A InceptionV3, contudo, a mais custosa das três, é a de pior desempenho: **capacidade não prediz qualidade de transferência**. |
+| **4(a)** Substituir `Flatten()` por `GlobalMaxPooling2D()` impacta significativamente o resultado? | 3 configurações, 2 *seeds* por braço | **Sim, e favoravelmente:** +1,19 pp (p = 9×10⁻⁵). O melhor braço, porém, é o `GlobalAveragePooling2D()`, em empate técnico com o máximo — o mérito é do **agrupamento global** como classe de operação. |
+| **4(b)** Substituir o otimizador (`Adam()`) pode melhorar o resultado? | Ablação não conduzida | Sem conclusão. Ver *Limitações do Delineamento*, item 3. |
+| **4(c)** Outras estratégias de aumento de dados podem melhorar o resultado? | Ablação não conduzida | Sem conclusão. Ver *Limitações do Delineamento*, item 3. |
 
-> **Sobre as questões não executadas.** As ablações 4(b) e 4(c) exigem dezesseis treinamentos adicionais da Estratégia 4, que não couberam na cota de GPU gratuita disponível dentro do prazo de entrega. Nenhum valor é estimado, inferido ou reportado sem o artefato correspondente em [`results/`](https://github.com/fsd-dantas/machine-learning-fundamentals/tree/main/activities/avaliacao-pratica-1/results): **uma tabela ausente significa que o experimento não foi realizado — e não que seu resultado tenha sido desfavorável.**
+Nenhum valor é estimado, inferido ou reportado sem o artefato correspondente em [`results/`](https://github.com/fsd-dantas/machine-learning-fundamentals/tree/main/activities/avaliacao-pratica-1/results). **A ausência de uma tabela indica que o experimento não foi conduzido — e não que seu resultado tenha sido desfavorável.**
 
 ### 2(a) — Trocar a rede CNN por uma mais simples, como a MobileNet, impacta significativamente o resultado?
+
+*Investigação conduzida. Seis configurações, uma* seed.
 
 <!-- BEGIN GENERATED: ablation-backbone -->
 | Backbone + classificador | Acurácia (média ± dp, 1 seeds) | Δ vs. melhor | Macro-F1 | Treino |
@@ -180,11 +182,13 @@ A estrutura do erro é, portanto, **compatível com a hipótese** de que o que r
 
 **Contudo, o resultado mais informativo é a InceptionV3.** Com 23,9 milhões de parâmetros e 11,5 GFLOPs — a mais cara das três — ela obtém **0,7867**, ficando **9 pontos percentuais abaixo da ResNet50** e **6,5 pontos abaixo da MobileNetV2**, que tem sete vezes menos parâmetros. **Capacidade não prediz qualidade de transferência.** A hipótese mais plausível para o fenômeno é arquitetural: a InceptionV3 foi projetada para entradas de 299×299 pixels e realiza subamostragem agressiva nas camadas iniciais; a 128×128, seu mapa de características final degrada-se a uma resolução espacial insuficiente. Registre-se que isso constitui uma **limitação da ablação**, e não uma propriedade intrínseca da rede: as três operam a 128 px por exigência do orçamento computacional, e essa resolução é nativa para a MobileNetV2, tolerável para a ResNet50 e adversa para a InceptionV3. A comparação é, nesse sentido, *justa quanto ao protocolo, porém não neutra quanto à arquitetura* — e esse desequilíbrio é declarado, não omitido.
 
-**Limitação desta ablação: uma única *seed*.** As seis configurações foram executadas apenas na *seed* 42. O teste de McNemar sustenta que, **para aquelas predições**, a ResNet50 supera a MobileNetV2 de modo não atribuível ao acaso amostral do conjunto de teste — mas ele **não mede a estabilidade da conclusão frente à aleatoriedade do treinamento**. A réplica acidental documentada na seção de protocolo mostra que treinos idênticos variam ~0,46 pp; a margem aqui observada (2,39 pp) é cerca de cinco vezes maior que essa variação, o que torna a inversão do ranking improvável, porém **não medida**. A ordenação entre ResNet50 e MobileNetV2 é reportada como **provável**, não como estabelecida.
+**Limitação desta ablação: uma única *seed*.** As seis configurações foram executadas apenas na *seed* 42. O teste de McNemar sustenta que, **para aquelas predições**, a ResNet50 supera a MobileNetV2 de modo não atribuível ao acaso amostral do conjunto de teste — mas ele **não mede a estabilidade da conclusão frente à aleatoriedade do treinamento**. A estimativa de ruído de treinamento apresentada no protocolo (0,46 pp entre execuções idênticas) situa a margem aqui observada (2,39 pp) em cerca de cinco vezes essa variação, o que torna improvável — porém **não medida** — a inversão do ordenamento. A ordenação entre ResNet50 e MobileNetV2 é reportada como **provável**, não como estabelecida.
 
 **A SVM supera o MLP em todos os três backbones** (+2,4 pp, +1,3 pp e +0,7 pp), sem exceção. Sobre características profundas já linearmente separáveis, a margem máxima de um classificador convexo é preferível à capacidade adicional de uma rede rasa treinada por gradiente sobre 10.000 exemplos — o mesmo padrão observado na Atividade 1, em que a regressão logística superou todos os *ensembles*.
 
 ### 4(a) — Substituir o `Flatten()` por `GlobalMaxPooling2D()` impacta significativamente o resultado?
+
+*Investigação conduzida. Três configurações, duas* seeds.
 
 <!-- BEGIN GENERATED: ablation-head -->
 | Cabeça (pooling) | Acurácia (média ± dp, 2 seeds) | Δ vs. melhor | Macro-F1 | Treino |
@@ -214,19 +218,25 @@ Cabe registrar que **o notebook da disciplina utiliza `Flatten()`** — e que a 
 
 ### 4(b) — Substituir o algoritmo otimizador (`Adam()`) pode melhorar o resultado?
 
+*Investigação não conduzida.*
+
 <!-- BEGIN GENERATED: ablation-optimizer -->
 _(sem resultados para `optimizer_*` — execute a ablação correspondente)_
 <!-- END GENERATED: ablation-optimizer -->
 
-*Adam, AdamW, SGD com momento de Nesterov e RMSprop. O SGD recebe taxa de aprendizado dez vezes maior, pois comparar otimizadores sob uma taxa calibrada para o Adam não constitui experimento, mas disputa viciada.*
+**Ablação não conduzida.** A comparação prevista — Adam, AdamW, SGD com momento de Nesterov e RMSprop, sob a política de aumento de dados fixada e duas *seeds* por braço — exige oito treinamentos da Estratégia 4, inviáveis na cota de GPU disponível (ver *Limitações do Delineamento*, item 3). O delineamento é preservado no repositório e executável por [`s4_augmentation.py --ablation-optimizer`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/s4_augmentation.py); ao SGD atribui-se taxa de aprendizado dez vezes maior, pois comparar otimizadores sob taxa calibrada para o Adam não constitui experimento controlado.
 
 ### 4(c) — Avaliar outras estratégias de aumento de dados pode melhorar o resultado?
+
+*Investigação não conduzida.*
 
 <!-- BEGIN GENERATED: ablation-policy -->
 _(sem resultados para `policy_*` — execute a ablação correspondente)_
 <!-- END GENERATED: ablation-policy -->
 
-*Quatro políticas, incluindo a do notebook da disciplina (`rotation 10°, zoom 0.15, shift 0.1`). Cabe notar o que essa política **omite**: o espelhamento horizontal — sobre o CIFAR-10, a transformação mais eficaz e mais evidentemente preservadora de rótulo disponível (um caminhão espelhado continua sendo um caminhão). O espelhamento vertical é deliberadamente excluído de todas as políticas: um cavalo de cabeça para baixo não é uma imagem natural, e o conjunto de teste não contém nenhuma, de modo que treinar sobre tais exemplos apenas acrescentaria ruído.*
+**Ablação não conduzida**, pelas razões expostas no item anterior. O delineamento previa quatro políticas — incluindo a do notebook da disciplina (`rotation 10°, zoom 0.15, shift 0.1`) — e é executável por [`s4_augmentation.py --ablation-policy`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/s4_augmentation.py).
+
+Cabe registrar, ainda assim, a observação que motivou a inclusão dessa ablação: **a política do notebook da disciplina omite o espelhamento horizontal** — sobre o CIFAR-10, a transformação mais eficaz e mais evidentemente preservadora de rótulo disponível, dado que um caminhão espelhado permanece um caminhão. O espelhamento **vertical**, por sua vez, é deliberadamente excluído de todas as políticas previstas: um cavalo de cabeça para baixo não constitui imagem natural, e o conjunto de teste não contém nenhuma.
 
 ---
 
