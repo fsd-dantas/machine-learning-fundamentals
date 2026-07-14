@@ -2,7 +2,6 @@
 
 > **Disciplina:** Aprendizagem de Máquina · PPGIA / PUC-PR · Mestrado 2026
 > **Aluno:** Fernando Dantas
-> **Versão:** preliminar. As investigações complementares 4(b) e 4(c) encontravam-se **em execução no momento da exportação deste documento**; seus resultados serão incorporados à versão final.
 > **Reprodutibilidade:** todos os valores foram gerados pelos scripts listados na seção *Scripts* (*seed* primária 42); o relatório é regenerado a partir dos artefatos de resultado por [`report.py`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/report.py).
 
 ---
@@ -35,13 +34,15 @@ A validade das comparações não repousa, contudo, sobre a repetição. Ela rep
 
 ## Limitações do Delineamento
 
-Três fatores confundem a comparação entre as cinco estratégias. Todos são declarados aqui, antes dos resultados, porque nenhum deles é corrigível dentro do orçamento disponível — e um relatório que os omitisse atribuiria a causas erradas os efeitos que observa.
+Quatro fatores limitam a interpretação dos resultados. Todos são declarados aqui, antes dos resultados, porque nenhum deles é corrigível dentro do orçamento disponível — e um relatório que os omitisse atribuiria a causas erradas os efeitos que observa.
 
 **1. O ViT não enfrenta um problema novo.** O ViT-B/16 foi pré-treinado na **ImageNet-21k**, cujo conjunto de classes contém categorias que coincidem, em substância, com as do CIFAR-10 — avião, automóvel, pássaro, gato, cervo, cão, sapo, cavalo, navio e caminhão são todas categorias amplamente representadas na ImageNet. O modelo, portanto, **não generaliza para um domínio inédito: ele reconhece categorias que já viu durante o pré-treinamento**, em resolução muito superior e com ordens de magnitude mais exemplos. Sua acurácia deve ser lida como um limite superior de transferência sob condições excepcionalmente favoráveis, e **não** como evidência de superioridade intrínseca da arquitetura *transformer* sobre a convolucional. As redes convolucionais pré-treinadas (estratégias 2 a 4) compartilham essa vantagem, porém em grau menor: foram pré-treinadas na ImageNet-1k, cerca de quatorze vezes menor.
 
 **2. A resolução de entrada não é constante entre as estratégias.** A CNN treinada do zero opera em 32×32 — a resolução nativa das imagens —, enquanto as demais operam em 128×128 (ou 224×224, no caso do ViT), pois as redes pré-treinadas exigem entradas compatíveis com suas estatísticas de origem. Essa diferença é **inerente à natureza das estratégias comparadas**, e não um descuido: ampliar as imagens para treinar uma rede do zero apenas interpolaria pixels, sem acrescentar informação, ao custo de mais computação. Ainda assim, ela impede atribuir a diferença de desempenho exclusivamente ao pré-treinamento.
 
-**3. Restrição computacional.** O experimento foi conduzido em infraestrutura de GPU de acesso gratuito, com cota limitada. Duas consequências decorrem disso, ambas reportadas sem atenuação. Primeira: a comparação principal repousa majoritariamente sobre execução única, de modo que **a estabilidade das estratégias frente à inicialização dos pesos não foi medida, e não é reivindicada** — mitigada, porém, pelo uso de teste pareado e pela estimativa de ruído de treinamento apresentada no protocolo. Segunda: as ablações das investigações 4(b) e 4(c) exigem dezesseis treinamentos adicionais da Estratégia 4 e, por essa razão, **encontravam-se em execução no momento da exportação desta versão do relatório, sem resultados consolidados até aqui**. O protocolo, os scripts e o procedimento de execução estão integralmente disponíveis no repositório; os resultados serão incorporados à versão final.
+**3. Restrição computacional e cobertura desigual.** O experimento foi conduzido em infraestrutura de GPU de acesso gratuito, com cota limitada. Em consequência, a comparação principal repousa majoritariamente sobre execução única, ao passo que as ablações dispõem de duas *seeds* por braço. **A estabilidade das estratégias frente à inicialização dos pesos não foi medida, e não é reivindicada**; a inferência é sustentada pelo teste pareado de McNemar, cuja evidência provém das 10.000 predições do conjunto de teste, e pela estimativa de ruído de treinamento apresentada no protocolo.
+
+**4. Seleção de modelo interna a cada fase.** A parada antecipada seleciona o melhor modelo **dentro** de cada uma das duas fases de treinamento (cabeça congelada; descongelamento do bloco superior), e não **globalmente entre elas**. O delineamento pressupõe, portanto, que a fase 2 aprimore o resultado da fase 1 — pressuposto válido em vinte e seis das vinte e sete execuções de ajuste fino conduzidas, e violado em uma (SGD, *seed* 7), conforme documentado na investigação 4(b). A correção é direta e está registrada como trabalho futuro; sua ausência afeta apenas execuções cuja fase 2 degrada o modelo, e o faz na direção conservadora.
 
 ---
 
@@ -151,14 +152,14 @@ A estrutura do erro é, portanto, **compatível com a hipótese** de que o que r
 
 ## Investigações Complementares
 
-O enunciado formula quatro questões de investigação. Duas foram conduzidas e respondidas. As duas restantes encontravam-se **em execução no momento da exportação desta versão do relatório**, sem resultados consolidados até aqui; seus delineamentos são apresentados adiante e seus resultados serão incorporados à versão final.
+O enunciado formula quatro questões de investigação. **Todas foram conduzidas e respondidas.** As conclusões sintéticas são apresentadas a seguir; cada seção subsequente detalha o delineamento, os resultados e os testes de significância.
 
 | Questão | Evidência | Conclusão |
 |---|---|---|
 | **2(a)** Trocar a CNN por uma mais simples (MobileNet) impacta significativamente o resultado? | 6 configurações (3 backbones × 2 classificadores), 1 *seed* | **Sim.** A adoção da MobileNetV2 custa **2,39 pp** de acurácia frente à ResNet50 (p = 4×10⁻¹⁰). A InceptionV3, contudo, a mais custosa das três, é a de pior desempenho: **capacidade não prediz qualidade de transferência**. |
 | **4(a)** Substituir `Flatten()` por `GlobalMaxPooling2D()` impacta significativamente o resultado? | 3 configurações, 2 *seeds* por braço | **Sim, e favoravelmente:** +1,19 pp (p = 9×10⁻⁵). O melhor braço, porém, é o `GlobalAveragePooling2D()`, em empate técnico com o máximo — o mérito é do **agrupamento global** como classe de operação. |
-| **4(b)** Substituir o otimizador (`Adam()`) pode melhorar o resultado? | Ablação em execução (8 treinamentos) | Sem resultados consolidados nesta versão. |
-| **4(c)** Outras estratégias de aumento de dados podem melhorar o resultado? | Ablação em execução (8 treinamentos) | Sem resultados consolidados nesta versão. |
+| **4(b)** Substituir o otimizador (`Adam()`) pode melhorar o resultado? | 4 otimizadores × 2 *seeds* | **Não.** Nenhum supera o Adam significativamente (AdamW: +0,08 pp; p = 0,087). O achado está na dispersão: o SGD varia **5,4 pp** entre *seeds* — 29× o desvio do AdamW. |
+| **4(c)** Outras estratégias de aumento de dados podem melhorar o resultado? | 4 políticas × 2 *seeds* | **Sim, mas não como previsto.** A política da disciplina empata com a melhor; o espelhamento horizontal isolado é a **pior**. A hipótese registrada por este relatório foi **refutada**. |
 
 Nenhum valor é estimado, inferido ou reportado sem o artefato correspondente em [`results/`](https://github.com/fsd-dantas/machine-learning-fundamentals/tree/main/activities/avaliacao-pratica-1/results). **A ausência de uma tabela indica que o experimento não foi conduzido — e não que seu resultado tenha sido desfavorável.**
 
@@ -219,25 +220,69 @@ Cabe registrar que **o notebook da disciplina utiliza `Flatten()`** — e que a 
 
 ### 4(b) — Substituir o algoritmo otimizador (`Adam()`) pode melhorar o resultado?
 
-*Investigação em execução no momento da exportação desta versão.*
+*Investigação conduzida. Quatro otimizadores, duas* seeds *por braço.*
 
 <!-- BEGIN GENERATED: ablation-optimizer -->
-_(sem resultados para `optimizer_*` — execute a ablação correspondente)_
+| Otimizador | Acurácia (média ± dp, 2 seeds) | Δ vs. melhor | Macro-F1 | Treino |
+|---|---|---|---|---|
+| `adamw` | 0,8660 ± 0,0013 | +0,00 pp | 0,8659 | 12,7 min |
+| `adam` | 0,8652 ± 0,0034 | -0,09 pp | 0,8648 | 13,4 min |
+| `rmsprop` | 0,8638 ± 0,0027 | -0,22 pp | 0,8637 | 12,7 min |
+| `sgd` | 0,8349 ± 0,0380 | -3,12 pp | 0,8351 | 11,1 min |
 <!-- END GENERATED: ablation-optimizer -->
 
-**Ablação em execução; sem resultados consolidados nesta versão.** A comparação delineada confronta Adam, AdamW, SGD com momento de Nesterov e RMSprop, sob política de aumento de dados fixada e duas *seeds* por braço — oito treinamentos da Estratégia 4, em curso no momento da exportação deste documento. O delineamento é [`s4_augmentation.py --ablation-optimizer`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/s4_augmentation.py); ao SGD atribui-se taxa de aprendizado dez vezes maior, pois comparar otimizadores sob taxa calibrada para o Adam não constitui experimento controlado.
+**Resposta: não. Nenhum otimizador supera o Adam de modo estatisticamente significativo.** O AdamW obtém a maior média (0,8660 contra 0,8652 do Adam), mas a diferença de **0,08 ponto percentual** é inferior a um quinto do ruído de treinamento medido (0,46 pp), e o teste exato de McNemar não a distingue de zero (p = 0,087). O RMSprop fica 0,14 pp abaixo do Adam. **A configuração padrão do enunciado já é adequada**, e a substituição do otimizador não constitui via de melhoria neste delineamento.
+
+**O resultado informativo desta ablação não está nas médias, e sim na dispersão.**
+
+| Otimizador | Média (2 *seeds*) | Desvio-padrão | Razão vs. AdamW |
+|---|---|---|---|
+| AdamW | 0,8660 | **± 0,0013** | 1× |
+| Adam | 0,8652 | ± 0,0034 | 2,6× |
+| RMSprop | 0,8638 | ± 0,0027 | 2,1× |
+| **SGD + Nesterov** | 0,8349 | **± 0,0380** | **29×** |
+
+O SGD produziu **0,8617** em uma *seed* e **0,8080** na outra — **5,4 pontos percentuais de diferença entre execuções que variam apenas na inicialização dos pesos**. Sua dispersão é vinte e nove vezes a do AdamW. A resposta útil à questão não é, portanto, que o SGD seja pior *em média*, mas que ele é **inconfiável neste regime**: uma execução única do SGD tem probabilidade não desprezível de produzir um resultado catastroficamente inferior, e nenhum protocolo baseado em execução única seria capaz de detectá-lo.
+
+**Uma limitação do delineamento, exposta por esta ablação.** A investigação da execução anômala (`sgd`, *seed* 7) revela que sua **melhor acurácia de validação ocorreu na fase 1** (época 10 de 27), isto é, **antes do descongelamento**. Todas as demais execuções desta ablação têm sua melhor época na fase 2 (Adam: 22 e 25; AdamW: 25 e 24; RMSprop: 21 e 24). Como a parada antecipada seleciona o melhor modelo **dentro de cada fase**, e não globalmente entre as duas, o protocolo reportou o modelo da fase 2 — inferior, neste caso, ao que a fase 1 havia produzido.
+
+Trata-se de um pressuposto implícito do delineamento em duas fases: **o de que a fase 2 aprimora o resultado da fase 1**. O pressuposto é válido para os três otimizadores estáveis, e falha exatamente para o instável. A correção — seleção global de modelo entre as duas fases — é direta, e está registrada como trabalho futuro; sua ausência afeta apenas a execução anômala aqui identificada, e a afeta na direção conservadora (subestimando o SGD, não superestimando-o).
 
 ### 4(c) — Avaliar outras estratégias de aumento de dados pode melhorar o resultado?
 
-*Investigação em execução no momento da exportação desta versão.*
+*Investigação conduzida. Quatro políticas, duas* seeds *por braço.*
 
 <!-- BEGIN GENERATED: ablation-policy -->
-_(sem resultados para `policy_*` — execute a ablação correspondente)_
+| Política de aumento de dados | Acurácia (média ± dp, 2 seeds) | Δ vs. melhor | Macro-F1 | Treino |
+|---|---|---|---|---|
+| `strong` | 0,8678 ± 0,0010 | +0,00 pp | 0,8672 | 20,7 min |
+| `lecture` | 0,8676 ± 0,0014 | -0,02 pp | 0,8672 | 21,0 min |
+| `flip_crop` | 0,8653 ± 0,0004 | -0,25 pp | 0,8649 | 11,5 min |
+| `flip` | 0,8590 ± 0,0028 | -0,88 pp | 0,8585 | 6,3 min |
 <!-- END GENERATED: ablation-policy -->
 
-**Ablação em execução; sem resultados consolidados nesta versão**, nas mesmas condições do item anterior. O delineamento confronta quatro políticas — incluindo a do notebook da disciplina (`rotation 10°, zoom 0.15, shift 0.1`) — e é [`s4_augmentation.py --ablation-policy`](https://github.com/fsd-dantas/machine-learning-fundamentals/blob/main/activities/avaliacao-pratica-1/s4_augmentation.py).
+**Resposta: sim, a política importa — porém não na direção que este relatório havia previsto.**
 
-Cabe registrar a observação que motivou a inclusão dessa ablação: **a política do notebook da disciplina omite o espelhamento horizontal**, transformação reportada na literatura como das mais eficazes sobre o CIFAR-10 e cuja preservação do rótulo é assegurada pela simetria bilateral aproximada das classes envolvidas. O espelhamento **vertical** é, em contrapartida, deliberadamente excluído de todas as políticas do delineamento: a inversão vertical não preserva a verossimilhança das cenas naturais representadas na base, e o conjunto de teste não contém instâncias sob tal transformação.
+| Política | Média (2 *seeds*) | Desvio-padrão | Treino |
+|---|---|---|---|
+| `strong` (flip + rotação + zoom + deslocamento + contraste) | **0,8678** | ± 0,0010 | 20,7 min |
+| `lecture` (**a do notebook da disciplina**) | 0,8676 | ± 0,0014 | 21,0 min |
+| `flip_crop` (espelhamento + deslocamento 12,5%) | 0,8653 | ± 0,0004 | 11,5 min |
+| `flip` (apenas espelhamento horizontal) | 0,8590 | ± 0,0028 | 6,3 min |
+
+Os vereditos pareados (McNemar exato, *seed* 42) são: `lecture` supera `flip` em **+0,76 pp** com significância (p = 0,0037); `lecture` **empata tecnicamente** com `flip_crop` (p = 0,159) e com `strong` (p = 0,547).
+
+**A hipótese registrada por este relatório antes da execução foi refutada.** Na seção de desvios metodológicos afirmou-se que a política da disciplina *"deixa desempenho na mesa"* por omitir o espelhamento horizontal — transformação reportada na literatura como das mais eficazes sobre o CIFAR-10. Os dados contradizem a expectativa em dois pontos:
+
+1. **A política da disciplina figura entre as melhores**, em empate técnico com a política mais elaborada do delineamento (`strong`), que aplica cinco transformações — inclusive o espelhamento — e custa o mesmo tempo.
+2. **O espelhamento horizontal isolado é a pior política testada**, significativamente inferior à da disciplina.
+
+A explicação mais plausível reside na **diferença de regime**. A eficácia do espelhamento horizontal é estabelecida na literatura para redes convolucionais **treinadas do zero**, sobre as 50.000 imagens completas, ao longo de centenas de épocas. O regime aqui é outro: *backbone* **pré-treinado na ImageNet**, 10.000 imagens, 27 épocas, maioria dos pesos congelada. Nesse contexto, o *backbone* já incorpora invariância a espelhamento — adquirida sobre milhões de imagens que contêm objetos em ambas as orientações —, e reensiná-la não acrescenta informação, apenas consome épocas. As transformações que a política da disciplina aplica (rotação, zoom, deslocamento) atacam variações **não** cobertas pelo pré-treinamento, e é isso que as torna produtivas.
+
+**A conclusão metodológica supera, em interesse, a conclusão empírica: uma heurística validada em um regime não transfere automaticamente para outro.** É, aliás, a mesma lição que a Estratégia 3 já havia produzido — o ajuste fino, prática padrão em regimes de dados abundantes, não se justifica com 10.000 imagens. O valor de registrar a hipótese *antes* do experimento está precisamente aqui: uma previsão refutada pelos próprios dados é resultado; uma previsão jamais formulada não é coisa alguma.
+
+**Custo.** Cabe registrar que `flip_crop` atinge 99,7% da acurácia da política vencedora consumindo **metade do tempo de treinamento** (11,5 contra 20,7 minutos), e empata tecnicamente com ela. Sob restrição computacional, é a escolha racional.
+
 
 ---
 
